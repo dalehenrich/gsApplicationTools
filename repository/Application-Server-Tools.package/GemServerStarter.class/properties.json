@@ -1,0 +1,14 @@
+{
+	"category" : "Application-Server-Tools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "GemServerStarter",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

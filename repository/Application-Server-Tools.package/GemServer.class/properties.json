@@ -1,0 +1,17 @@
+{
+	"category" : "Application-Server-Tools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"name",
+		"serverClass",
+		"ports",
+		"delegate" ],
+	"name" : "GemServer",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

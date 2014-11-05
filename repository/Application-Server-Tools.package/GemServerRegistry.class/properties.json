@@ -1,0 +1,14 @@
+{
+	"category" : "Application-Server-Tools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"Singleton" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"servers" ],
+	"name" : "GemServerRegistry",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }
