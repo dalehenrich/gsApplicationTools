@@ -8,16 +8,25 @@
 Adaptor="$2"
 PORTS="$3"
 
+stonePath=$GS_HOME/gemstone/stones/$GEMSTONE_NAME
+
+# set up stone environment
+pushd $stonePath >& /dev/null
+source $stonePath/stone.env
+popd >& /dev/null
+
+toolPath=${stonePath}/tools
+
 topaz_start()
 {
     echo "Starting Server Gem...."
     for port in $PORTS; do
-        if [ -e $GEMSTONE_STONE_DIR/tools/${Adaptor}_server-${port}.pid ]; then
+        if [ -e ${toolPath}/${Adaptor}_server-${port}.pid ]; then
             echo "PID file for topaz on port $port already exists (already running?), try using the stop command first."
             continue
         fi
         echo "  Starting ${Adaptor} gem on port $port"
-        $GEMSTONE_STONE_DIR/tools/startSmalltalkServerGem $Adaptor $port >& $GEMSTONE_STONE_DIR/tools/${Adaptor}_start-${port}.log &
+        ${toolPath}/startSmalltalkServerGem $Adaptor $port >& ${toolPath}/${Adaptor}_start-${port}.log &
     done
 
 }
@@ -27,7 +36,7 @@ topaz_stop()
     echo "Stopping Gems..."
     for port in $PORTS; do
 
-        pidfile="$GEMSTONE_STONE_DIR/tools/${Adaptor}_server-${port}.pid"
+        pidfile="${toolPath}/${Adaptor}_server-${port}.pid"
 
         if [ -e $pidfile ]; then
             pid=`cat $pidfile`
@@ -66,5 +75,4 @@ case "$1" in
             echo "Usage: runem (start|stop|restart)"
             ;;
 esac
-
 
