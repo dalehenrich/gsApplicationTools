@@ -14,7 +14,7 @@ GsDeployer deploy: [
   Metacello new
     baseline: 'GsApplicationTools';
     repository: 'filetree://', gitPath, '/gsApplicationTools/repository';
-    load: #('default')
+    load: #('CI')
 ].
 
 true ifTrue: [
