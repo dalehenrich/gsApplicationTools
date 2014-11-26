@@ -1,16 +1,13 @@
 {
-	"category" : "Application-Server-Tools",
+	"category" : "GsApplicationTools-Server",
 	"classinstvars" : [
 		 ],
 	"classvars" : [
 		 ],
 	"commentStamp" : "",
 	"instvars" : [
-		"name",
-		"serverClass",
-		"ports",
-		"delegate" ],
-	"name" : "GemServer",
+		 ],
+	"name" : "GemServerStarter",
 	"pools" : [
 		 ],
 	"super" : "Object",

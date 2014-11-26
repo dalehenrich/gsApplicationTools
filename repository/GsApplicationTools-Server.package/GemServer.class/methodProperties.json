@@ -2,18 +2,16 @@
 	"class" : {
 		"createServerOfClass:withName:on:" : "SebastianHeidbrink 11/02/2014 15:00" },
 	"instance" : {
-		"delegate" : "SebastianHeidbrink 11/02/2014 15:01",
-		"delegate:" : "SebastianHeidbrink 11/02/2014 15:01",
+		"defaultPortList" : "dkh 11/26/2014 14:05",
 		"isRunning" : "SebastianHeidbrink 11/02/2014 15:00",
 		"name" : "SebastianHeidbrink 11/02/2014 15:00",
 		"name:" : "SebastianHeidbrink 11/02/2014 15:00",
 		"portString" : "SebastianHeidbrink 11/02/2014 15:00",
-		"ports" : "SebastianHeidbrink 11/02/2014 15:00",
+		"ports" : "dkh 11/26/2014 14:02",
 		"ports:" : "SebastianHeidbrink 11/02/2014 15:00",
 		"serverClass" : "SebastianHeidbrink 11/02/2014 15:00",
 		"serverClass:" : "SebastianHeidbrink 11/02/2014 15:00",
 		"start" : "SebastianHeidbrink 11/02/2014 15:00",
-		"startDebug" : "SebastianHeidbrink 11/02/2014 15:00",
-		"startDebugOn:" : "sebastianheidbrink 11/05/2014 13:27",
-		"startOn:" : "sebastianheidbrink 11/05/2014 13:26",
-		"stop" : "SebastianHeidbrink 11/02/2014 15:00" } }
+		"startDebug" : "dkh 11/26/2014 14:05",
+		"startOn:" : "dkh 11/26/2014 14:03",
+		"stop" : "dkh 11/26/2014 13:49" } }
