@@ -1,4 +1,4 @@
-gsApplicationTools
+gsApplicationTools [![master branch:](https://travis-ci.org/GsDevKit/gsApplicationTools.png?branch=master)](https://travis-ci.org/GsDevKit/gsApplicationTools)
 ==================
 
 This repository includes scripts and code that allow a more convenient setup of a Gemstone server application 
