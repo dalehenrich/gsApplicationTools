@@ -1,0 +1,14 @@
+{
+	"category" : "BaselineOfGsApplicationTools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "dkh 11/26/2014 11:12",
+	"instvars" : [
+		 ],
+	"name" : "BaselineOfGsApplicationTools",
+	"pools" : [
+		 ],
+	"super" : "BaselineOf",
+	"type" : "normal" }
