@@ -1,3 +1,3 @@
 gem server restart
 restartAllGems
-  self singleton servers do: [ :each | self restartGems: each ]
+  self singleton servers do: [ :each | each restartGems ]

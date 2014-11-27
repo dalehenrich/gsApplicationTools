@@ -1,5 +1,5 @@
 gem server stop
 stopGems: server
-	"self stopGems"
+  "self stopGems"
 
-	self executeGemCommand: 'stop' for: server
+  server executeGemCommand: 'stop'

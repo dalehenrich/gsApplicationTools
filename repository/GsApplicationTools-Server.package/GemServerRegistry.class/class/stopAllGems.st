@@ -1,3 +1,3 @@
 gem server stop
 stopAllGems
-	self singleton servers do: [:each | self stopGems: each].
+  self singleton servers do: [ :each | each stopGems ]

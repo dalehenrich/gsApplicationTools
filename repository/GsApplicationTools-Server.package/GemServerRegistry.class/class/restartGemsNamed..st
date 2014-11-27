@@ -1,4 +1,3 @@
 gem server restart
 restartGemsNamed: aName
-	
-	self restartGems: (self gemServerNamed: aName)
+  (self gemServerNamed: aName) restartGems

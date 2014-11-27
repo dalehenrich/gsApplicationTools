@@ -1,6 +1,6 @@
 registration
 addGemServerOfClass: aServerClass withName: aUniqueName on: anArrayOfPortNumbers
-  self
+  ^ self
     addGemServerOfClass: aServerClass
     withName: aUniqueName
     on: anArrayOfPortNumbers

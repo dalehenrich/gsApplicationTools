@@ -1,3 +1,3 @@
 gem server start
 startGemsNamed: aName
-  self startGems: (self gemServerNamed: aName)
+  (self gemServerNamed: aName) startGems

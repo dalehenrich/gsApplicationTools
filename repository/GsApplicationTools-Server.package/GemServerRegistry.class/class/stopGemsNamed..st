@@ -1,4 +1,3 @@
 gem server stop
 stopGemsNamed: aName
-	
-	self stopGems:(self gemServerNamed: aName).
+  (self gemServerNamed: aName) stopGems
