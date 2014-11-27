@@ -1,3 +1,3 @@
 registration
 removeGemServer: aServerGem
-  self singleton removeServer: aServerGem
+  self singleton removeServer: aServerGem name
