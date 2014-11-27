@@ -9,7 +9,6 @@
 		"name",
 		"serverClass",
 		"ports",
-		"portInstance",
 		"enableRemoteBreakpoints" ],
 	"name" : "GemServer",
 	"pools" : [

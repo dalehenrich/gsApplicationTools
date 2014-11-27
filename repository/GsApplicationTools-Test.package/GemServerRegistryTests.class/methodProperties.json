@@ -8,7 +8,7 @@
 		"tearDown" : "dkh 11/26/2014 14:49",
 		"testInvalidGemServerNames" : "dkh 11/26/2014 18:22",
 		"testQuerying" : "dkh 11/26/2014 18:02",
-		"testRegistration" : "dkh 11/26/2014 18:02",
+		"testRegistration" : "dkh 11/26/2014 20:02",
 		"testStartStopRestart" : "dkh 11/26/2014 18:03",
 		"testStartStopRestartAll" : "dkh 11/26/2014 18:03",
 		"testValidGemServerNames" : "dkh 11/26/2014 18:30" } }

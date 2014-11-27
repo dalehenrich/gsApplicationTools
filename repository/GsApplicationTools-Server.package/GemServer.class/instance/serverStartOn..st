@@ -2,12 +2,11 @@ service instance-script
 serverStartOn: port
   "called from shell script"
 
-  portInstance := port.
   self
-    recordGemPid;
+    recordGemPid: port;
     setStatmonCacheName;
     enableRemoteBreakpointHandling.
   System transactionMode: #'manualBegin'.
   self
     startSigAbortHandling;
-    startService	"does not return"
+    startServiceOn: port	"does not return"
