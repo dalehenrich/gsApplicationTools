@@ -8,7 +8,9 @@
 	"instvars" : [
 		"name",
 		"serverClass",
-		"ports" ],
+		"ports",
+		"portInstance",
+		"enableRemoteBreakpoints" ],
 	"name" : "GemServer",
 	"pools" : [
 		 ],

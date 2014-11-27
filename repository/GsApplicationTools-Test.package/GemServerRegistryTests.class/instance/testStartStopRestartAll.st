@@ -1,8 +1,8 @@
 tests
 testStartStopRestartAll
   | mockServer mockServerDefault |
-  mockServer := GemServerRegistry gemServerNamed: 'Mock Server'.
-  mockServerDefault := GemServerRegistry gemServerNamed: 'Mock Server Default'.
+  mockServer := GemServerRegistry gemServerNamed: 'Mock_Server'.
+  mockServerDefault := GemServerRegistry gemServerNamed: 'Mock_Server_Default'.
   mockServerDefault eventLog: mockServer eventLog.
   self assert: mockServer eventLog isEmpty.
   GemServerRegistry startAllGems.

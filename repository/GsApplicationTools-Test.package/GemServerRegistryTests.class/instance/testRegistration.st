@@ -1,7 +1,7 @@
 tests
 testRegistration
   | gemName |
-  gemName := 'Another Mock Server'.
+  gemName := 'Another_Mock_Server'.
   self assert: (GemServerRegistry gemServerNamed: gemName) isNil.
   GemServerRegistry
     addGemServerOfClass: GemServerMockServer
