@@ -1,3 +1,3 @@
-other
+accessing
 isRunning
 	^self serverClass isRunning

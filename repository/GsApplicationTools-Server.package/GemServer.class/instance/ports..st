@@ -1,4 +1,4 @@
-other
+accessing
 ports: aCollection 
 
 	ports := aCollection

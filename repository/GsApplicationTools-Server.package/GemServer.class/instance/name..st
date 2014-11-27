@@ -1,4 +1,4 @@
-other
+accessing
 name: aString 
 
 	name := aString

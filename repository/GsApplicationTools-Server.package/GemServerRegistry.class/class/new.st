@@ -1,3 +1,3 @@
-other
+instance creation
 new
 	^self singleton

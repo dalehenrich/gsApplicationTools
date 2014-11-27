@@ -1,4 +1,4 @@
-other
+gem server stop
 stopGems: server
 	"self stopGems"
 

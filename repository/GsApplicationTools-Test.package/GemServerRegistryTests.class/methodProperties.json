@@ -2,4 +2,11 @@
 	"class" : {
 		 },
 	"instance" : {
-		 } }
+		"assertEventLog:total:start:stop:restart:" : "dkh 11/26/2014 16:46",
+		"assertExpectedNames:equals:" : "dkh 11/26/2014 15:01",
+		"setUp" : "dkh 11/26/2014 16:56",
+		"tearDown" : "dkh 11/26/2014 14:49",
+		"testQuerying" : "dkh 11/26/2014 16:02",
+		"testRegistration" : "dkh 11/26/2014 14:55",
+		"testStartStopRestart" : "dkh 11/26/2014 16:47",
+		"testStartStopRestartAll" : "dkh 11/26/2014 16:49" } }

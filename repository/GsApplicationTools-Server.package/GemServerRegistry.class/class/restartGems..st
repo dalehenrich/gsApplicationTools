@@ -1,4 +1,4 @@
-other
+gem server restart
 restartGems: server
 	"self restartGems"
 

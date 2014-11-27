@@ -1,7 +1,7 @@
-other
+private
 initSingleton
-
-	"
+  "
 	GemServerRegistry initSingleton
 	"
-	Singleton := self basicNew initialize
+
+  self _singleton: self basicNew initialize

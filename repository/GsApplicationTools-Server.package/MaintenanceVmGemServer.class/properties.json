@@ -1,0 +1,14 @@
+{
+	"category" : "GsApplicationTools-Server",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "dkh 11/26/2014 16:54",
+	"instvars" : [
+		 ],
+	"name" : "MaintenanceVmGemServer",
+	"pools" : [
+		 ],
+	"super" : "GemServer",
+	"type" : "normal" }
