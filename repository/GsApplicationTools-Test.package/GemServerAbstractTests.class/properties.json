@@ -6,9 +6,9 @@
 		 ],
 	"commentStamp" : "",
 	"instvars" : [
-		 ],
-	"name" : "GemServerRegistryTests",
+		"registry" ],
+	"name" : "GemServerAbstractTests",
 	"pools" : [
 		 ],
-	"super" : "GemServerAbstractTests",
+	"super" : "TestCase",
 	"type" : "normal" }

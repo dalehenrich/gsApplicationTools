@@ -1,7 +1,5 @@
 server specialization
 performOnServer: commandLine
-  "override as necessary"
-
   | performOnServerStatusArray |
   performOnServerStatusArray := System _performOnServer: commandLine.
   (performOnServerStatusArray at: 1) ~~ 0

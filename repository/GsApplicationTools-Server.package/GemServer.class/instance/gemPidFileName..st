@@ -1,3 +1,3 @@
 service instance-private
 gemPidFileName: port
-  ^ self pidDir , '/' , self name , '_server-' , port asString , '.pid'
+  ^ self pidDirPath , '/' , self name , '_server-' , port asString , '.pid'

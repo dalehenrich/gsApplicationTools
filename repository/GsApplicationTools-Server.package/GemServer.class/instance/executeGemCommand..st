@@ -1,7 +1,5 @@
 server specialization
 executeGemCommand: command
-  "override as necessary"
-
   | commandLine performOnServerStatusArray |
   Transcript
     cr;

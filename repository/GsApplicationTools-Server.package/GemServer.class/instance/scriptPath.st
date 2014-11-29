@@ -1,5 +1,3 @@
 server specialization
 scriptPath
-  "override as necessary"
-
-  ^ self scriptBinDir , '/' , self scriptName
+  ^ self scriptBinDirPath , '/' , self scriptName
