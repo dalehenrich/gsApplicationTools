@@ -4,6 +4,9 @@ enableRemoteBreakpointHandling
 
   self enableRemoteBreakpoints
     ifFalse: [ ^ self ].
+  Transcript
+    cr;
+    show: 'Enable remote breakpoint handling'.
   Breakpoint trappable: true.
   GemToGemAnnouncement installStaticHandler.
   System commitTransaction

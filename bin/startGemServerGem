@@ -18,7 +18,7 @@ cat << EOF | nohup $GEMSTONE/bin/topaz -l -e $ExeConf 2>&1 >> ${GEMSTONE_LOGDIR}
 set user DataCurator pass $GEMSTONE_CURATOR_PASS gems $GEMSTONE_NAME
 
 display oops
-iferror where
+iferror stack
 
 login
 
@@ -36,8 +36,3 @@ System commitTransaction.
 %
 
 EOF
-
-if [ $# -ne 0 ]; then
-  cat ${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.log
-  exit 1
-fi

@@ -2,9 +2,13 @@ service instance-control
 stopGems
   self ports
     do: [ :port | 
-      | pid |
-      (GsFile openReadOnServer: (self gemPidFileName: port))
+      | pid pidFilePath |
+      pidFilePath := self gemPidFileName: port.
+      (GsFile openReadOnServer: pidFilePath)
         ifNotNil: [ :file | 
           pid := file contentsOfEntireFile.
           file close.
-          self performOnServer: 'kill ' , pid ] ]
+          GsFile removeServerFile: pidFilePath.
+          [ self performOnServer: 'kill ' , pid ]
+            on: Error
+            do: [ :ignore |  ] ] ]

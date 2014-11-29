@@ -1,3 +1,3 @@
 accessing
 serverClass
-	^serverClass
+  ^ serverClassAssoc value

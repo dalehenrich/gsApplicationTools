@@ -9,4 +9,5 @@ defaultScriptBinDirPath
   fileTreeRepo := (wc repositoryGroup repositories
     reject: [ :repo | MCCacheRepository default = repo ])
     detect: [ :repo | repo isKindOf: MCFileTreeRepository ].
-  ^ fileTreeRepo directory pathString
+  ^ (fileTreeRepo directory containingDirectory directoryNamed: 'bin')
+    pathString
