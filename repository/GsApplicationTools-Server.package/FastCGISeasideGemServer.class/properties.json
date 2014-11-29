@@ -4,11 +4,11 @@
 		 ],
 	"classvars" : [
 		 ],
-	"commentStamp" : "",
+	"commentStamp" : "dkh 11/29/2014 09:04",
 	"instvars" : [
 		 ],
-	"name" : "FastCGIGemServer",
+	"name" : "FastCGISeasideGemServer",
 	"pools" : [
 		 ],
-	"super" : "GemServer",
+	"super" : "SeasideGemServer",
 	"type" : "normal" }

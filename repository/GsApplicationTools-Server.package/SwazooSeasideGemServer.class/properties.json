@@ -1,0 +1,14 @@
+{
+	"category" : "GsApplicationTools-Server",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "dkh 11/29/2014 09:04",
+	"instvars" : [
+		 ],
+	"name" : "SwazooSeasideGemServer",
+	"pools" : [
+		 ],
+	"super" : "SeasideGemServer",
+	"type" : "normal" }

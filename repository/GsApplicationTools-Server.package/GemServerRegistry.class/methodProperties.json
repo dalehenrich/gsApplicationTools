@@ -2,10 +2,6 @@
 	"class" : {
 		"_singleton:" : "dkh 11/26/2014 14:46",
 		"addGemServer:" : "dkh 11/26/2014 19:32",
-		"addGemServerOfClass:withName:" : "dkh 11/26/2014 19:32",
-		"addGemServerOfClass:withName:on:" : "dkh 11/26/2014 19:32",
-		"addGemServerOfClass:withName:on:using:" : "dkh 11/26/2014 19:32",
-		"addGemServerOfClass:withName:using:" : "dkh 11/26/2014 19:33",
 		"gemServerNamed:" : "SebastianHeidbrink 11/02/2014 14:47",
 		"gemServerNames" : "SebastianHeidbrink 11/02/2014 14:41",
 		"initSingleton" : "dkh 11/26/2014 14:46",
@@ -20,7 +16,6 @@
 		"singleton" : "SebastianHeidbrink 10/21/2014 04:22",
 		"startAllGems" : "dkh 11/26/2014 19:46",
 		"startGemsNamed:" : "dkh 11/26/2014 19:46",
-		"startServerInCurrentSession:onPort:" : "dkh 11/26/2014 18:47",
 		"stopAllGems" : "dkh 11/26/2014 19:47",
 		"stopGemOnPort:" : "dkh 11/26/2014 19:47",
 		"stopGems:" : "dkh 11/26/2014 19:40",
