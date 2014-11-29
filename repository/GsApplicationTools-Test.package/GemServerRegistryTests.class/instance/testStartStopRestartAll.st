@@ -22,7 +22,7 @@ testStartStopRestartAll
   GemServerRegistry restartAllGems.
   self
     assertEventLog: mockServer eventLog
-    total: 12
-    start: 4
-    stop: 4
-    restart: 4
+    total: 16
+    start: 8
+    stop: 8
+    restart: 0
