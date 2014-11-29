@@ -2,7 +2,7 @@
 
 GemServer="$1"
 Port="$2"
-GemConf="$3"
+ExeConf="$3"
 
 if [ -s $GEMSTONE/seaside/etc/gemstone.secret ]; then
     . $GEMSTONE/seaside/etc/gemstone.secret
@@ -11,7 +11,9 @@ else
     exit 1
 fi
 
-cat << EOF | nohup $GEMSTONE/bin/topaz -l -e $GemConf 2>&1 >> ${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.log &
+echo "Starting $GemServer on $Port using $ExeConf ..."
+
+cat << EOF | nohup $GEMSTONE/bin/topaz -l -e $ExeConf 2>&1 >> ${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.log &
 
 set user DataCurator pass $GEMSTONE_CURATOR_PASS gems $GEMSTONE_NAME
 
@@ -32,4 +34,10 @@ System beginTransaction.
     'pid: ', (System gemVersionReport at: 'processId') printString) addToLog.
 System commitTransaction.
 %
+
 EOF
+
+if [ $# -ne 0 ]; then
+  cat ${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.log
+  exit 1
+fi
