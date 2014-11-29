@@ -5,6 +5,7 @@
 # The default setup is to run 1 vm on whatever ports specified and not affect the ServerGems  or the Maintenance VM
 # it does not check for port conflicts .
 #
+Command="$1"
 Adaptor="$2"
 PORTS="$3"
 
@@ -60,7 +61,7 @@ topaz_restart()
     topaz_start
 }
 
-case "$1" in
+case "$Command" in
 
     start)
            topaz_start

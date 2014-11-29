@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ -s $GEMSTONE/seaside/etc/gemstone.secret ]; then
+    . $GEMSTONE/seaside/etc/gemstone.secret
+else
+    echo 'Missing password file $GEMSTONE/seaside/etc/gemstone.secret'
+    exit 1
+fi
+
+cat << EOF | nohup $GEMSTONE/bin/topaz -l -T50000 2>&1 >> ${GEMSTONE_LOGDIR}/${1}_server-${2}.log &
+
+set user DataCurator pass $GEMSTONE_CURATOR_PASS gems $GEMSTONE_NAME
+
+display oops
+iferror where
+
+login
+
+run
+GemServerRegistry startGemServer: '$1' On: $2.
+%
+run
+System beginTransaction.
+(ObjectLogEntry
+  fatal: '${1}_server_${2}: topaz exit'
+  object:
+    'pid: ', (System gemVersionReport at: 'processId') printString) addToLog.
+System commitTransaction.
+%
+EOF
