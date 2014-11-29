@@ -1,3 +1,3 @@
 server specialization
 scriptName
-  ^ 'runSmalltalkServerGem'
+  ^ 'startGemServerGem'

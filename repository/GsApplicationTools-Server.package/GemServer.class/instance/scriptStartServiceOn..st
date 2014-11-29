@@ -1,5 +1,5 @@
 service instance-script
-serverStartOn: port
+scriptStartServiceOn: port
   "called from shell script"
 
   self

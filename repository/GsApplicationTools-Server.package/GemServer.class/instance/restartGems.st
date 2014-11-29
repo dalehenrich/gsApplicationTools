@@ -1,3 +1,5 @@
 service instance-control
 restartGems
-  self executeGemCommand: 'restart'
+  self
+    stopGems;
+    startGems

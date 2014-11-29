@@ -9,7 +9,6 @@
 		"removeGemServer:" : "dkh 11/26/2014 22:01",
 		"removeGemServerNamed:" : "SebastianHeidbrink 11/03/2014 14:40",
 		"restartAllGems" : "dkh 11/26/2014 19:45",
-		"restartGemOnPort:" : "dkh 11/26/2014 19:45",
 		"restartGemsNamed:" : "dkh 11/26/2014 19:45",
 		"serverGems" : "SebastianHeidbrink 11/02/2014 14:01",
 		"serversOnPort:" : "SebastianHeidbrink 10/21/2014 04:22",
@@ -17,8 +16,6 @@
 		"startAllGems" : "dkh 11/26/2014 19:46",
 		"startGemsNamed:" : "dkh 11/26/2014 19:46",
 		"stopAllGems" : "dkh 11/26/2014 19:47",
-		"stopGemOnPort:" : "dkh 11/26/2014 19:47",
-		"stopGems:" : "dkh 11/26/2014 19:40",
 		"stopGemsNamed:" : "dkh 11/26/2014 19:47" },
 	"instance" : {
 		"addServer:" : "SebastianHeidbrink 10/21/2014 04:22",
