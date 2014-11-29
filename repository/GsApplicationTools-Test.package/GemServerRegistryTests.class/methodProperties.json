@@ -2,12 +2,10 @@
 	"class" : {
 		 },
 	"instance" : {
-		"assertEventLog:total:start:stop:restart:" : "dkh 11/26/2014 16:46",
 		"assertExpectedNames:equals:" : "dkh 11/26/2014 15:01",
 		"setUp" : "dkh 11/29/2014 09:15",
 		"testInvalidGemServerNames" : "dkh 11/29/2014 06:37",
 		"testQuerying" : "dkh 11/26/2014 18:02",
 		"testRegistration" : "dkh 11/29/2014 06:38",
-		"testStartStopRestart" : "dkh 11/29/2014 14:46",
 		"testStartStopRestartAll" : "dkh 11/29/2014 14:42",
 		"testValidGemServerNames" : "dkh 11/29/2014 06:39" } }

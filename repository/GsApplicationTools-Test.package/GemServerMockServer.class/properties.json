@@ -3,7 +3,7 @@
 	"classinstvars" : [
 		 ],
 	"classvars" : [
-		 ],
+		"EvenLog" ],
 	"commentStamp" : "",
 	"instvars" : [
 		"port" ],

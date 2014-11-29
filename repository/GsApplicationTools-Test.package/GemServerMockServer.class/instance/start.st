@@ -1,3 +1,3 @@
 service start
 start
-  self class startOnPort: port
+  self class eventLog add: 'start' -> port
