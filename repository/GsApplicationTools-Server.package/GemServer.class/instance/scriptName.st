@@ -1,0 +1,3 @@
+server specialization
+scriptName
+  ^ 'startGemServerGem'

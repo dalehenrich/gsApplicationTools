@@ -1,0 +1,13 @@
+{
+	"class" : {
+		"serverClass" : "dkh 11/29/2014 06:35" },
+	"instance" : {
+		"eventLog" : "dkh 11/26/2014 16:56",
+		"eventLog:" : "dkh 11/26/2014 16:56",
+		"executeStartGemCommand:" : "dkh 11/29/2014 14:36",
+		"executeStopGemCommand:" : "dkh 11/29/2014 14:46",
+		"pidDir" : "dkh 11/29/2014 09:34",
+		"resetEventLog" : "dkh 11/26/2014 16:56",
+		"scriptBinDir" : "dkh 11/29/2014 09:46",
+		"useEventLog" : "dkh 11/29/2014 09:12",
+		"useEventLog:" : "dkh 11/29/2014 09:12" } }

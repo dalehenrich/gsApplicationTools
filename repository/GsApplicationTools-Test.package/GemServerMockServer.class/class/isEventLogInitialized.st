@@ -1,0 +1,3 @@
+testing
+isEventLogInitialized
+  ^ EventLog notNil

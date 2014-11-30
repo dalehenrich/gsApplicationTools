@@ -1,3 +1,0 @@
-other
-stopAllGems
-	GemServerRegistry stopAllGems

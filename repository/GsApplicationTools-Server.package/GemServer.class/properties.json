@@ -1,0 +1,17 @@
+{
+	"category" : "GsApplicationTools-Server",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"name",
+		"serverClassAssoc",
+		"ports",
+		"enableRemoteBreakpoints" ],
+	"name" : "GemServer",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

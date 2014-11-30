@@ -1,0 +1,3 @@
+accessing
+resetEventLog
+  eventLog := nil
