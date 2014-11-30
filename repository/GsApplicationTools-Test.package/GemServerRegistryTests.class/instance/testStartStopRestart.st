@@ -1,9 +1,9 @@
 tests
 testStartStopRestart
-  | eventLog |
-  GemServerRegistry gemServerNamed: 'Mock_Server'.
+  | gemServer eventLog |
+  gemServer := GemServerRegistry gemServerNamed: 'Mock_Server'.
   GemServerRegistry startGemsNamed: 'Mock_Server'.
-  eventLog := self eventLog.
+  eventLog := gemServer eventLog.
   self
     assertEventLog: eventLog
     total: 3
