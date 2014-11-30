@@ -1,4 +1,4 @@
-server specialization
+*gsapplicationtools-serverv30
 performOnServer: commandLine
   | performOnServerStatusArray |
   performOnServerStatusArray := System _performOnServer: commandLine.
