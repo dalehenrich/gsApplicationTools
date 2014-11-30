@@ -12,11 +12,4 @@ performOnServer: commandLine
       | message |
       message := 'performOnServer: ' , commandLine printString
         , ' failed with result: ' , (performOnServerStatusArray at: 3) asString.
-      Transcript
-        cr;
-        show: '---ERROR (';
-        show: TimeStamp now printString;
-        show: ')';
-        cr;
-        show: message.
       self error: message ]
