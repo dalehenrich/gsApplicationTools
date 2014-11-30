@@ -1,4 +1,4 @@
 accessing
 eventLog
-  EvenLog ifNil: [ EvenLog := OrderedCollection new ].
-  ^ EvenLog
+  EventLog ifNil: [ EventLog := OrderedCollection new ].
+  ^ EventLog

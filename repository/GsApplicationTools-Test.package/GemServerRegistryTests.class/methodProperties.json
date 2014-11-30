@@ -7,5 +7,6 @@
 		"testInvalidGemServerNames" : "dkh 11/29/2014 06:37",
 		"testQuerying" : "dkh 11/26/2014 18:02",
 		"testRegistration" : "dkh 11/29/2014 06:38",
+		"testStartStopRestart" : "dkh 11/29/2014 18:09",
 		"testStartStopRestartAll" : "dkh 11/29/2014 14:42",
 		"testValidGemServerNames" : "dkh 11/29/2014 06:39" } }

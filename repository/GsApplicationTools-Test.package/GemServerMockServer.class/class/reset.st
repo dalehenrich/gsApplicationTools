@@ -1,4 +1,3 @@
 accessing
 reset
-  EvenLog := nil.
-  System commitTransaction
+  EventLog := nil

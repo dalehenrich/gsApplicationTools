@@ -1,5 +1,8 @@
 running
 setUp
   super setUp.
-  (MockGemServer register: 'Mock_Server') useEventLog: false.
-  GemServerMockServer reset
+  (MockGemServer register: 'Mock_Server')
+    useEventLog: false;
+    stopGems.
+  GemServerMockServer reset.
+  System commitTransaction

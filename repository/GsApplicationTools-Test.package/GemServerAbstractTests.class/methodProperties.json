@@ -4,5 +4,4 @@
 	"instance" : {
 		"assertEventLog:total:start:stop:restart:" : "dkh 11/29/2014 15:05",
 		"setUp" : "dkh 11/29/2014 09:15",
-		"tearDown" : "dkh 11/29/2014 09:15",
-		"testStartStopRestart" : "dkh 11/29/2014 15:06" } }
+		"tearDown" : "dkh 11/29/2014 09:15" } }

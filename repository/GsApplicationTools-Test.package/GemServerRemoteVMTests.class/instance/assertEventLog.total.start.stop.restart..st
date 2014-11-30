@@ -1,6 +1,6 @@
 private
 assertEventLog: eventLog total: total start: start stop: stop restart: restart
-  self abortTransaction.
+  System abortTransaction.
   super
     assertEventLog: eventLog
     total: total
