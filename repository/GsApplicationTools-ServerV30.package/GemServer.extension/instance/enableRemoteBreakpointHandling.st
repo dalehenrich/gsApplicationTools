@@ -1,4 +1,4 @@
-service instance-private
+*gsapplicationtools-serverv30
 enableRemoteBreakpointHandling
   "Enable remote Breakpoing handling"
 
