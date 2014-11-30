@@ -4,9 +4,9 @@ enableRemoteBreakpointHandling
 
   self enableRemoteBreakpoints
     ifFalse: [ ^ self ].
-  Transcript
-    cr;
-    show: 'Enable remote breakpoint handling'.
+  self
+    scriptLogEvent: 'enableRemoteBreakpointHandling: ' , self name
+    object: self.
   Breakpoint trappable: true.
   GemToGemAnnouncement installStaticHandler.
   System commitTransaction

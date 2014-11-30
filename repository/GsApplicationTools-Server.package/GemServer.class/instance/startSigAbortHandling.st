@@ -1,5 +1,6 @@
 service instance-private
 startSigAbortHandling
+  self scriptLogEvent: 'startSigAbortHandling: ' , self name object: self.
   Exception
     installStaticException: [ :ex :cat :num :args | 
       "Run the abort in a lowPriority process, since we must acquire the

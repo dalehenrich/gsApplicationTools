@@ -2,6 +2,11 @@
 performOnServer: commandLine
   | performOnServerStatusArray |
   performOnServerStatusArray := System _performOnServer: commandLine.
+  self
+    scriptLogEvent: 'performOnServer: ' , self name
+    object:
+      {commandLine.
+      performOnServerStatusArray}.
   (performOnServerStatusArray at: 1) ~~ 0
     ifTrue: [ 
       | message |
