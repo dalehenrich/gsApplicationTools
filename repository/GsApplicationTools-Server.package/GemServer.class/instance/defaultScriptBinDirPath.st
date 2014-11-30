@@ -3,7 +3,7 @@ defaultScriptBinDirPath
   | wc fileTreeRepo |
   MCWorkingCopy registry
     do: [ :mgr | 
-      (mgr packageInfo includesClass: self class)
+      (mgr packageInfo includesClass: GemServer)
         ifTrue: [ wc := mgr ] ].
   wc ifNil: [ ^ self error: 'GemServer script bin dir not foiund' ].
   fileTreeRepo := (wc repositoryGroup repositories
