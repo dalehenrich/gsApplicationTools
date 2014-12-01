@@ -5,10 +5,11 @@ recordGemPid: port
   | file pid pidFileName |
   pid := (System gemVersionReport at: 'processId') printString.
   pidFileName := self gemPidFileName: port.
-  Transcript
-    cr;
-    show:
-        'Record Gem pid: ' , pid printString , ' in: ' , pidFileName printString.
+  self
+    scriptLogEvent: 'recordGemPid: ' , self name , ' on ' , port printString
+    object:
+      {pid.
+      pidFileName}.
   (ServerFileDirectory on: self pidDirPath) assureExistence.
   file := GsFile openWriteOnServer: pidFileName.
   file nextPutAll: pid.
