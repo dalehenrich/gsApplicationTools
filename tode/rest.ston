@@ -4,10 +4,16 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
   command
     getOptsMixedLongShort:
       {#(\'help\' $h #\'none\').
+      #(\'client\' nil #\'required\').
+      #(\'path\' nil #\'required\').
+      #(\'post\' nil #\'required\').
       #(\'log\' nil #\'required\').
       #(\'logTo\' nil #\'required\').
       #(\'port\' nil #\'required\').
       #(\'register\' nil #\'required\').
+      #(\'restart\' nil #\'required\').
+      #(\'start\' nil #\'required\').
+      #(\'stop\' nil #\'required\').
       #(\'unregister\' nil #\'required\')}
     optionsAndArguments: [ :options :operands | 
       opts := options.
@@ -15,36 +21,75 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
   opts
     at: \'help\'
     ifAbsent: [ 
-      | gemServer |
+      | gemServer result |
+      result := #\'noop\'.
       opts
         at: \'unregister\'
-        ifPresent: [ :serverName | GemServerRegistry removeGemServerNamed: serverName ]
+        ifPresent: [ :serverName | 
+          result := GemServerRegistry removeGemServerNamed: serverName.
+            ]
         ifAbsent: [ 
           opts
             at: \'register\'
             ifPresent: [ :serverName | 
               gemServer := (GemServerRegistry gemServerNamed: serverName)
                 ifNil: [ 
-                  (ZnGemServer register: \'ZnGsExampleStorageRestServer\')
+                  gemServer := (ZnGemServer register: serverName)
                     delegate: ZnExampleStorageRestServerDelegate new;
-                    yourself ] ] .
+                    yourself ].
+              opts
+                at: \'port\'
+                ifPresent: [ :portString | gemServer ports: {(portString asNumber)} ].
+              opts
+                at: \'log\'
+                ifPresent: [ :logString | 
+                  logString = \'all\'
+                    ifTrue: [ gemServer logFilter: nil ]
+                    ifFalse: [ gemServer logFilter: logString asSymbol ].
+                  opts
+                    at: \'logTo\'
+                    ifPresent: [ :logToString | 
+                      logToString = \'objectLog\'
+                        ifTrue: [ gemServer logToObjectLog ]
+                        ifFalse: [ 
+                          logToString = \'transcript\'
+                            ifTrue: [ gemServer logToTranscript ] ] ] ] ].
+          result := gemServer ].
       opts
-        at: \'port\'
-        ifPresent: [ :portString | gemServer ports: {(portString asNumber)} ].
+        at: \'restart\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) restartGems ].
       opts
-        at: \'log\'
-        ifPresent: [ :logString | 
-          logString = \'all\'
-            ifTrue: [ gemServer logFilter: nil ]
-            ifFalse: [ gemServer logFilter: logString asSymbol ].
+        at: \'start\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) startGems ].
+      opts
+        at: \'client\'
+        ifPresent: [ :serverName | 
+          | client url pathSegment |
+          gemServer := GemServerRegistry gemServerNamed: serverName.
+          url := \'http://localHost:\' , gemServer ports first printString.
+          client := ZnClient new
+            url: url;
+            addPathSegment: #\'storage\';
+            accept: ZnMimeType applicationJson;
+            contentReader: [ :entity | entity ifNotNil: [ NeoJSONReader fromString: entity contents ] ];
+            contentWriter: [ :object | ZnEntity with: (NeoJSONWriter toString: object) type: ZnMimeType applicationJson ];
+            yourself.
           opts
-            at: \'logTo\'
-            ifPresent: [ :logToString | 
-              logToString = \'objectLog\'
-                ifTrue: [ gemServer logToObjectLog ]
-                ifFalse: [ 
-                  logToString = \'transcript\'
-                    ifTrue: [ gemServer logToTranscript ] ] ] ] ]]
+            at: \'path\'
+            ifPresent: [ :path | pathSegment := path ]
+            ifAbsent: [ pathSegment := \'objects\' ].
+          opts
+            at: \'post\'
+            ifPresent: [ :expression | 
+              client
+                addPathSegment: pathSegment;
+                contents: expression evaluate;
+                post.
+              result := client response ] ].
+      opts
+        at: \'stop\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stopGems ].
+      result ]
     ifPresent: [ :ignored | 
       TDManPage
         viewManPage:
@@ -54,11 +99,19 @@ SYNOPSIS
   rest [-h|--help]
        --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] [--log=all|debug|error|info]
        --unregister=<gemServer-name>
+       --client=<gemServer-name> [--path=<path>] [--post=`expression`]
+       --client=<gemServer-name> [--get=<path>] 
 DESCRIPTION
 EXAMPLES
   ./rest --help
   ./rest -h
   ./rest --register=rest --port=1720 --log=all --logTo=objectLog
   ./rest --unregister=rest
+
+  ./rest --start=rest
+  ./rest --stop=rest
+  ./rest --restart=rest
+
+  ./rest --client=rest --path=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`
 \'
-        topez: topez ] ]',#creationTime:DateAndTime['2014-12-04T09:40:16.3255650997161-08:00'],#modificationTime:DateAndTime['2014-12-04T10:07:58.2852840423584-08:00']}
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-04T09:40:16.3255650997161-08:00'],#modificationTime:DateAndTime['2014-12-04T11:29:00.8640038967132-08:00']}
