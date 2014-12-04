@@ -1,4 +1,4 @@
-*gsapplicationtools-serverv30
+breakpoint handling
 handleBreakpointException: exception
   "Handle breakpoint or halt, snap off continuation, then resume"
 
