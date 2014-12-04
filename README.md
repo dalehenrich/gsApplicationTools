@@ -17,7 +17,7 @@ GsDeployer deploy: [
   Metacello new
     baseline: 'GsApplicationTools';
     repository: 'github://GsDevKit/gsApplicationTools:master/repository';
-    load: #('')
+    load: #('default')
 ].
 ```
 
