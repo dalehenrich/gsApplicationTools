@@ -45,12 +45,21 @@ GsDeployer deploy: [
 By default, a **ZnTranscriptLogger** is used. A continuation is snapped off and saved to ObjectLog when an error is logged. The **ZnTranscriptLogger** dumps a stack to the gem log.
 
 ### Debugging a separate GemServer
-Set `debugMode: true` for a **ZnGemServer**:
+`logToObjectLog` arranges for the Zinc logging to go the object log. 
+`logToTranscript` may be used to route logging to go to Transcript, which ends up being written to the gem log.
+By default only error events are logged.
+Also by default error continuations are dumped to the object log (whether or not you have specified object log logging). 
+`enableContinuations: false` can be used to disable logging of error continuations.
+`logEverything` arranges for all log events to be logged.
+`logFilter:` can be used to set a custom log filter.
+
+The following causes all log entries to be dumped to object log:
 
 ```Smalltalk
   | gemServer |
   gemServer := (ZnGemServer register: 'ZnWebSocketTestStatusServer' on: #(1701))
-    debugMode: true; 
+    logToObjectLog;
+    logEverything;
     delegate:
         (ZnWebSocketDelegate map: 'ws-status' to: ZnWebSocketStatusHandler new);
     yourself.
@@ -61,7 +70,7 @@ Set `debugMode: true` for a **ZnGemServer**:
   gemServer stopGems.
 ```
 
-Means that a **ZnObjectLogLogger** is used for logging, so tODE object log viewer:
+The tODE object log viewer:
 
 ```Shell
 ol view --age=`1 hour`

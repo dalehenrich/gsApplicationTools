@@ -2,6 +2,7 @@
 	"class" : {
 		"createServerOfClass:withName:on:" : "SebastianHeidbrink 11/02/2014 15:00",
 		"defaultPortList" : "dkh 11/29/2014 06:33",
+		"handleBreakpointException:" : "dkh 12/03/2014 14:52",
 		"register:" : "dkh 11/29/2014 06:33",
 		"register:for:on:" : "dkh 12/03/2014 10:21",
 		"register:on:" : "dkh 11/29/2014 06:31",
