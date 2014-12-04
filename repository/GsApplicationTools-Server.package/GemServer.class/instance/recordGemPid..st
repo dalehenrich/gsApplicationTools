@@ -10,7 +10,6 @@ recordGemPid: port
     object:
       {pid.
       pidFileName}.
-  (ServerFileDirectory on: self pidDirPath) assureExistence.
   file := GsFile openWriteOnServer: pidFileName.
   file nextPutAll: pid.
   file cr.
