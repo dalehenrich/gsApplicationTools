@@ -1,0 +1,64 @@
+TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :commandNode | 
+  | opts args |
+  \"for help: ./rest -h\"
+  command
+    getOptsMixedLongShort:
+      {#(\'help\' $h #\'none\').
+      #(\'log\' nil #\'required\').
+      #(\'logTo\' nil #\'required\').
+      #(\'port\' nil #\'required\').
+      #(\'register\' nil #\'required\').
+      #(\'unregister\' nil #\'required\')}
+    optionsAndArguments: [ :options :operands | 
+      opts := options.
+      args := operands ].
+  opts
+    at: \'help\'
+    ifAbsent: [ 
+      | gemServer |
+      opts
+        at: \'unregister\'
+        ifPresent: [ :serverName | GemServerRegistry removeGemServerNamed: serverName ]
+        ifAbsent: [ 
+          opts
+            at: \'register\'
+            ifPresent: [ :serverName | 
+              gemServer := (GemServerRegistry gemServerNamed: serverName)
+                ifNil: [ 
+                  (ZnGemServer register: \'ZnGsExampleStorageRestServer\')
+                    delegate: ZnExampleStorageRestServerDelegate new;
+                    yourself ] ] .
+      opts
+        at: \'port\'
+        ifPresent: [ :portString | gemServer ports: {(portString asNumber)} ].
+      opts
+        at: \'log\'
+        ifPresent: [ :logString | 
+          logString = \'all\'
+            ifTrue: [ gemServer logFilter: nil ]
+            ifFalse: [ gemServer logFilter: logString asSymbol ].
+          opts
+            at: \'logTo\'
+            ifPresent: [ :logToString | 
+              logToString = \'objectLog\'
+                ifTrue: [ gemServer logToObjectLog ]
+                ifFalse: [ 
+                  logToString = \'transcript\'
+                    ifTrue: [ gemServer logToTranscript ] ] ] ] ]]
+    ifPresent: [ :ignored | 
+      TDManPage
+        viewManPage:
+          \'NAME
+  rest - rest sript utility template
+SYNOPSIS
+  rest [-h|--help]
+       --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] [--log=all|debug|error|info]
+       --unregister=<gemServer-name>
+DESCRIPTION
+EXAMPLES
+  ./rest --help
+  ./rest -h
+  ./rest --register=rest --port=1720 --log=all --logTo=objectLog
+  ./rest --unregister=rest
+\'
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-04T09:40:16.3255650997161-08:00'],#modificationTime:DateAndTime['2014-12-04T10:07:58.2852840423584-08:00']}
