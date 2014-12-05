@@ -32,15 +32,10 @@ mount /sys/stone/repos/gsApplicationTools/tode/ /home gemServerExample
 cd /home/gemServerExample
 ```
 
-Script synopsis:
+Script man page:
 
-```
-./rest [-h|--help]
-     --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] \
-                                 [--log=all|debug|error|info]
-     --unregister=<gemServer-name>
-     --client=<gemServer-name> [--path=<path>] [--post=`expression`]
-     --client=<gemServer-name> [--get=<path>]
+```Shell
+./rest --help
 ```
 
 #### `rest` GemServer control commands
@@ -67,9 +62,42 @@ Unregister the GemServer ([**smalltalk code**](#unregister-gemserver]):
 
 #### `rest` Client commands
 
+Register a dictionary with the REST server using the `post` command ([**smalltalk code**](#client-post-command)):
+
+```Shell
+./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`
+edit
+```
+
+Register a dictionary with the REST server using the `post` command ([**smalltalk code**](#client-post-command)):
+
+```Shell
+./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
+```
+
+The command returns the URI of the object for example: `/storage/objects/1001`.
+
+The `get` command returns an object ([**smalltalk code**](#client-get-command)): 
+
+```Shell
+./rest --client=rest --uri=/objects/1001 --get; edit
+```
+
+Here's the contents of tODE inspector:
+
+```
+.        -> aDictionary( 'x'->1, 'y'->1, 'object-uri'->'/storage/objects/1001')
+(class)@ -> Dictionary
+(oop)@   -> 217431809
+1@       -> 'object-uri'->'/storage/objects/1001'
+2@       -> 'x'->1
+3@       -> 'y'->1
+```
+
 ```Shell
 ./rest
 ```
+
 
 ##Smalltalk Appendix
 
@@ -144,5 +172,49 @@ executes the following **Smalltalk**:
 
 ```Smalltalk
 (GemServerRegistry gemServerNamed: 'rest') unregister.
+```
+
+####Client `post` command
+
+The **tODE** command:
+
+```Shell
+./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`
+```
+
+executes the following **Smalltalk**:
+
+```Smalltalk
+  ZnClient new
+    url: 'http://localHost:1720';
+    addPathSegment: #'storage';
+    accept: ZnMimeType applicationJson;
+    contentReader: [ :entity | entity ifNotNil: [ NeoJSONReader fromString: entity contents ] ];
+    contentWriter: [ :object | ZnEntity with: (NeoJSONWriter toString: object) type: ZnMimeType applicationJson ];
+    addPathSegment: 'objects';
+    contents: (Dictionary with: #'x' -> 1 with: #'y' -> 1);
+    post
+```
+
+####Client `get` command
+
+The **tODE** command:
+
+```Shell
+./rest --client=rest --uri=/objects/1001 --get
+```
+
+executes the following **Smalltalk**:
+
+```Smalltalk
+  ZnClient new
+    url: 'http://localHost:1720';
+    addPathSegment: #'storage';
+    accept: ZnMimeType applicationJson;
+    contentReader: [ :entity | entity ifNotNil: [ NeoJSONReader fromString: entity contents ] ];
+    contentWriter: [ :object | ZnEntity with: (NeoJSONWriter toString: object) type: ZnMimeType applicationJson ];
+    addPath: 'objects/1001';
+    get;
+    contents
 ```
 
