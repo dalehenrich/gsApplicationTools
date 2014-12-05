@@ -71,14 +71,20 @@ project load --loads=REST --baseline \
 executes:
 
 ```Smalltalk
-Metacello new
-  baseline: 'ZincHTTPComponents';
-  repository: 'github://GsDevKit/zinc:issue_58/repository';
-  load: 'REST'.
+GsDeployer bulkMigrate: [
+  Metacello new
+    baseline: 'ZincHTTPComponents';
+    repository: 'github://GsDevKit/zinc:issue_58/repository';
+    load: 'REST' ].
 ```
 
 ###Register REST GemServer
 
+```Shell
+./rest --register=rest --port=1720 --log=all --logTo=objectLog
+```
+
+executes: 
 ```Smalltalk
 (ZnGemServer register: 'rest')
     ports: #(1720);
@@ -90,6 +96,14 @@ Metacello new
 
 ###Start/Stop/Restart GemServer
 
+```Shell
+./rest --start=rest
+./rest --stop=rest
+./rest --restart=rest
+```
+
+executes:
+
 ```Smalltalk
 (GemServerRegistry gemServerNamed: 'rest') startGems.
 (GemServerRegistry gemServerNamed: 'rest') stopGems.
@@ -97,6 +111,12 @@ Metacello new
 ```
 
 ###Unregister GemServer
+
+```Shell
+./rest --unregister=rest
+```
+
+executes:
 
 ```Smalltalk
 (GemServerRegistry gemServerNamed: 'rest') unregister.
