@@ -5,8 +5,9 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
     getOptsMixedLongShort:
       {#(\'help\' $h #\'none\').
       #(\'client\' nil #\'required\').
-      #(\'path\' nil #\'required\').
+      #(\'uri\' nil #\'required\').
       #(\'post\' nil #\'required\').
+      #(\'get\' nil #\'none\').
       #(\'log\' nil #\'required\').
       #(\'logTo\' nil #\'required\').
       #(\'port\' nil #\'required\').
@@ -25,9 +26,7 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
       result := #\'noop\'.
       opts
         at: \'unregister\'
-        ifPresent: [ :serverName | 
-          result := GemServerRegistry removeGemServerNamed: serverName.
-            ]
+        ifPresent: [ :serverName | result := GemServerRegistry removeGemServerNamed: serverName ]
         ifAbsent: [ 
           opts
             at: \'register\'
@@ -64,7 +63,7 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
       opts
         at: \'client\'
         ifPresent: [ :serverName | 
-          | client url pathSegment |
+          | client url uri |
           gemServer := GemServerRegistry gemServerNamed: serverName.
           url := \'http://localHost:\' , gemServer ports first printString.
           client := ZnClient new
@@ -74,18 +73,26 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
             contentReader: [ :entity | entity ifNotNil: [ NeoJSONReader fromString: entity contents ] ];
             contentWriter: [ :object | ZnEntity with: (NeoJSONWriter toString: object) type: ZnMimeType applicationJson ];
             yourself.
+          result := client.
           opts
-            at: \'path\'
-            ifPresent: [ :path | pathSegment := path ]
-            ifAbsent: [ pathSegment := \'objects\' ].
+            at: \'uri\'
+            ifPresent: [ :path | uri := path findTokens: \'/\' ]
+            ifAbsent: [ uri := \'objects\' ].
           opts
             at: \'post\'
             ifPresent: [ :expression | 
               client
-                addPathSegment: pathSegment;
+                addPath: uri;
                 contents: expression evaluate;
                 post.
-              result := client response ] ].
+              result := client contents ].
+          opts
+            at: \'get\'
+            ifPresent: [ :ignored | 
+              client
+                addPath: uri;
+                get.
+              result := client contents ] ].
       opts
         at: \'stop\'
         ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stopGems ].
@@ -112,6 +119,9 @@ EXAMPLES
   ./rest --stop=rest
   ./rest --restart=rest
 
-  ./rest --client=rest --path=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`
+  ./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
+  ./rest --client=rest --uri=/objects/1001 --get; edit
+
+  ./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
 \'
-        topez: topez ] ]',#creationTime:DateAndTime['2014-12-04T09:40:16.3255650997161-08:00'],#modificationTime:DateAndTime['2014-12-04T11:29:00.8640038967132-08:00']}
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-04T09:40:16.3255650997161-08:00'],#modificationTime:DateAndTime['2014-12-04T11:56:34.1674859523773-08:00']}

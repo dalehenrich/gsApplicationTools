@@ -14,3 +14,4 @@ if [ -e $pidfile ]; then
 else
   echo "   No PID file found for gem on port $port, not running?"
 fi
+exit 0
