@@ -80,7 +80,7 @@ The following Smalltalk snippets are representative of the code that is executed
 The **tODE** command:
 
 ```Shell
-tode> project load --loads=REST --baseline \
+project load --loads=REST --baseline \
         --repository=github://GsDevKit/zinc:issue_58/repository ZincHTTPComponents  
 ```
 
@@ -99,7 +99,7 @@ GsDeployer bulkMigrate: [
 The **tODE** command:
 
 ```Shell
-tode> ./rest --register=rest --port=1720 --log=all --logTo=objectLog
+./rest --register=rest --port=1720 --log=all --logTo=objectLog
 ```
 
 executes the following **Smalltalk**:
@@ -119,9 +119,9 @@ executes the following **Smalltalk**:
 The **tODE** commands:
 
 ```Shell
-tode> ./rest --start=rest
-tode> ./rest --stop=rest
-tode> ./rest --restart=rest
+./rest --start=rest
+./rest --stop=rest
+./rest --restart=rest
 ```
 
 executes the following **Smalltalk**:
@@ -137,7 +137,7 @@ executes the following **Smalltalk**:
 The **tODE** command:
 
 ```Shell
-tode> ./rest --unregister=rest
+./rest --unregister=rest
 ```
 
 executes the following **Smalltalk**:
