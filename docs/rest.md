@@ -89,6 +89,8 @@ Here's the contents of tODE inspector:
 3@       -> 'y'->1
 ```
 
+#### Debugging with remote GemServer
+
 ```Shell
 ./rest
 ```
@@ -211,8 +213,12 @@ executes the following **Smalltalk**:
     url: 'http://localHost:1720';
     addPathSegment: #'storage';
     accept: ZnMimeType applicationJson;
-    contentReader: [ :entity | entity ifNotNil: [ NeoJSONReader fromString: entity contents ] ];
-    contentWriter: [ :object | ZnEntity with: (NeoJSONWriter toString: object) type: ZnMimeType applicationJson ];
+    contentReader: [ :entity | 
+        entity ifNotNil: [ NeoJSONReader fromString: entity contents ] ];
+    contentWriter: [ :object | 
+        ZnEntity 
+            with: (NeoJSONWriter toString: object) 
+            type: ZnMimeType applicationJson ];
     addPath: 'objects/1001';
     get;
     contents
