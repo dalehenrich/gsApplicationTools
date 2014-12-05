@@ -9,7 +9,7 @@ I offer a REST interface on /storage with CRUD operations on JSON maps.
 I automatically use the call hierarchy below ZnExampleStorageRestCall.
 ```
 
-To install Zinc REST support ([*st*](#zinc-rest-installation)), evaluate the following in a tODE shell:
+To install Zinc REST support ([*smalltalk*](#zinc-rest-installation)), evaluate the following in a tODE shell:
 
 ```Shell
 project load --loads=REST --baseline \
@@ -32,7 +32,7 @@ cd /home/gemServerExample
 
 to bring the `rest` script into your 
 
-To register a REST GemServer ([**st**](#register-rest-gemserver)) execute the following in a tODE shell:
+To register a REST GemServer ([**smalltalk**](#register-rest-gemserver)) execute the following in a tODE shell:
 
 ```Shell
 ./rest --register=rest --port=1720 --log=all --logTo=objectLog
