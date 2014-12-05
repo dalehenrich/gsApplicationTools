@@ -10,7 +10,7 @@ From the class comment:
 To install Zinc REST support, evaluate the following in a tODE shell ([**smalltalk code**](#zinc-rest-installation)):
 
 ```csh
-tode> project load --loads=REST --baseline \
+tode > project load --loads=REST --baseline \
         --repository=github://GsDevKit/zinc:issue_58/repository ZincHTTPComponents  
 ```
 
