@@ -10,22 +10,21 @@ From the class comment:
 To install Zinc REST support, evaluate the following in a tODE shell ([**smalltalk code**](#zinc-rest-installation)):
 
 ```Shell
-project load --loads=REST --baseline \
+> project load --loads=REST --baseline \
         --repository=github://GsDevKit/zinc:issue_58/repository ZincHTTPComponents  
 ```
 
 To browse the classes used in this example evaluate the following in a tODE shell:
 
 ```Shell
-browse class --exact --hier ZnExampleStorageRestCall ZnExampleStorageRestServerDelegate \
+> browse class --exact --hier ZnExampleStorageRestCall ZnExampleStorageRestServerDelegate \
        ZnAbstractExampleStorageRestServerDelegateTest ZnGemServer
 ```
 
 Use the `mount` command:  
 
 ```Shell
-mount /sys/stone/repos/gsApplicationTools/tode/ /home gemServerExample
-cd /home/gemServerExample
+> mount /sys/stone/repos/gsApplicationTools/tode/ /home gemServerExample
 ```
 
 to bring the `rest` script into your 
@@ -33,21 +32,21 @@ to bring the `rest` script into your
 To register a REST GemServer execute the following in a tODE shell ([**smalltalk code**](#register-rest-gemserver)):
 
 ```Shell
-./rest --register=rest --port=1720 --log=all --logTo=objectLog
+> ./rest --register=rest --port=1720 --log=all --logTo=objectLog
 ```
 
 The regisrtation command need only be issued once. Thereafter you can used the following to start/stop/restart a remote GemServer ([**smalltalk code**](#startstoprestart-gemserver)):
 
 ```Shell
-./rest --start=rest
-./rest --stop=rest
-./rest --restart=rest
+> ./rest --start=rest
+> ./rest --stop=rest
+> ./rest --restart=rest
 ```
 
 When you are done, you may use the following to unregister the GemServer ([**smalltalk code**](#unregister-gemserver]): 
 
 ```Shell
-./rest --unregister=rest
+> ./rest --unregister=rest
 ```
 
 
