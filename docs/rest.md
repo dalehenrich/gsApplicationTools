@@ -9,7 +9,7 @@ I offer a REST interface on /storage with CRUD operations on JSON maps.
 I automatically use the call hierarchy below ZnExampleStorageRestCall.
 ```
 
-To install Zinc REST support ([*smalltalk*](#zinc-rest-installation)), evaluate the following in a tODE shell:
+To install Zinc REST support, evaluate the following in a tODE shell ([**smalltalk code**](#zinc-rest-installation)):
 
 ```Shell
 project load --loads=REST --baseline \
@@ -32,13 +32,13 @@ cd /home/gemServerExample
 
 to bring the `rest` script into your 
 
-To register a REST GemServer ([**smalltalk**](#register-rest-gemserver)) execute the following in a tODE shell:
+To register a REST GemServer execute the following in a tODE shell ([**smalltalk code**](#register-rest-gemserver)):
 
 ```Shell
 ./rest --register=rest --port=1720 --log=all --logTo=objectLog
 ```
 
-The regisrtation command need only be issued once. Thereafter you can used the following to [start/stop/restart](#startstoprestart-gemserver) a remote GemServer:
+The regisrtation command need only be issued once. Thereafter you can used the following to start/stop/restart a remote GemServer ([**smalltalk code**](#startstoprestart-gemserver)):
 
 ```Shell
 ./rest --start=rest
@@ -46,7 +46,7 @@ The regisrtation command need only be issued once. Thereafter you can used the f
 ./rest --restart=rest
 ```
 
-When you are done, you may use the following to [unregister the GemServer](#unregister-gemserver]: 
+When you are done, you may use the following to unregister the GemServer ([**smalltalk code**](#unregister-gemserver]): 
 
 ```Shell
 ./rest --unregister=rest
