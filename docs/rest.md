@@ -61,7 +61,7 @@ When you are done, you may use the following to unregister the GemServer ([**sma
 
 The following Smalltalk snippets are representative of the code that is executed by the tODE commands.
 
-###Zinc REST Installation
+####Zinc REST Installation
 
 The tODE command:
 
@@ -80,7 +80,7 @@ GsDeployer bulkMigrate: [
     load: 'REST' ].
 ```
 
-###Register REST GemServer
+####Register REST GemServer
 
 The tODE command:
 
@@ -98,7 +98,7 @@ executes:
     register.
 ```
 
-###Start/Stop/Restart GemServer
+####Start/Stop/Restart GemServer
 
 The tODE command:
 
@@ -116,7 +116,7 @@ executes:
 (GemServerRegistry gemServerNamed: 'rest') restartGems.
 ```
 
-###Unregister GemServer
+####Unregister GemServer
 
 The tODE command:
 
