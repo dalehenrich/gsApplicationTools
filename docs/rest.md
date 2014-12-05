@@ -24,6 +24,7 @@ browse class --exact --hier ZnExampleStorageRestCall ZnExampleStorageRestServerD
        ZnAbstractExampleStorageRestServerDelegateTest ZnGemServer
 ```
 
+#### tODE `rest` script
 Mount the example script directory in your `/home` directory:  
 
 ```Shell
@@ -31,10 +32,10 @@ mount /sys/stone/repos/gsApplicationTools/tode/ /home gemServerExample
 cd /home/gemServerExample
 ```
 
-*rest* script synopsis:
+Script synopsis:
 
 ```
-rest [-h|--help]
+./rest [-h|--help]
      --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] \
                                  [--log=all|debug|error|info]
      --unregister=<gemServer-name>
