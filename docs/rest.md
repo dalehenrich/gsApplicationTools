@@ -1,26 +1,36 @@
 GemServer support of Zinc REST
 -----------------
 
-The following REST examples are base on using the **ZnExampleStorageRestServerDelegate** from the class commet:
+The following REST examples are base on using the **ZnExampleStorageRestServerDelegate**.
+From the class commet:
 
 ```
 I offer a REST interface on /storage with CRUD operations on JSON maps. 
 I automatically use the call hierarchy below ZnExampleStorageRestCall.
 ```
 
-## GemStone Installation
-
 To [install Zinc REST support](#zinc-rest-installation), evaluate the following in a tODE shell:
 
 ```Shell
-project load --loads=REST --baseline --repository=github://GsDevKit/zinc:issue_58/repository ZincHTTPComponents  
+project load --loads=REST --baseline \
+        --repository=github://GsDevKit/zinc:issue_58/repository ZincHTTPComponents  
 ```
 
 To browse the classes used in this example evaluate the following in a tODE shell:
 
 ```Shell
-browse class --exact --hier ZnExampleStorageRestCall ZnExampleStorageRestServerDelegate ZnAbstractExampleStorageRestServerDelegateTest ZnGemServer
+browse class --exact --hier ZnExampleStorageRestCall ZnExampleStorageRestServerDelegate \
+       ZnAbstractExampleStorageRestServerDelegateTest ZnGemServer
 ```
+
+Use the `mount` command:  
+
+```Shell
+mount --repoRoot=github://GsDevKit/gsApplicationTools:master/repository ../tode/ /home gemServerExample
+cd /home/gemServerExample
+```
+
+to bring the `rest` script into your 
 
 To [register a REST GemServer](#register-rest-gemserver) execute the following in a tODE shell:
 
@@ -28,7 +38,7 @@ To [register a REST GemServer](#register-rest-gemserver) execute the following i
 ./rest --register=rest --port=1720 --log=all --logTo=objectLog
 ```
 
-The regisrtation command need only be issued once. Thereafter you can used the following to [start/stop/restart](#start-stop-restart-gemserver) a remote GemServer:
+The regisrtation command need only be issued once. Thereafter you can used the following to [start/stop/restart](#startstoprestart-gemserver) a remote GemServer:
 
 ```Shell
 ./rest --start=rest
@@ -36,9 +46,7 @@ The regisrtation command need only be issued once. Thereafter you can used the f
 ./rest --restart=rest
 ```
 
-The remote GemServer is started a *topaz* instance using the [*startGemServerGem* script](https://github.com/GsDevKit/gsApplicationTools/blob/master/bin/startGemServerGem) found in the *bin* directory of the gsApplicationTools git clone.
-
-When you are done, you may use the following to unregister the GemServer: 
+When you are done, you may use the following to [unregister the GemServer](#unregister-gemserver]: 
 
 ```Shell
 ./rest --unregister=rest
@@ -49,7 +57,7 @@ When you are done, you may use the following to unregister the GemServer:
 ./rest
 ```
 
-##Smalltalk Workspaces
+##Smalltalk Appendix
 
 ###Zinc REST Installation
 
