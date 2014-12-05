@@ -62,13 +62,7 @@ Unregister the GemServer ([**smalltalk code**](#unregister-gemserver]):
 
 #### `rest` Client commands
 
-Register a dictionary with the REST server using the `post` command ([**smalltalk code**](#client-post-command)):
-
-```Shell
-./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`
-edit
-```
-
+##### Post
 Register a dictionary with the REST server using the `post` command ([**smalltalk code**](#client-post-command)):
 
 ```Shell
@@ -77,6 +71,7 @@ Register a dictionary with the REST server using the `post` command ([**smalltal
 
 The command returns the URI of the object for example: `/storage/objects/1001`.
 
+##### Get
 The `get` command returns an object ([**smalltalk code**](#client-get-command)): 
 
 ```Shell
@@ -98,6 +93,7 @@ Here's the contents of tODE inspector:
 ./rest
 ```
 
+---
 
 ##Smalltalk Appendix
 
@@ -189,8 +185,12 @@ executes the following **Smalltalk**:
     url: 'http://localHost:1720';
     addPathSegment: #'storage';
     accept: ZnMimeType applicationJson;
-    contentReader: [ :entity | entity ifNotNil: [ NeoJSONReader fromString: entity contents ] ];
-    contentWriter: [ :object | ZnEntity with: (NeoJSONWriter toString: object) type: ZnMimeType applicationJson ];
+    contentReader: [ :entity | 
+        entity ifNotNil: [ NeoJSONReader fromString: entity contents ] ];
+    contentWriter: [ :object | 
+        ZnEntity 
+            with: (NeoJSONWriter toString: object) 
+            type: ZnMimeType applicationJson ];
     addPathSegment: 'objects';
     contents: (Dictionary with: #'x' -> 1 with: #'y' -> 1);
     post
