@@ -63,6 +63,8 @@ The following Smalltalk snippets are representative of the code that is executed
 
 ###Zinc REST Installation
 
+The tODE command:
+
 ```Shell
 project load --loads=REST --baseline \
         --repository=github://GsDevKit/zinc:issue_58/repository ZincHTTPComponents  
@@ -80,6 +82,8 @@ GsDeployer bulkMigrate: [
 
 ###Register REST GemServer
 
+The tODE command:
+
 ```Shell
 ./rest --register=rest --port=1720 --log=all --logTo=objectLog
 ```
@@ -96,6 +100,8 @@ executes:
 
 ###Start/Stop/Restart GemServer
 
+The tODE command:
+
 ```Shell
 ./rest --start=rest
 ./rest --stop=rest
@@ -111,6 +117,8 @@ executes:
 ```
 
 ###Unregister GemServer
+
+The tODE command:
 
 ```Shell
 ./rest --unregister=rest
