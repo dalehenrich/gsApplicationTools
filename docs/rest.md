@@ -51,7 +51,7 @@ When you are done, you may use the following to unregister the GemServer ([**sma
 
 
 ```Shell
-./rest
+ tode 1 > ./rest
 ```
 
 ##Smalltalk Appendix
