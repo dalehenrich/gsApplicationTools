@@ -31,14 +31,15 @@ mount /sys/stone/repos/gsApplicationTools/tode/ /home gemServerExample
 cd /home/gemServerExample
 ```
 
-**SYNOPSIS** for `rest` script:
+*rest* script synopsis:
 
-```man
-  rest [-h|--help]
-       --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] [--log=all|debug|error|info]
-       --unregister=<gemServer-name>
-       --client=<gemServer-name> [--path=<path>] [--post=`expression`]
-       --client=<gemServer-name> [--get=<path>]
+```
+rest [-h|--help]
+     --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] \
+                                 [--log=all|debug|error|info]
+     --unregister=<gemServer-name>
+     --client=<gemServer-name> [--path=<path>] [--post=`expression`]
+     --client=<gemServer-name> [--get=<path>]
 ```
 
 #### GemServer control
