@@ -2,14 +2,14 @@ GemServer support of Zinc REST
 -----------------
 
 The following REST examples are base on using the **ZnExampleStorageRestServerDelegate**.
-From the class commet:
+From the class comment:
 
 ```
 I offer a REST interface on /storage with CRUD operations on JSON maps. 
 I automatically use the call hierarchy below ZnExampleStorageRestCall.
 ```
 
-To [install Zinc REST support](#zinc-rest-installation), evaluate the following in a tODE shell:
+To[install Zinc REST support ([*st*](#zinc-rest-installation)), evaluate the following in a tODE shell:
 
 ```Shell
 project load --loads=REST --baseline \
