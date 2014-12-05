@@ -59,7 +59,16 @@ When you are done, you may use the following to unregister the GemServer ([**sma
 
 ##Smalltalk Appendix
 
+The following Smalltalk snippets are representative of the code that is executed by the tODE commands.
+
 ###Zinc REST Installation
+
+```Shell
+project load --loads=REST --baseline \
+        --repository=github://GsDevKit/zinc:issue_58/repository ZincHTTPComponents  
+```
+
+executes:
 
 ```Smalltalk
 Metacello new
