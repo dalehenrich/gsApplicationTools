@@ -43,7 +43,7 @@ Script synopsis:
      --client=<gemServer-name> [--get=<path>]
 ```
 
-#### GemServer control
+#### `rest` GemServer control commands
 
 Register the REST example GemServer ([**smalltalk code**](#register-rest-gemserver)):
 
@@ -65,6 +65,7 @@ Unregister the GemServer ([**smalltalk code**](#unregister-gemserver]):
 ./rest --unregister=rest
 ```
 
+#### `rest` Client commands
 
 ```Shell
 ./rest
