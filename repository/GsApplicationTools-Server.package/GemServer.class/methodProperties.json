@@ -7,6 +7,7 @@
 		"register:on:" : "dkh 11/29/2014 06:31",
 		"serverClass" : "dkh 11/29/2014 06:32" },
 	"instance" : {
+		"bounceServerForBreakpointHandling" : "dkh 12/06/2014 14:11",
 		"createContinuation:" : "dkh 11/30/2014 08:59",
 		"defaultScriptBinDirPath" : "dkh 11/29/2014 20:08",
 		"enableRemoteBreakpoints" : "dkh 11/26/2014 19:15",
@@ -25,7 +26,7 @@
 		"ports:" : "SebastianHeidbrink 11/02/2014 15:00",
 		"recordGemPid:" : "dkh 12/04/2014 06:56",
 		"register" : "dkh 12/03/2014 10:21",
-		"restartGems" : "dkh 11/30/2014 08:33",
+		"restartGems" : "dkh 12/06/2014 13:04",
 		"scriptBinDirPath" : "dkh 11/29/2014 09:44",
 		"scriptLogEvent:object:" : "dkh 11/30/2014 08:39",
 		"scriptStartServiceOn:" : "dkh 11/30/2014 11:45",
