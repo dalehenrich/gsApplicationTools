@@ -2,5 +2,9 @@
 	"class" : {
 		"breakpointExceptionSet" : "dkh 12/03/2014 14:45" },
 	"instance" : {
-		"enableRemoteBreakpointHandling" : "dkh 11/30/2014 08:45",
-		"performOnServer:" : "dkh 11/30/2014 11:47" } }
+		"bounceServerAfterSetOrClearBreakpoints:" : "dkh 12/06/2014 14:39",
+		"clearAllBreakpoints:" : "dkh 12/06/2014 14:08",
+		"enableRemoteBreakpointHandling" : "dkh 12/06/2014 13:12",
+		"hasNoBreakpointsSet" : "dkh 12/06/2014 14:40",
+		"performOnServer:" : "dkh 11/30/2014 11:47",
+		"setOrClearBreakpoint:" : "dkh 12/06/2014 14:08" } }
