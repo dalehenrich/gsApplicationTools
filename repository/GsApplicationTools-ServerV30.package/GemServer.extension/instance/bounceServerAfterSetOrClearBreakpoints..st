@@ -3,30 +3,16 @@ bounceServerAfterSetOrClearBreakpoints: restartServerBlock
   "In GemStone 3.0, Breakpoints are only signalled from a portable (non-native) process.
    This method bounces the necessary server processes using <restartServerBlock>."
 
-  | sema activeProcess convertToPortable |
   self hasNoBreakpointsSet
     ifTrue: [ 
-      "should be native"
-      GsProcess usingNativeCode
-        ifTrue: [ 
-          "no need to bounce server threads"
-          ^ self ].
-      convertToPortable := false ]
+      "fork restartServerBlock in native process"
+      self
+        logInfo:
+          'No breakpoints: fork native thread: ' , GsProcess usingNativeCode printString.
+      GemServerLauncher forkNative: restartServerBlock ]
     ifFalse: [ 
-      "should be portable"
-      convertToPortable := true ].
-  activeProcess := ProcessorScheduler scheduler activeProcess.
-  sema := Semaphore new.
-  [ 
-  activeProcess localStackDepth.	"convert process to OM"
-  convertToPortable
-    ifTrue: [ activeProcess _convertToPortableStack ]
-    ifFalse: [ 
-      activeProcess _nativeStack
-        ifFalse: [ 
-          "no _convertToNativeStack implementation available"
-           ] ].
-  sema signal ]
-    fork.
-  sema wait.
-  restartServerBlock value
+      "fork restartServerBlock in portable process"
+      self
+        logInfo:
+          'Breakpoints: fork portable thread: ' , GsProcess usingNativeCode printString.
+      GemServerLauncher forkPortable: restartServerBlock ]

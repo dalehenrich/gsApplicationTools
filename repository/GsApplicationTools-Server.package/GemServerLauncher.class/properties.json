@@ -3,16 +3,15 @@
 	"classinstvars" : [
 		 ],
 	"classvars" : [
-		 ],
+		"Singleton" ],
 	"commentStamp" : "",
 	"instvars" : [
-		"name",
-		"serverClassAssoc",
-		"ports",
-		"enableRemoteBreakpoints",
-		"nativeLauncher",
-		"portableLauncher" ],
-	"name" : "GemServer",
+		"block",
+		"nativeSemaphore",
+		"nativeProcess",
+		"portableSemaphore",
+		"portableProcess" ],
+	"name" : "GemServerLauncher",
 	"pools" : [
 		 ],
 	"super" : "Object",
