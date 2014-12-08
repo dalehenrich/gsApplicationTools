@@ -2,9 +2,9 @@
 	"class" : {
 		"breakpointExceptionSet" : "dkh 12/03/2014 14:45" },
 	"instance" : {
-		"bounceServerAfterSetOrClearBreakpoints:" : "dkh 12/06/2014 14:39",
-		"clearAllBreakpoints:" : "dkh 12/06/2014 14:08",
+		"bounceServerAfterSetOrClearBreakpoints:" : "dkh 12/07/2014 10:12",
+		"clearAllBreakpoints:" : "dkh 12/07/2014 18:24",
 		"enableRemoteBreakpointHandling" : "dkh 12/06/2014 13:12",
-		"hasNoBreakpointsSet" : "dkh 12/06/2014 14:40",
+		"hasNoBreakpointsSet" : "dkh 12/07/2014 18:26",
 		"performOnServer:" : "dkh 11/30/2014 11:47",
-		"setOrClearBreakpoint:" : "dkh 12/06/2014 14:08" } }
+		"setOrClearBreakpoint:" : "dkh 12/07/2014 18:24" } }
