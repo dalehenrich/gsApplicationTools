@@ -7,8 +7,6 @@ From the class comment:
 > I offer a REST interface on /storage with CRUD operations on JSON maps. 
 > I automatically use the call hierarchy below ZnExampleStorageRestCall.
 
-**Note: All of the code snippets in this section should be evaluated in a tODE shell window.**
-
 - [Installation](#installation)
 - [tODE `rest` script](#tode-rest-script)
   - [`rest` Server commands](#rest-gemserver-commands)
@@ -27,6 +25,8 @@ From the class comment:
   - [Client `post` command](#client-post-command)
   - [Client `get` command](#client-get-command)
   - []()
+
+**Note: All of the code snippets in this document (with the exception of the code in the [Smalltalk Expression Appendix](#smalltalk-expression-appendix)) should be evaluated in a tODE shell window.**
 
 #### Installation
 Install Zinc REST support ([**smalltalk code**](#zinc-rest-installation)):
@@ -59,7 +59,7 @@ Script man page:
 
 ##### `rest` Server commands
 
-Register the REST example GemServer ([**smalltalk code**](#register-rest-gemserver)):
+Register the GemServer ([**smalltalk code**](#register-rest-gemserver)):
 
 ```Shell
 ./rest --register=rest --port=1720 --log=all --logTo=objectLog
@@ -265,7 +265,7 @@ and clicking on one of the stack frames will show you the method source and brin
 
 ##### Remote Breakpoints
 
-##Note: to use remote breakpoings you must be using GemStone 3.2.4 or greater##
+**Note: to use remote breakpoings you must be using GemStone 3.2.4 or greater**
 
 To use remote breakpoints, you first need to start your remote gemServer:
 
@@ -328,7 +328,7 @@ So let's set a breakpoint there:
 break set ZnRestServerDelegate>>handleRequest: 14
 ```
 
-And then let's run a `post` command:
+Run a `post` command to trigger the breakpoint:
 
 ```Shell
 ./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`
