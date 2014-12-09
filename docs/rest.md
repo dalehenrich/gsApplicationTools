@@ -17,6 +17,7 @@ From the class comment:
   - [Object Log](#object-log)
   - [Debugging continuations in the Object Log](#debugging-continuations-in-the-object-log)
   - [Remote Breakpoints (3.2.4 and beyond)](#remote-breakpoints)
+- [`rest` Script source](#rest-script-source)
 - [tODE Script Appendix](#tode-script-appendix)
 - [Smalltalk Expression Appendix](#smalltalk-expression-appendix)
   - [Zinc REST Installation](#zinc-rest-installation)
@@ -436,6 +437,144 @@ break remote --enable
 break steps ZnRestServerDelegate>>handleRequest:
 break set ZnRestServerDelegate>>handleRequest: 14
 break clear
+```
+
+## `rest` Script source
+
+```Smalltalk
+[ :topez :objIn :tokens :command :commandNode | 
+  | opts args |
+  "for help: ./rest -h"
+  command
+    getOptsMixedLongShort:
+      {#('help' $h #'none').
+      #('client' nil #'required').
+      #('uri' nil #'required').
+      #('post' nil #'required').
+      #('get' nil #'none').
+      #('debug' nil #'none').
+      #('log' nil #'required').
+      #('logTo' nil #'required').
+      #('port' nil #'required').
+      #('register' nil #'required').
+      #('restart' nil #'required').
+      #('start' nil #'required').
+      #('stop' nil #'required').
+      #('unregister' nil #'required')}
+    optionsAndArguments: [ :options :operands | 
+      opts := options.
+      args := operands ].
+  opts
+    at: 'help'
+    ifAbsent: [ 
+      | gemServer result |
+      result := #'noop'.
+      opts
+        at: 'unregister'
+        ifPresent: [ :serverName | result := GemServerRegistry removeGemServerNamed: serverName ]
+        ifAbsent: [ 
+          opts
+            at: 'register'
+            ifPresent: [ :serverName | 
+              gemServer := (GemServerRegistry gemServerNamed: serverName)
+                ifNil: [ 
+                  gemServer := (ZnGemServer register: serverName)
+                    delegate: ZnExampleStorageRestServerDelegate new;
+                    yourself ].
+              opts
+                at: 'debug'
+                ifPresent: [ :ignored | gemServer debugMode: true ].
+              opts
+                at: 'port'
+                ifPresent: [ :portString | gemServer ports: {(portString asNumber)} ].
+              opts
+                at: 'log'
+                ifPresent: [ :logString | 
+                  logString = 'all'
+                    ifTrue: [ gemServer logFilter: nil ]
+                    ifFalse: [ gemServer logFilter: logString asSymbol ].
+                  opts
+                    at: 'logTo'
+                    ifPresent: [ :logToString | 
+                      logToString = 'objectLog'
+                        ifTrue: [ gemServer logToObjectLog ]
+                        ifFalse: [ 
+                          logToString = 'transcript'
+                            ifTrue: [ gemServer logToTranscript ] ] ] ] ].
+          result := gemServer ].
+      opts
+        at: 'restart'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) restartGems ].
+      opts
+        at: 'start'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) startGems ].
+      opts
+        at: 'client'
+        ifPresent: [ :serverName | 
+          | client url uri |
+          gemServer := GemServerRegistry gemServerNamed: serverName.
+          url := 'http://localHost:' , gemServer ports first printString.
+          client := ZnClient new
+            url: url;
+            addPathSegment: #'storage';
+            accept: ZnMimeType applicationJson;
+            contentReader: [ :entity | entity ifNotNil: [ NeoJSONReader fromString: entity contents ] ];
+            contentWriter: [ :object | ZnEntity with: (NeoJSONWriter toString: object) type: ZnMimeType applicationJson ];
+            yourself.
+          result := client.
+          opts
+            at: 'uri'
+            ifPresent: [ :path | uri := path findTokens: '/' ]
+            ifAbsent: [ uri := 'objects' ].
+          opts
+            at: 'post'
+            ifPresent: [ :expression | 
+              client
+                addPath: uri;
+                contents: expression evaluate;
+                post.
+              result := client contents ].
+          opts
+            at: 'get'
+            ifPresent: [ :ignored | 
+              client
+                addPath: uri;
+                get.
+              result := client contents ] ].
+      opts
+        at: 'stop'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stopGems ].
+      result ]
+    ifPresent: [ :ignored | 
+      TDManPage
+        viewManPage:
+          'NAME
+  rest - rest sript utility template
+SYNOPSIS
+  rest [-h|--help]
+       --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] [--log=all|debug|error|info] [--debug]
+       --unregister=<gemServer-name>
+       --client=<gemServer-name> [--path=<path>] [--post=`expression`]
+       --client=<gemServer-name> [--get=<path>] 
+DESCRIPTION
+EXAMPLES
+  ./rest --help
+  ./rest -h
+  ./rest --register=rest --port=1720 --log=all --logTo=transcript --debug
+  ./rest --register=rest --port=1720 --log=all --logTo=transcript
+  ./rest --register=rest --port=1720 --log=all --logTo=objectLog
+  ./rest --unregister=rest
+
+  ./rest --start=rest
+  ./rest --stop=rest
+  ./rest --restart=rest
+
+  ./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
+  ./rest --client=rest --uri=/objects/1001 --get; edit
+
+  ./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
+'
+        topez: topez ] ]
 ```
 
 ---
