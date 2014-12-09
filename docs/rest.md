@@ -9,6 +9,25 @@ From the class comment:
 
 **Note: All of the code snippets in this section should be evaluated in a tODE shell window.**
 
+- [Installation](#installation)
+- [tODE `rest` script](#tode-rest-script)
+  - [`rest` Server commands](#rest-gemserver-commands)
+  - [`rest` Client commands ](#rest-client-commands)
+    - [Post](#post)
+    - [Get](#get)
+- [Debugging Server](#debugging-server)
+  - [Object Log](#object-log)
+  - [Continuations in Object Log](#continuations-in-object-log)
+  - [Remote Breakpoints (3.2.4 and beyond)](#remote-breakpoints)
+- [Smalltalk Expression Appendix](#smalltalk-expression-appendix)
+  - [Zinc REST Installation](#zinc-rest-installation)
+  - [Register REST GemServer](#register-rest-gemserver)
+  - [Start/Stop/Restart GemServer](#startstoprestart-gemserver)
+  - [Unregister GemServer](#unregister-gemserver)
+  - [Client `post` command](#client-post-command)
+  - [Client `get` command](#client-get-command)
+  - []()
+
 #### Installation
 Install Zinc REST support ([**smalltalk code**](#zinc-rest-installation)):
 
@@ -38,7 +57,7 @@ Script man page:
 ./rest --help
 ```
 
-#### `rest` GemServer control commands
+##### `rest` Server commands
 
 Register the REST example GemServer ([**smalltalk code**](#register-rest-gemserver)):
 
@@ -60,9 +79,9 @@ Unregister the GemServer ([**smalltalk code**](#unregister-gemserver]):
 ./rest --unregister=rest
 ```
 
-#### `rest` Client commands
+##### `rest` Client commands
 
-##### Post
+###### Post
 Register a dictionary with the REST server using the `post` command ([**smalltalk code**](#client-post-command)):
 
 ```Shell
@@ -71,7 +90,7 @@ Register a dictionary with the REST server using the `post` command ([**smalltal
 
 The command returns the URI of the object for example: `/storage/objects/1001`.
 
-##### Get
+###### Get
 The `get` command returns an object ([**smalltalk code**](#client-get-command)): 
 
 ```Shell
@@ -89,9 +108,9 @@ Here's the contents of tODE inspector:
 3@       -> 'y'->1
 ```
 
-#### Debugging with remote GemServer
+##### Debugging Server
 
-The command used to register the command is all set up to do remote debugging:
+The command used to register the gemServer is all set up to do remote debugging:
 
 ```Shell
 ./rest --register=rest --port=1720 --log=all --logTo=objectLog
@@ -99,6 +118,7 @@ The command used to register the command is all set up to do remote debugging:
 
 All of the Zinc server log events are written to the object log.
 
+##### Object Log
 View the object log entries for the last hour:
 
 ```Shell
@@ -171,6 +191,7 @@ processId@   -> 881795
 timeStamp@   -> 12/05/2014 15:14:09
 ```
 
+##### Continuations in Object Log
 If an error occurs during processing a debuggable continuation is created like this one (in tODE errors are displayed in bold):
 
 ```
@@ -242,7 +263,9 @@ If you select the `-- continuation --` and select the *debug continuation* menu 
 
 and clicking on one of the stack frames will show you the method source and bring up an inspector on the method frame.
 
-#### Remote Breakpoints
+##### Remote Breakpoints
+
+##Note: to use remote breakpoings you must be using GemStone 3.2.4 or greater##
 
 To use remote breakpoints, you first need to start your remote gemServer:
 
@@ -319,7 +342,7 @@ And then let's run a `post` command:
 
 ---
 
-##Smalltalk Appendix
+##Smalltalk Expression Appendix
 
 The following Smalltalk snippets are representative of the code that is executed by the tODE commands.
 
