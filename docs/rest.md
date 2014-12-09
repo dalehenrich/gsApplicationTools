@@ -263,7 +263,7 @@ and clicking on one of the stack frames will show you the method source and brin
 
 ##### Remote Breakpoints
 
-**Note: to use remote breakpoings you must be using GemStone 3.2.4 or greater**
+**Note: to use remote breakpoings you must be using GemStone 3.2.4 or greater. If you insert a `self halt` into your code, you will get the same effect (continuation and uninterrupted execution). **
 
 To use remote breakpoints, you first need to start your remote gemServer:
 
