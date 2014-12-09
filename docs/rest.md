@@ -9,7 +9,7 @@ From the class comment:
 
 - [Installation](#installation)
 - [tODE `rest` script](#tode-rest-script)
-  - [`rest` Server commands](#rest-gemserver-commands)
+  - [`rest` Server commands](#rest-server-commands)
   - [`rest` Client commands ](#rest-client-commands)
     - [Post](#post)
     - [Get](#get)
