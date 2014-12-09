@@ -17,7 +17,7 @@ From the class comment:
   - [Object Log](#object-log)
   - [Debugging continuations in theObject Log](#debugging-continuations-in-the-object-log)
   - [Remote Breakpoints (3.2.4 and beyond)](#remote-breakpoints)
-- [tODE Script Appendix](#tode-script-appendix]
+- [tODE Script Appendix](#tode-script-appendix)
 - [Smalltalk Expression Appendix](#smalltalk-expression-appendix)
   - [Zinc REST Installation](#zinc-rest-installation)
   - [Register REST GemServer](#register-rest-gemserver)
