@@ -1,4 +1,4 @@
 accessing
 nativeSemaphore
-  nativeSemaphore ifNil: [ nativeSemaphore := Semaphore new ].
+  nativeSemaphore ifNil: [ nativeSemaphore := TransientSemaphore new ].
   ^ nativeSemaphore

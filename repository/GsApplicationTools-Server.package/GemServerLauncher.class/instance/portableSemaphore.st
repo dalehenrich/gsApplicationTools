@@ -1,4 +1,4 @@
 accessing
 portableSemaphore
-  portableSemaphore ifNil: [ portableSemaphore := Semaphore new ].
+  portableSemaphore ifNil: [ portableSemaphore := TransientSemaphore new ].
   ^ portableSemaphore

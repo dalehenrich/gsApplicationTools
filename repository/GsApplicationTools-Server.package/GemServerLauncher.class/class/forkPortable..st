@@ -3,7 +3,7 @@ forkPortable: launchBlock
   "fork a portable process to evaluate launchBlock"
 
   | sem |
-  sem := Semaphore new.
+  sem := TransientSemaphore new.
   self singleton
     block: [ 
       launchBlock value.
