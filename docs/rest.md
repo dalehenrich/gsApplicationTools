@@ -15,7 +15,7 @@ From the class comment:
     - [Get](#get)
 - [Debugging Server](#debugging-server)
   - [Object Log](#object-log)
-  - [Debugging continuations in theObject Log](#debugging-continuations-in-the-object-log)
+  - [Debugging continuations in the Object Log](#debugging-continuations-in-the-object-log)
   - [Remote Breakpoints (3.2.4 and beyond)](#remote-breakpoints)
 - [tODE Script Appendix](#tode-script-appendix)
 - [Smalltalk Expression Appendix](#smalltalk-expression-appendix)
@@ -25,7 +25,6 @@ From the class comment:
   - [Unregister GemServer](#unregister-gemserver)
   - [Client `post` command](#client-post-command)
   - [Client `get` command](#client-get-command)
-  - []()
 
 **Note: All of the code snippets in this document (with the exception of the code in the [Smalltalk Expression Appendix](#smalltalk-expression-appendix)) should be evaluated in a tODE shell window.**
 
@@ -441,10 +440,16 @@ break clear
 
 ---
 
-
 ##Smalltalk Expression Appendix
 
 The following Smalltalk snippets are representative of the code that is executed by the tODE commands.
+
+- [Zinc REST Installation](#zinc-rest-installation)
+- [Register REST GemServer](#register-rest-gemserver)
+- [Start/Stop/Restart GemServer](#startstoprestart-gemserver)
+- [Unregister GemServer](#unregister-gemserver)
+- [Client `post` command](#client-post-command)
+- [Client `get` command](#client-get-command)
 
 ####Zinc REST Installation
 
