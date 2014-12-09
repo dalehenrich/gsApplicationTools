@@ -367,7 +367,7 @@ cd /home/gemServerExample
 ./rest --stop=rest
 ./rest --restart=rest
 
-./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
+./rest --client=rest --uri=objects --post=`Dictionary with: 'x' -> 1 with: 'y' -> 1`; edit
 ./rest --client=rest --uri=/objects/1001 --get; edit
 
 ./rest --unregister=rest
