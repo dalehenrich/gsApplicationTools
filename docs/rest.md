@@ -15,8 +15,9 @@ From the class comment:
     - [Get](#get)
 - [Debugging Server](#debugging-server)
   - [Object Log](#object-log)
-  - [Continuations in Object Log](#continuations-in-object-log)
+  - [Debugging continuations in theObject Log](#debugging-continuations-in-the-object-log)
   - [Remote Breakpoints (3.2.4 and beyond)](#remote-breakpoints)
+- [tODE Script Appendix](#tode-script-appendix]
 - [Smalltalk Expression Appendix](#smalltalk-expression-appendix)
   - [Zinc REST Installation](#zinc-rest-installation)
   - [Register REST GemServer](#register-rest-gemserver)
@@ -191,7 +192,7 @@ processId@   -> 881795
 timeStamp@   -> 12/05/2014 15:14:09
 ```
 
-##### Continuations in Object Log
+##### Debugging continuations in the Object Log
 If an error occurs during processing a debuggable continuation is created like this one (in tODE errors are displayed in bold):
 
 ```
@@ -280,19 +281,23 @@ break remote --enable
 ```
 
 The you need to set a breakpoint in a method of interest. 
-The following sets a breakpoint at the first step point in ZnRestServerDelegate>>handleRequest::
+
+If you want to set a breakpoint somewhere else in the method, you can do so interactively by using the `Method>>set breakpoint (k)` menu item in a method editor.
+
+You can also use the `break set` command set a breakpoint. 
+The following sets a breakpoint at the first step point in the method *ZnRestServerDelegate>>handleRequest:*:
 
 ```Shell
-break set ZnRestServerDelegate>>handleRequest:
+break set ZnRestServerDelegate>>handleRequest: 1
 ```
 
-If you want to set a breakpoint somewhere else in the method, you can do so interactively by using the `Method>>set breakpoint (k)` menu item in a method editor or you may use the `break step` command to list the breakpoints in a method:
+If you want to set the breakpoin somewhere else in the method, you can use the `break step` command to list the breakpoints in the method:
 
 ```Shell
 break steps ZnRestServerDelegate>>handleRequest:
 ```
 
-produces the following output:
+and determine the step number by looking at the output:
 
 ```
    handleRequest: request
@@ -321,19 +326,19 @@ produces the following output:
  *                ^24                                        ^21      *******
 ```
 
-and step point 14 looks like a good place to put a break (at the beginning of the **execute:** call).
-So let's set a breakpoint there:
+The following sets the breakpoint at step point 14:
 
 ```Shell
 break set ZnRestServerDelegate>>handleRequest: 14
 ```
 
-Run a `post` command to trigger the breakpoint:
+To trigger the breakpoint, run a `post` command:
 
 ```Shell
 ./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`
 ```
 
+When a Breakpoint (or Halt) is encountered, a continuation is saved to the object log and the exception is resumed, so that from the external observer, execution is not interrupted.
 
 
 ```Shell
@@ -341,6 +346,44 @@ Run a `post` command to trigger the breakpoint:
 ```
 
 ---
+
+##tODE Script Appendix
+
+```Shell
+# installation
+project load --loads=REST --baseline \
+        --repository=github://GsDevKit/zinc:issue_58/repository ZincHTTPComponents
+browse class --exact --hier ZnExampleStorageRestCall ZnExampleStorageRestServerDelegate \
+       ZnAbstractExampleStorageRestServerDelegateTest ZnGemServer
+mount /sys/stone/repos/gsApplicationTools/tode/ /home gemServerExample
+cd /home/gemServerExample
+
+# rest script
+./rest --help
+
+./rest --register=rest --port=1720 --log=all --logTo=objectLog
+
+./rest --start=rest
+./rest --stop=rest
+./rest --restart=rest
+
+./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
+./rest --client=rest --uri=/objects/1001 --get; edit
+
+./rest --unregister=rest
+
+# object log viewer
+ol view --age=`1 hour`
+
+# breakpoints
+break remote --enable
+break steps ZnRestServerDelegate>>handleRequest:
+break set ZnRestServerDelegate>>handleRequest: 14
+break clear
+```
+
+---
+
 
 ##Smalltalk Expression Appendix
 
