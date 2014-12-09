@@ -9,9 +9,7 @@
 		"name",
 		"serverClassAssoc",
 		"ports",
-		"enableRemoteBreakpoints",
-		"nativeLauncher",
-		"portableLauncher" ],
+		"enableRemoteBreakpoints" ],
 	"name" : "GemServer",
 	"pools" : [
 		 ],

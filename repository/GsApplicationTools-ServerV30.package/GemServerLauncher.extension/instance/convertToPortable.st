@@ -1,4 +1,4 @@
-private
+*gsapplicationtools-serverv30
 convertToPortable
   "convert activeProcess to portable"
 

@@ -7,7 +7,9 @@
 		"register:on:" : "dkh 11/29/2014 06:31",
 		"serverClass" : "dkh 11/29/2014 06:32" },
 	"instance" : {
+		"bounceServerAfterSetOrClearBreakpoints:" : "dkh 12/09/2014 14:12",
 		"bounceServerForBreakpointHandling" : "dkh 12/06/2014 14:11",
+		"clearAllBreakpoints:" : "dkh 12/07/2014 18:24",
 		"createContinuation:" : "dkh 11/30/2014 08:59",
 		"defaultScriptBinDirPath" : "dkh 11/29/2014 20:08",
 		"enableRemoteBreakpoints" : "dkh 11/26/2014 19:15",
@@ -34,6 +36,7 @@
 		"scriptStartServiceOn:" : "dkh 11/30/2014 11:45",
 		"serverClass" : "dkh 11/29/2014 14:08",
 		"serverClass:" : "dkh 11/29/2014 14:08",
+		"setOrClearBreakpoint:" : "dkh 12/07/2014 18:24",
 		"setStatmonCacheName" : "dkh 11/30/2014 08:45",
 		"startGems" : "dkh 11/30/2014 08:34",
 		"startScriptName" : "dkh 12/04/2014 08:02",

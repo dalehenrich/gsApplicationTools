@@ -1,4 +1,4 @@
-*gsapplicationtools-serverv30
+remote breakpoints
 bounceServerAfterSetOrClearBreakpoints: restartServerBlock
   "In GemStone 3.0, Breakpoints are only signalled from a portable (non-native) process.
    This method bounces the necessary server processes using <restartServerBlock>."
@@ -8,13 +8,11 @@ bounceServerAfterSetOrClearBreakpoints: restartServerBlock
       "fork restartServerBlock in native process"
       self
         logInfo:
-          'No breakpoints: fork native thread: '
-            , GsProcess _current _nativeStack printString.
+          'No breakpoints: fork native thread: ' , self activeProcessIsNative printString.
       GemServerLauncher forkNative: restartServerBlock ]
     ifFalse: [ 
       "fork restartServerBlock in portable process"
       self
         logInfo:
-          'Breakpoints: fork portable thread: '
-            , GsProcess _current _nativeStack printString.
+          'Breakpoints: fork portable thread: ' , self activeProcessIsNative printString.
       GemServerLauncher forkPortable: restartServerBlock ]
