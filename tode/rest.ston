@@ -8,6 +8,7 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
       #(\'uri\' nil #\'required\').
       #(\'post\' nil #\'required\').
       #(\'get\' nil #\'none\').
+      #(\'debug\' nil #\'none\').
       #(\'log\' nil #\'required\').
       #(\'logTo\' nil #\'required\').
       #(\'port\' nil #\'required\').
@@ -36,6 +37,9 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
                   gemServer := (ZnGemServer register: serverName)
                     delegate: ZnExampleStorageRestServerDelegate new;
                     yourself ].
+              opts
+                at: \'debug\'
+                ifPresent: [ :ignored | gemServer debugMode: true ].
               opts
                 at: \'port\'
                 ifPresent: [ :portString | gemServer ports: {(portString asNumber)} ].
@@ -104,7 +108,7 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
   rest - rest sript utility template
 SYNOPSIS
   rest [-h|--help]
-       --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] [--log=all|debug|error|info]
+       --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] [--log=all|debug|error|info] [--debug]
        --unregister=<gemServer-name>
        --client=<gemServer-name> [--path=<path>] [--post=`expression`]
        --client=<gemServer-name> [--get=<path>] 
@@ -112,6 +116,8 @@ DESCRIPTION
 EXAMPLES
   ./rest --help
   ./rest -h
+  ./rest --register=rest --port=1720 --log=all --logTo=transcript --debug
+  ./rest --register=rest --port=1720 --log=all --logTo=transcript
   ./rest --register=rest --port=1720 --log=all --logTo=objectLog
   ./rest --unregister=rest
 
@@ -124,4 +130,4 @@ EXAMPLES
 
   ./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
 \'
-        topez: topez ] ]',#creationTime:DateAndTime['2014-12-04T09:40:16.3255650997161-08:00'],#modificationTime:DateAndTime['2014-12-04T11:56:34.1674859523773-08:00']}
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-04T09:40:16.3255650997161-08:00'],#modificationTime:DateAndTime['2014-12-08T16:20:56.169830083847-08:00']}

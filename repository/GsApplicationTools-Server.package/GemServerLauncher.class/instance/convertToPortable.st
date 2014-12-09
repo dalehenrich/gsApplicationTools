@@ -3,7 +3,7 @@ convertToPortable
   "convert activeProcess to portable"
 
   | sema activeProcess |
-  sema := Semaphore new.
+  sema := TransientSemaphore new.
   activeProcess := ProcessorScheduler scheduler activeProcess.
   [ 
   activeProcess localStackDepth.

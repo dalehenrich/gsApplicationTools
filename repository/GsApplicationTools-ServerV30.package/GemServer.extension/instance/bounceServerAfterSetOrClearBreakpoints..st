@@ -8,11 +8,13 @@ bounceServerAfterSetOrClearBreakpoints: restartServerBlock
       "fork restartServerBlock in native process"
       self
         logInfo:
-          'No breakpoints: fork native thread: ' , GsProcess usingNativeCode printString.
+          'No breakpoints: fork native thread: '
+            , GsProcess _current _nativeStack printString.
       GemServerLauncher forkNative: restartServerBlock ]
     ifFalse: [ 
       "fork restartServerBlock in portable process"
       self
         logInfo:
-          'Breakpoints: fork portable thread: ' , GsProcess usingNativeCode printString.
+          'Breakpoints: fork portable thread: '
+            , GsProcess _current _nativeStack printString.
       GemServerLauncher forkPortable: restartServerBlock ]
