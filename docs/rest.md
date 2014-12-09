@@ -1,4 +1,4 @@
-GemServer support of Zinc REST
+GemServer support for Zinc REST
 -----------------
 
 The REST examples in this document are base on using the **ZnExampleStorageRestServerDelegate**.
