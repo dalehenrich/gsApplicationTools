@@ -1,6 +1,6 @@
-*gsapplicationtools-serverv30
+*gsapplicationtools-serverv24
 hasNoBreakpointsSet
   | breakReport |
-  breakReport := (GsNMethod _breakReport: false) at: 2.
+  breakReport := (GsMethod _breakReport: false) at: 2.
   self logDebug: [ 'hasNoBreakpointsSet: ' , breakReport printString ].
   ^ breakReport isEmpty

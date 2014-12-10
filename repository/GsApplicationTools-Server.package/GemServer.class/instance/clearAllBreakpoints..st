@@ -1,4 +1,4 @@
-*gsapplicationtools-serverv30
+remote breakpoints
 clearAllBreakpoints: aClearBreakpointAnnouncement
   "need to bounce the server so that new GsProcess instances will be native"
 
