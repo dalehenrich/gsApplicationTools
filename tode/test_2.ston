@@ -1,0 +1,8 @@
+TDTopezLeafNode{#name:'test_2',
+#contents:'/home/examples/rest --restart=rest
+eval `(Delay forSeconds: 3) wait`
+eval `(Delay forSeconds: 3) wait`
+break clear
+eval `(Delay forSeconds: 15) wait`
+/home/examples/rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`
+',#creationTime:DateAndTime['2014-12-08T14:43:00.601331949234-08:00'],#modificationTime:DateAndTime['2014-12-08T14:44:43.0967319011688-08:00']}
