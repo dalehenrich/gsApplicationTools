@@ -1,5 +1,6 @@
 service instance-server
 startServerOn: port
-  "start server in current vm."
+  "start server in current vm. for gemstone, not expected to return."
 
-  (self serverClass on: port) start
+  self startBasicServerOn: port.
+  [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
