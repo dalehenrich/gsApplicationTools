@@ -7,8 +7,8 @@
 	"commentStamp" : "",
 	"instvars" : [
 		 ],
-	"name" : "GemServerRemoteVMTests",
+	"name" : "GemServerLauncherTests",
 	"pools" : [
 		 ],
-	"super" : "GemServerAbstractTests",
+	"super" : "TestCase",
 	"type" : "normal" }
