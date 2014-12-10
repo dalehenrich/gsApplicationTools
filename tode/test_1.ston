@@ -1,4 +1,5 @@
-TDTopezLeafNode{#name:'test_1',#contents:'break remote --enable
+TDTopezLeafNode{#name:'test_1',
+#contents:'break remote --enable
 /home/examples/rest --restart=rest
 eval `(Delay forSeconds: 3) wait`
 break set ZnRestServerDelegate>>handleRequest: 1
