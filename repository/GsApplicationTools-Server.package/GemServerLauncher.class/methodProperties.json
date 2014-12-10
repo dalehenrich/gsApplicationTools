@@ -1,0 +1,19 @@
+{
+	"class" : {
+		"forkNative:" : "dkh 12/08/2014 13:47",
+		"forkPortable:" : "dkh 12/08/2014 13:49",
+		"singleton" : "dkh 12/07/2014 08:36" },
+	"instance" : {
+		"block" : "dkh 12/07/2014 08:05",
+		"block:" : "dkh 12/07/2014 08:04",
+		"initialize" : "dkh 12/07/2014 08:21",
+		"initializeNative" : "dkh 12/07/2014 18:18",
+		"initializePortable" : "dkh 12/07/2014 18:10",
+		"nativeProcess" : "dkh 12/07/2014 08:20",
+		"nativeProcess:" : "dkh 12/07/2014 08:20",
+		"nativeSemaphore" : "dkh 12/08/2014 13:49",
+		"nativeSemaphore:" : "dkh 12/07/2014 08:20",
+		"portableProcess" : "dkh 12/07/2014 08:20",
+		"portableProcess:" : "dkh 12/07/2014 08:20",
+		"portableSemaphore" : "dkh 12/08/2014 13:49",
+		"portableSemaphore:" : "dkh 12/07/2014 08:20" } }

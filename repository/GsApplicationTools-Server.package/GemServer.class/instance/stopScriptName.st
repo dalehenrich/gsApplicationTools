@@ -1,0 +1,3 @@
+server specialization
+stopScriptName
+  ^ 'stopGemServerGem'

@@ -1,0 +1,18 @@
+{
+	"category" : "GsApplicationTools-Server",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"Singleton" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"block",
+		"nativeSemaphore",
+		"nativeProcess",
+		"portableSemaphore",
+		"portableProcess" ],
+	"name" : "GemServerLauncher",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

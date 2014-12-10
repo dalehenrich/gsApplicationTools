@@ -1,0 +1,14 @@
+{
+	"category" : "GsApplicationTools-Test",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"EventLog" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"port" ],
+	"name" : "GemServerMockServer",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+GemServer="$1"
+Port="$2"
+
+# must match GemServer>>gemPidFileName:
+pidfile="${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.pid"
+
+if [ -e $pidfile ]; then
+  pid=`cat $pidfile`
+  rm $pidfile
+  echo "   Stopping topaz PID $pid running on port $port"
+  kill $pid
+else
+  echo "   No PID file found for gem on port $port, not running?"
+fi
+exit 0

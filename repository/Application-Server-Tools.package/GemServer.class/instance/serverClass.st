@@ -1,3 +1,0 @@
-other
-serverClass
-	^serverClass
