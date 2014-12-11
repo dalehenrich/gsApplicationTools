@@ -9,7 +9,7 @@ enableRemoteBreakpointHandling
     object: self.
   Breakpoint trappable: true.
   GemToGemAnnouncement installStaticHandler.
-  System commitTransaction
+  System _commitPrintingDiagnostics
     ifFalse: [ self error: 'Could not commit for GemToGemSignaling' ].
   GemToGemAnnouncement announcer
     on: ClearAllBreakpointsAnnouncement send: #'clearAllBreakpoints:' to: self;
