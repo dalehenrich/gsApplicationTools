@@ -1,6 +1,6 @@
 server specialization
 executeStopGemCommand: port
-  | commandLine performOnServerStatusArray |
+  | commandLine |
   commandLine := self stopScriptPath , ' ' , self name , ' ' , port asString
     , ' "' , self exeConfPath , '"'.
   self performOnServer: commandLine
