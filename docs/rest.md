@@ -22,7 +22,7 @@ From the class comment:
 - [Smalltalk Expression Appendix](#smalltalk-expression-appendix)
   - [Zinc REST Installation](#zinc-rest-installation)
   - [Register REST GemServer](#register-rest-gemserver)
-  - [Start/Stop/Restart GemServer](#startstoprestart-gemserver)
+  - [Start/Stop/Restart/Status GemServer](#startstoprestartstatus-gemserver)
   - [Unregister GemServer](#unregister-gemserver)
   - [Client `post` command](#client-post-command)
   - [Client `get` command](#client-get-command)
@@ -66,12 +66,13 @@ Register the GemServer ([**smalltalk code**](#register-rest-gemserver)):
 ./rest --register=rest --port=1720 --log=all --logTo=objectLog
 ```
 
-Start/stop/restart GemServer ([**smalltalk code**](#startstoprestart-gemserver)):
+Start/stop/restart/status GemServer ([**smalltalk code**](#startstoprestartstatus-gemserver)):
 
 ```Shell
 ./rest --start=rest
 ./rest --stop=rest
 ./rest --restart=rest
+./rest --status=rest
 ```
 
 Unregister the GemServer ([**smalltalk code**](#unregister-gemserver]): 
@@ -423,6 +424,7 @@ cd /home/gemServerExample
 ./rest --start=rest
 ./rest --stop=rest
 ./rest --restart=rest
+./rest --status=rest
 
 ./rest --client=rest --uri=objects --post=`Dictionary with: 'x' -> 1 with: 'y' -> 1`; edit
 ./rest --client=rest --uri=/objects/1001 --get; edit
@@ -460,6 +462,7 @@ break clear
       #('restart' nil #'required').
       #('start' nil #'required').
       #('stop' nil #'required').
+      #('status' nil #'required').
       #('unregister' nil #'required')}
     optionsAndArguments: [ :options :operands | 
       opts := options.
@@ -544,6 +547,9 @@ break clear
       opts
         at: 'stop'
         ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stopGems ].
+      opts
+        at: 'status'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) statusGems ].
       result ]
     ifPresent: [ :ignored | 
       TDManPage
@@ -554,6 +560,10 @@ SYNOPSIS
   rest [-h|--help]
        --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] [--log=all|debug|error|info] [--debug]
        --unregister=<gemServer-name>
+       --start=<gemServer-name>
+       --stop=<gemServer-name>
+       --restart=<gemServer-name>
+       --status=<gemServer-name>
        --client=<gemServer-name> [--path=<path>] [--post=`expression`]
        --client=<gemServer-name> [--get=<path>] 
 DESCRIPTION
@@ -568,6 +578,7 @@ EXAMPLES
   ./rest --start=rest
   ./rest --stop=rest
   ./rest --restart=rest
+  ./rest --status=rest
 
   ./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
   ./rest --client=rest --uri=/objects/1001 --get; edit
@@ -585,7 +596,7 @@ The following Smalltalk snippets are representative of the code that is executed
 
 - [Zinc REST Installation](#zinc-rest-installation)
 - [Register REST GemServer](#register-rest-gemserver)
-- [Start/Stop/Restart GemServer](#startstoprestart-gemserver)
+- [Start/Stop/Restart/Status GemServer](#startstoprestartstatus-gemserver)
 - [Unregister GemServer](#unregister-gemserver)
 - [Client `post` command](#client-post-command)
 - [Client `get` command](#client-get-command)
@@ -629,7 +640,7 @@ executes the following **Smalltalk**:
     register.
 ```
 
-####Start/Stop/Restart GemServer
+####Start/Stop/Restart/Status GemServer
 
 The **tODE** commands:
 
@@ -637,6 +648,7 @@ The **tODE** commands:
 ./rest --start=rest
 ./rest --stop=rest
 ./rest --restart=rest
+./rest --status=rest
 ```
 
 executes the following **Smalltalk**:
@@ -645,6 +657,7 @@ executes the following **Smalltalk**:
 (GemServerRegistry gemServerNamed: 'rest') startGems.
 (GemServerRegistry gemServerNamed: 'rest') stopGems.
 (GemServerRegistry gemServerNamed: 'rest') restartGems.
+(GemServerRegistry gemServerNamed: 'rest') statusGems.
 ```
 
 ####Unregister GemServer

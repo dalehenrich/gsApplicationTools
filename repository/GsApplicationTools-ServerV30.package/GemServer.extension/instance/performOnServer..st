@@ -12,4 +12,5 @@ performOnServer: commandLine
       | message |
       message := 'performOnServer: ' , commandLine printString
         , ' failed with result: ' , (performOnServerStatusArray at: 3) asString.
-      self error: message ]
+      self error: message ].
+  ^ performOnServerStatusArray at: 3
