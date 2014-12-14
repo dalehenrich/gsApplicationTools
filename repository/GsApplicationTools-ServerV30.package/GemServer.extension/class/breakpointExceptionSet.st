@@ -2,4 +2,4 @@
 breakpointExceptionSet
   "Answer exceptionSet for handling Halt and or Breakpoint"
 
-  ^ Breakpoint , Halt
+  ^ Break , Breakpoint , Halt

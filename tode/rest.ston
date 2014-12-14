@@ -1,4 +1,5 @@
-TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :commandNode | 
+TDScriptLeafNode{#name:'rest',
+#contents:'[ :topez :objIn :tokens :command :commandNode | 
   | opts args |
   \"for help: ./rest -h\"
   command
@@ -16,6 +17,7 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
       #(\'restart\' nil #\'required\').
       #(\'start\' nil #\'required\').
       #(\'stop\' nil #\'required\').
+      #(\'status\' nil #\'required\').
       #(\'unregister\' nil #\'required\')}
     optionsAndArguments: [ :options :operands | 
       opts := options.
@@ -100,6 +102,9 @@ TDScriptLeafNode{#name:'rest',#contents:'[ :topez :objIn :tokens :command :comma
       opts
         at: \'stop\'
         ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stopGems ].
+      opts
+        at: \'status\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) statusGems ].
       result ]
     ifPresent: [ :ignored | 
       TDManPage
@@ -110,6 +115,10 @@ SYNOPSIS
   rest [-h|--help]
        --register=<gemServer-name> [--port=<server-port>] [--logTo=transcript|objectLog] [--log=all|debug|error|info] [--debug]
        --unregister=<gemServer-name>
+       --start=<gemServer-name>
+       --stop=<gemServer-name>
+       --restart=<gemServer-name>
+       --status=<gemServer-name>
        --client=<gemServer-name> [--path=<path>] [--post=`expression`]
        --client=<gemServer-name> [--get=<path>] 
 DESCRIPTION
@@ -124,6 +133,7 @@ EXAMPLES
   ./rest --start=rest
   ./rest --stop=rest
   ./rest --restart=rest
+  ./rest --status=rest
 
   ./rest --client=rest --uri=objects --post=`Dictionary with: #x -> 1 with: #y -> 1`; edit
   ./rest --client=rest --uri=/objects/1001 --get; edit
