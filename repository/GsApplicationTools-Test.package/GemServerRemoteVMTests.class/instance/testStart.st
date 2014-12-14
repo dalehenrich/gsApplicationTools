@@ -1,6 +1,6 @@
 tests
 testStart
-  | eventLog count statusReport |
+  | eventLog count statusReport gemServer |
   GemServerRegistry gemServerNamed: 'Mock_Server'.
   GemServerRegistry startGemsNamed: 'Mock_Server'.
   count := 0.
@@ -22,9 +22,10 @@ testStart
     start: 1
     stop: 0
     restart: 0.
-  statusReport := (GemServerRegistry gemServerNamed: 'Mock_Server') statusGems.
+  gemServer := GemServerRegistry gemServerNamed: 'Mock_Server'.
+  statusReport := gemServer statusGems.
   Transcript
     cr;
     show: statusReport.
-  self assert: statusReport lines size = (self ports size + 1).
+  self assert: statusReport lines size = (gemServer ports size + 1).
   GemServerRegistry stopGemsNamed: 'Mock_Server'
