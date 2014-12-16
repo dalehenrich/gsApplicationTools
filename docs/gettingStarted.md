@@ -42,10 +42,10 @@ session.*
 
 ---
 
-*Committing a transaction has two effects:
-- It makes your new and changed objects visible to other users as a permanent part of
-the repository.
-- It makes visible to you any new or modified objects that have been committed by
+*Committing a transaction has two effects:*
+- *It makes your new and changed objects visible to other users as a permanent part of
+the repository.*
+- *It makes visible to you any new or modified objects that have been committed by
 other users in an up-to-date view of the repository.*
 
 ---
