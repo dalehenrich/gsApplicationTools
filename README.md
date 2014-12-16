@@ -1,4 +1,4 @@
-gsApplicationTools [![master branch:](https://travis-ci.org/GsDevKit/gsApplicationTools.png?branch=master)](https://travis-ci.org/GsDevKit/gsApplicationTools) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GsDevKit/gsApplicationTools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+gsApplicationTools [![master branch:](https://travis-ci.org/GsDevKit/gsApplicationTools.png?branch=master)](https://travis-ci.org/GsDevKit/gsApplicationTools) 
 ==================
 
 
@@ -26,3 +26,8 @@ GsDeployer deploy: [
 ## Examples
 
 - [REST example](https://github.com/GsDevKit/gsApplicationTools/blob/master/docs/rest.md#gemserver-support-for-zinc-rest)
+
+## Questions [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GsDevKit/gsApplicationTools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+1. [Gitter chat](https://gitter.im/GsDevKit/gsApplicationTools)
+2. [GLASS mailing list](http://lists.gemtalksystems.com/mailman/listinfo/glass)

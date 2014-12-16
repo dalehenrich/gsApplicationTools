@@ -1,7 +1,7 @@
 # Getting started with Gem Servers
 
 ##Table of Contents
-- [What is a Gem Server](#what-is-a-gemserver)
+- [Introduction](#introduction)
 - [Basic Gem Server Structure](#basic-gem-server-structure)
 - [Seaside Gem Servers](#seaside-gem-servers)
 - [ServiceVM Gem Servers](#servicevm-gem-servers)
@@ -9,61 +9,11 @@
 - [Background Articles](#background-articles)
 - [Glossary](#glossary)
 
-##What is a Gem Server
+##Introduction
+
+The gsApplicationTools project provides a framework for launching *gem servers*.
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
-
-###Gem Server Service Loop
-The *service loop* is defined by subclassing the **GemServer** class and implementing a **startBasicServerOn:** method. 
-Here's the **startBasicServerOn:** method for a [maintenance vm](#maintenance-vm):
-
-```Smalltalk
-startBasicServerOn: ignored
-  "start server in current vm. expected to return."
-
-  self
-    maintenanceProcess:
-      [ 
-      | count |
-      count := 0.
-      [ true ]
-        whileTrue: [ 
-          [ 
-          "run maintenance tasks"
-          self taskClass performTasks: count.
-          (Delay forMilliseconds: self delayTimeMs) wait.
-          count := count + 1 ]
-            on: self class breakpointExceptionSet
-            do: [ :ex | self handleBreakpointException: ex ] ] ]
-        fork.
-  self serverInstance: self
-```
-
-As you can see, this is a classic *forever* loop that performs tasks every *delayTimeMs*. 
-If an exception occurs (**Error**, **Halt**, or **Breakpoint**), the exception is handled by snapping off a continuation and resuming the exception (if possible):
-
-```Smalltalk
-handleBreakpointException: exception
-  "Snap off continuation, then resume if possible"
-
-  GRPlatform current
-    doTransaction: [ DebuggerLogEntry createContinuationLabeled: exception description ].
-  exception isResumable
-    ifTrue: [ exception resume ]
-    ifFalse: [ exception pass ]
-```
-
-###Gem Server Control
-####Start/Stop from Bash
-####Start/Stop/Restart/Status API
-####Remote Debugging
-####Interactive Debugging
-##Gem Server Reference
-###Seaside Gem Servers (including ServiceVM)
-###Zinc Gem Servers
-
-**Eventually delete remainder of doc ... 
-
 
 A **GemServer** class is used to define the application-specific service loop and any attributes that may be needed. 
 For example, a web server must have a service loop that starts listening for http connections on a particular port, so the gem server attributes typically include a list of port numbers to launch servers on.
@@ -107,6 +57,27 @@ startBasicServerOn: port
   adaptor gemServerStart
 ```
 
+```Smalltalk
+startBasicServerOn: ignored
+  "start server in current vm. expected to return."
+
+  self
+    maintenanceProcess:
+      [ 
+      | count |
+      count := 0.
+      [ true ]
+        whileTrue: [ 
+          [ 
+          "run maintenance tasks"
+          self taskClass performTasks: count.
+          (Delay forMilliseconds: self delayTimeMs) wait.
+          count := count + 1 ]
+            on: self class breakpointExceptionSet
+            do: [ :ex | self handleBreakpointException: ex ] ] ]
+        fork.
+  self serverInstance: self
+```
 
 ###Start/Restart/Stop/Status Gem Server
 
