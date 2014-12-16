@@ -9,7 +9,11 @@ Multiple gems
 
 ##Glossary
 
+---
+
 ###GemStone Session
+
+---
 
 A GemStone session consists of four parts:
 - An application, such as, [Topaz][2].
@@ -22,7 +26,11 @@ A GemStone session consists of four parts:
 
 *Excerpted from [Topaz Programming Environment for GemStone/S 64 Bit][2], Section 1.2*
 
+---
+
 ###GemStone Transaction
+
+---
 
 GemStone prevents conflict between users by encapsulating each session’s operations
 (computations, stores, and fetches) in units called transactions. The operations that make
@@ -48,6 +56,8 @@ repository, by commit, abort, or continuing, any new or modified objects that ha
 committed by other users become visible to you...
 
 *Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.1*
+
+---
 
 [1]: https://gemstonesoup.wordpress.com/2007/05/10/porting-application-specific-seaside-threads-to-gemstone/
 [2]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-Topaz-3.2.pdf
