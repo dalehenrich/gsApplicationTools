@@ -5,41 +5,35 @@ The gsApplicationTools project provides a framework for launching *gem servers*.
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
 
 ##Basic Gem Server structure
-
+###Service Loop
+###Start/Restart/Stop/Status Gem Server
 ####Launching from bash shell
 ####Launching from development environment
 ###Remote debugging
 ###Interactive debugging
-
 ## Seaside Gem Servers
-
+###Seaside Service Loop
 In [Seaside][4] applications a *simple persistence model* is used where the [transaction](#gemstone-transaction) boundaries are aligned along HTTP request boundaries: 
 
 1. An [abort](#abort-transaction) is performed before the HTTP request is passed to Seaside for processing.
 2. A [commit](#commit-transaction) is performed before the HTTP request is returned to the HTTP client). 
 3. [Transaction conflicts](#transaction-conflicts) are handled by doing an *abort* and then the HTTP request is retried.
-
-Using this model means that it is not necessary to include code for transaction handling in a Seaside application, thus it possible to [Develop in Pharo and deploy in GemStone][5].
-
 ###FastCGI Gem Server
 ###Zinc Gem Server
 ###Swazoo Gem Server
 ###Maintenance VM
-
 ## ServiceVM
-The downside to using this model is that [it is not advisable to fork processes while processing an HTTP request][6].
-
 ## Non-Seaside Gem Servers
 ###Zinc HTTP Gem Server
 ###Zinc REST Gem Server
 ###Zinc Web Socket Gem Server
 ##Background Articles
-
 1. https://gemstonesoup.wordpress.com/2007/05/07/transparent-persistence-for-seaside/
 2. https://gemstonesoup.wordpress.com/2008/03/08/glass-101-disposable-gems-durable-data/
 3. https://gemstonesoup.wordpress.com/2008/03/09/glass-101-simple-persistence/
 4. https://gemstonesoup.wordpress.com/2007/05/10/porting-application-specific-seaside-threads-to-gemstone/
 5. https://gemstonesoup.wordpress.com/2007/06/29/unlimited-gemstone-vms-in-every-garage-and-a-stone-in-every-pot/
+6. http://smalltalkinspect1.rssing.com/browser.php?indx=6463396&item=10
 
 ##Glossary
 
@@ -147,5 +141,4 @@ problem.*
 [2]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-Topaz-3.2.pdf
 [3]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-ProgGuide-3.2.pdf
 [4]: https://github.com/GsDevKit/Seaside31#seaside31
-[5]: http://smalltalkinspect1.rssing.com/browser.php?indx=6463396&item=10
-[6]: https://gemstonesoup.wordpress.com/2007/05/10/porting-application-specific-seaside-threads-to-gemstone/
+
