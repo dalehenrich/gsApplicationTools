@@ -55,11 +55,11 @@ other users in an up-to-date view of the repository.*
 
 ---
 
-*A GemStone session consists of four parts:
-- An application, such as, [Topaz][2].
-- One repository. An application has one repository to hold its persistent objects.
-- One repository monitor, or Stone process, to control access to the repository.
-- At least one GemStone session, or Gem process. All applications, including [Topaz][2],
+*A GemStone session consists of four parts:*
+- *An application, such as, [Topaz][2].*
+- *One repository. An application has one repository to hold its persistent objects.*
+- *One repository monitor, or Stone process, to control access to the repository.*
+- *At least one GemStone session, or Gem process. All applications, including [Topaz][2],
   must communicate with the repository through Gem processes. A Gem provides a
   work area within which objects can be used and modified. Several Gem processes can
   coexist, communicating with the repository through a single Stone process...*
@@ -76,11 +76,11 @@ other users in an up-to-date view of the repository.*
 (computations, stores, and fetches) in units called transactions. The operations that make
 up a transaction act on what appears to you to be a private view of GemStone objects.
 When you tell GemStone to commit the current transaction, GemStone tries to merge the
-modified objects in your view with the shared object store. 
+modified objects in your view with the shared object store.*
 
-#### Views and Transactions
+#### *Views and Transactions*
 
-Every user session maintains its own consistent view of the
+*Every user session maintains its own consistent view of the
 repository state. Objects that the repository contained at the beginning of your session are
 preserved in your view, even if you are not using them—and even if other users’ actions
 have rendered them obsolete. The storage that those objects are using cannot be reclaimed
@@ -104,16 +104,16 @@ committed by other users become visible to you...*
 
 *GemStone detects conflict by comparing your read and write sets with those of all other
 transactions committed since your transaction began. The following conditions signal a
-possible concurrency conflict:
-- An object in your write set is also in the write set of another transaction—a write-write
-conflict. Write-write conflicts can involve only a single object.
-- An object in your write set is also in another session’s dependency list—a writedependency
+possible concurrency conflict:*
+- *An object in your write set is also in the write set of another transaction—a write-write
+conflict. Write-write conflicts can involve only a single object.*
+- *An object in your write set is also in another session’s dependency list—a writedependency
 conflict. An object belongs to a session’s dependency list if the session has
 added, removed, or changed a dependency (index) for that object. For details about
 how GemStone creates and manages indexes on collections, see Chapter 7, Indexes
-and Querying.
+and Querying.*
 
-If a write-write or write-dependency conflict is detected, then your transaction cannot
+*If a write-write or write-dependency conflict is detected, then your transaction cannot
 commit. This mode allows an occasional out-of-date entry to overwrite a more current
 one. You can use object locks to enforce more stringent control if you can anticipate the
 problem.*
