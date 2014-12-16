@@ -1,10 +1,21 @@
 # Getting started with Gem Servers
 
+##Table of Contents
+- [Introduction](#introduction)
+- [Basic Gem Server Structure](#basic-gem-server-structure)
+- [Seaside Gem Servers](#seaside-gem-servers)
+- [ServiceVM Gem Servers](#servicevm-gem-servers)
+- [Non-Seaside Gem Servers](#nonseaside-gem-servers)
+- [Backgorund Articles](#background-articles)
+- [Glossary](#glossary)
+
+##Introduction
+
 The gsApplicationTools project provides a framework for launching *gem servers*.
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
 
-##Basic Gem Server structure
+##Basic Gem Server Structure
 ###Service Loop
 ###Start/Restart/Stop/Status Gem Server
 ####Launching from bash shell
@@ -23,7 +34,7 @@ In [Seaside][4] applications a *simple persistence model* is used where the [tra
 ###Zinc Gem Server
 ###Swazoo Gem Server
 ###Maintenance VM
-## ServiceVM
+## ServiceVM Gem Servers
 ## Non-Seaside Gem Servers
 ###Zinc HTTP Gem Server
 ###Zinc REST Gem Server
