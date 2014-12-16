@@ -1,7 +1,7 @@
-gsApplicationTools [![master branch:](https://travis-ci.org/GsDevKit/gsApplicationTools.png?branch=master)](https://travis-ci.org/GsDevKit/gsApplicationTools)
+gsApplicationTools [![master branch:](https://travis-ci.org/GsDevKit/gsApplicationTools.png?branch=master)](https://travis-ci.org/GsDevKit/gsApplicationTools) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GsDevKit/gsApplicationTools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ==================
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GsDevKit/gsApplicationTools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 This repository includes scripts and code that allow a more convenient setup of a Gemstone server application 
 
