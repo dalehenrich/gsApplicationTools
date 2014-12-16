@@ -16,23 +16,125 @@ The gsApplicationTools project provides a framework for launching *gem servers*.
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
 
 ##Basic Gem Server Structure
+
+```Smalltalk
+ZnGemServer register: 'RESTServer'.
+FastCGISeasideGemServer register: 'FastCGISeasideServer' on: #( 9001 9002 9003 )
+```
+
 ###Service Loop
+####startServerOn:
+
+```Smalltalk
+startServerOn: port
+  "start server in current vm. for gemstone, not expected to return."
+
+  self startBasicServerOn: port.
+  [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
+```
+
+####startBasicServerOn:
+
+```Smalltalk
+startBasicServerOn: port
+  "start server in current vm. expected to return."
+
+  [ "start listening on socket or running application specific service loop" ] fork.
+```
+
+```Smalltalk
+startBasicServerOn: port
+  "start instance of seaside adaptor. expected to return."
+
+  | adaptor |
+  GRPlatform current seasideLogServerStart: self class name port: port.
+  adaptor := self serverClass port: port.
+  self serverInstance: adaptor.
+  adaptor gemServerStart
+```
+
+```Smalltalk
+startBasicServerOn: ignored
+  "start server in current vm. expected to return."
+
+  self
+    maintenanceProcess:
+      [ 
+      | count |
+      count := 0.
+      [ true ]
+        whileTrue: [ 
+          [ 
+          "run maintenance tasks"
+          self taskClass performTasks: count.
+          (Delay forMilliseconds: self delayTimeMs) wait.
+          count := count + 1 ]
+            on: self class breakpointExceptionSet
+            do: [ :ex | self handleBreakpointException: ex ] ] ]
+        fork.
+  self serverInstance: self
+```
+
 ###Start/Restart/Stop/Status Gem Server
+
+```Smalltalk
+gemServer := FastCGISeasideGemServer register: 'FastCGISeasideServer' on: #( 9001 9002 9003 ).
+gemServer startGems.
+gemServer restartGems.
+gemServer statusGems.
+gemServer stopGems.
+```
+
+###Launching GemServer
+
+```Smalltalk
+scriptStartServiceOn: port
+  "called from shell script"
+
+  self
+    scriptLogEvent: '-->>Start ' , self name , ' on ' , port printString
+    object: self.
+  self
+    recordGemPid: port;
+    setStatmonCacheName;
+    enableRemoteBreakpointHandling.
+  System transactionMode: #'manualBegin'.
+  self
+    startSigAbortHandling;
+    startServiceOn: port	"does not return"
+```
+
 ####Launching from bash shell
+
+```Shell
+startGemServerGem <gemServer-name> <port> <exe-conf-path>
+```
+
+```
+#
+# standard gem.conf file for dev kit gems
+# 
+
+GEM_TEMPOBJ_CACHE_SIZE = 50000;
+GEM_TEMPOBJ_POMGEN_PRUNE_ON_VOTE = 90;
+```
+
 ####Launching from development environment
-###Remote debugging
-###Interactive debugging
+
+```Smalltalk
+gemServer startServerOn: 8383. "will not return"
+```
+
 ## Seaside Gem Servers
-###Seaside Service Loop
 In [Seaside][4] applications a *simple persistence model* is used where the [transaction](#gemstone-transaction) boundaries are aligned along HTTP request boundaries: 
 
 1. An [abort](#abort-transaction) is performed before the HTTP request is passed to Seaside for processing.
 2. A [commit](#commit-transaction) is performed before the HTTP request is returned to the HTTP client). 
 3. [Transaction conflicts](#transaction-conflicts) are handled by doing an *abort* and then the HTTP request is retried.
 
-###FastCGI Gem Server
-###Zinc Gem Server
-###Swazoo Gem Server
+###Seaside Adaptors
+ 
+
 ###Maintenance VM
 ## ServiceVM Gem Servers
 ## Non-Seaside Gem Servers
