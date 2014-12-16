@@ -18,6 +18,7 @@ In [Seaside][4] applications a *simple persistence model* is used where the [tra
 1. An [abort](#abort-transaction) is performed before the HTTP request is passed to Seaside for processing.
 2. A [commit](#commit-transaction) is performed before the HTTP request is returned to the HTTP client). 
 3. [Transaction conflicts](#transaction-conflicts) are handled by doing an *abort* and then the HTTP request is retried.
+
 ###FastCGI Gem Server
 ###Zinc Gem Server
 ###Swazoo Gem Server
