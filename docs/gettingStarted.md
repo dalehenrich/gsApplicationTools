@@ -4,6 +4,13 @@ The gsApplicationTools project provides a framework for launching *gem servers*.
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
 
+##Basic Gem Server structure
+
+####Launching from bash shell
+####Launching from development environment
+###Remote debugging
+###Interactive debugging
+
 ## Seaside Gem Servers
 
 In [Seaside][4] applications a *simple persistence model* is used where the [transaction](#gemstone-transaction) boundaries are aligned along HTTP request boundaries: 
@@ -14,11 +21,25 @@ In [Seaside][4] applications a *simple persistence model* is used where the [tra
 
 Using this model means that it is not necessary to include code for transaction handling in a Seaside application, thus it possible to [Develop in Pharo and deploy in GemStone][5].
 
+###FastCGI Gem Server
+###Zinc Gem Server
+###Swazoo Gem Server
+###Maintenance VM
 
 ## ServiceVM
 The downside to using this model is that [it is not advisable to fork processes while processing an HTTP request][6].
 
 ## Non-Seaside Gem Servers
+###Zinc HTTP Gem Server
+###Zinc REST Gem Server
+###Zinc Web Socket Gem Server
+##Background Articles
+
+1. https://gemstonesoup.wordpress.com/2007/05/07/transparent-persistence-for-seaside/
+2. https://gemstonesoup.wordpress.com/2008/03/08/glass-101-disposable-gems-durable-data/
+3. https://gemstonesoup.wordpress.com/2008/03/09/glass-101-simple-persistence/
+4. https://gemstonesoup.wordpress.com/2007/05/10/porting-application-specific-seaside-threads-to-gemstone/
+5. https://gemstonesoup.wordpress.com/2007/06/29/unlimited-gemstone-vms-in-every-garage-and-a-stone-in-every-pot/
 
 ##Glossary
 
