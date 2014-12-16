@@ -5,8 +5,8 @@
 - [Basic Gem Server Structure](#basic-gem-server-structure)
 - [Seaside Gem Servers](#seaside-gem-servers)
 - [ServiceVM Gem Servers](#servicevm-gem-servers)
-- [Non-Seaside Gem Servers](#nonseaside-gem-servers)
-- [Backgorund Articles](#background-articles)
+- [Non-Seaside Gem Servers](#non-seaside-gem-servers)
+- [Background Articles](#background-articles)
 - [Glossary](#glossary)
 
 ##Introduction
