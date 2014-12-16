@@ -1,22 +1,24 @@
 # Getting started with Gem Servers
 
-The gsApplicationTools project provides a framework for launching gem servers.
+The gsApplicationTools project provides a framework for launching *gem servers*.
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
 
-GsDevKit [Seaside][4] applications use a [simple persistence model][5] where the [transaction](#gemstone-transaction) boundaries are aligned along HTTP request boundaries where an [abort](#abort-transaction) is performed before the HTTP request is passed to Seaside for processing and a [commit](#commit-transaction) is performed before the HTTP request is returned to the HTTP client). [Transaction conflicts](#transaction-conflicts) are handled by simply doing an *abort* and then retrying the HTTP request.
+## Seaside Gem Servers
+
+In [Seaside][4] applications a *simple persistence model* is used where the [transaction](#gemstone-transaction) boundaries are aligned along HTTP request boundaries: 
+
+1. An [abort](#abort-transaction) is performed before the HTTP request is passed to Seaside for processing.
+2. A [commit](#commit-transaction) is performed before the HTTP request is returned to the HTTP client). 
+3. [Transaction conflicts](#transaction-conflicts) are handled by doing an *abort* and then the HTTP request is retried.
+
+Using this model means that it is not necessary to include code for transaction handling in a Seaside application, thus it possible to [Develop in Pharo and deploy in GemStone][5].
 
 
+## ServiceVM
+The downside to using this model is that [it is not advisable to fork processes while processing an HTTP request][6].
 
-
-Since only one *transaction* may be active at any one time within a *GemStone session*, multiple *gem servers* must be run to achieve concurrent execution.
-
-therefore it to is necessry to run multiple 
-
-a separate operating system process ([topaz][2]) that runs a single GemStone session.
-Application-specific gem servers are needed for GsDevKit because [it is not a good idea to fork application-specific threads within a Seaside application][1].
-Multiple gems
-
+## Non-Seaside Gem Servers
 
 ##Glossary
 
@@ -123,5 +125,6 @@ problem.*
 [1]: https://gemstonesoup.wordpress.com/2007/05/10/porting-application-specific-seaside-threads-to-gemstone/
 [2]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-Topaz-3.2.pdf
 [3]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-ProgGuide-3.2.pdf
-[4]: http://seaside.st/
-[5]: https://gemstonesoup.wordpress.com/2008/03/09/glass-101-simple-persistence/
+[4]: https://github.com/GsDevKit/Seaside31#seaside31
+[5]: http://smalltalkinspect1.rssing.com/browser.php?indx=6463396&item=10
+[6]: https://gemstonesoup.wordpress.com/2007/05/10/porting-application-specific-seaside-threads-to-gemstone/
