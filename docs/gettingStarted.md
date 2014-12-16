@@ -53,6 +53,7 @@ handleBreakpointException: exception
     ifFalse: [ exception pass ]
 ```
 
+###Gem Server Logging
 ###Gem Server Control
 ####Start/Stop from Bash
 ####Start/Stop/Restart/Status API
