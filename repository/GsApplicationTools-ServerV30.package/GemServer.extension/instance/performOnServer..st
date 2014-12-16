@@ -11,6 +11,8 @@ performOnServer: commandLine
     ifTrue: [ 
       | message |
       message := 'performOnServer: ' , commandLine printString
-        , ' failed with result: ' , (performOnServerStatusArray at: 3) asString.
+        , ' failed with errno: '
+        , (performOnServerStatusArray at: 5) printString , ' errMsg: '
+        , (performOnServerStatusArray at: 4) asString.
       self error: message ].
   ^ performOnServerStatusArray at: 3
