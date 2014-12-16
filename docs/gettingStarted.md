@@ -15,6 +15,10 @@ The gsApplicationTools project provides a framework for launching *gem servers*.
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
 
+A **GemServer** class is used to define the application-specific service loop and any attributes that may be needed. 
+For example, a web server must have a service loop that starts listening for http connections on a particular port, so the gem server attributes typically include a list of port numbers to launch servers on.
+Other attributes may include the logging method and level to use.
+
 ##Basic Gem Server Structure
 
 ```Smalltalk
