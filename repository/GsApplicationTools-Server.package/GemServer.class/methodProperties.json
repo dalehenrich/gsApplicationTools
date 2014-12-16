@@ -21,6 +21,7 @@
 		"executeStatusGemCommand:" : "dkh 12/15/2014 15:43",
 		"executeStopGemCommand:" : "dkh 12/13/2014 17:07",
 		"gemPidFileName:" : "dkh 12/04/2014 07:43",
+		"handleBreakpointException:" : "dkh 12/15/2014 23:29",
 		"initialize" : "dkh 12/10/2014 17:02",
 		"isRunning" : "SebastianHeidbrink 11/02/2014 15:00",
 		"isValidName:" : "dkh 11/26/2014 18:31",
