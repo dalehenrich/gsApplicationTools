@@ -15,7 +15,7 @@ A *gem server* is a [Topaz session](#gemstone-session) that executes an applicat
 
 ###Gem Server Service Loop
 The *service loop* is defined by subclassing the **GemServer** class and implementing a **startBasicServerOn:** method. 
-Here's the **startBasicServerOn:** method for a [maintenance vm](#maintenance-vm):
+Here is the **startBasicServerOn:** method for a [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
 startBasicServerOn: ignored
@@ -261,6 +261,12 @@ repository, by commit, abort, or continuing, any new or modified objects that ha
 committed by other users become visible to you...*
 
 ---
+
+###Maintenance VM
+The *maintenance vm* is a gem server that must be run while serving Seaside requests.
+The main job of the *maintenance vm* is to reap expired session state.
+The *maintenance vm* also runs an hourly *mark For collect*.
+For large Seaside installations (a stone where the entire GemStone repository cannot fit into the Shared Page Cache), the *mark for collect* should be moved into a separate gem server and run during off-peak hours.
 
 ###Transaction Conflict
 **Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.2**
