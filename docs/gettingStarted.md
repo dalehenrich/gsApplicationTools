@@ -166,10 +166,8 @@ In [Seaside][4] applications a *simple persistence model* is used where the [tra
 2. A [commit](#commit-transaction) is performed before the HTTP request is returned to the HTTP client). 
 3. [Transaction conflicts](#transaction-conflicts) are handled by doing an *abort* and then the HTTP request is retried.
 
-###Seaside Adaptors
- 
-
-###Maintenance VM
+###Seaside Adaptor Gem Server
+###MaintenanceVM Gem Server
 ## ServiceVM Gem Servers
 ## Non-Seaside Gem Servers
 ###Zinc HTTP Gem Server
