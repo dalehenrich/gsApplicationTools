@@ -72,7 +72,6 @@ Gem servers can be started and stopped from within a development image using the
 (GemServerRegistry gemServerNamed: 'Seaside') start.
 (GemServerRegistry gemServerNamed: 'Seaside') restart.
 (GemServerRegistry gemServerNamed: 'Seaside') stop.
-(GemServerRegistry gemServerNamed: 'Seaside') status.
 ```
 
 or started and stopped by using a bash script:
@@ -82,15 +81,11 @@ startGemServerGem Seaside 9001
 stopGemServerGem Seaside 9001
 ```
 
-When using the Smalltalk API, 
+The bash scripts are designed to be called once for each port associated with the gem server. 
+This makes it possible to use scripts to start individual gem servers from a process management tool like [DaemonTools][5] or [Monit][6].
 
-```Smalltalk
-| gemServer |
-gemServer := GemServerRegistry gemServerNamed: 'Seaside'.
-```
+The Smalltalk GemServer api uses `System class>>performOnServer:` to launch the bash scripts for each of the ports associated with the gem server.
 
-####Start/Stop from Bash
-####Start/Stop/Restart/Status API
 ###Gem Server Logging
 ####Transcript logging
 ####Object Log Logging
@@ -331,4 +326,5 @@ problem.*
 [2]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-Topaz-3.2.pdf
 [3]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-ProgGuide-3.2.pdf
 [4]: https://github.com/GsDevKit/Seaside31#seaside31
-
+[5]: https://github.com/Monty/GemStone_daemontools_setup#daemontools-setup-scripts-for-gemstones-on-ubuntu-or-other-debian-systems
+[6]: http://mmonit.com/monit/
