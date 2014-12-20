@@ -84,11 +84,19 @@ stopGemServerGem Seaside 9001
 The bash scripts are designed to be called once for each port associated with the gem server. 
 This makes it possible to use scripts to start individual gem servers from a process management tool like [DaemonTools][5] or [Monit][6].
 
-The Smalltalk GemServer api uses `System class>>performOnServer:` to launch the bash scripts for each of the ports associated with the gem server.
+The Smalltalk GemServer api uses `System class>>performOnServer:` to launch a bash script for each of the ports associated with the gem server.
 
 ###Gem Server Logging
-####Transcript logging
-####Object Log Logging
+The exact logging options are a function of the application running in the service loop.
+For example, Zinc-based gem servers offer a choice of Transcript logging (**logToTranscript**) or Object Log logging (**logToObjectLog**) with control over which events are logged (**#debug**, **#error**, **#info**, **#object**, and **#transaction**):
+
+```Smalltalk
+(ZnSeasideGemServer register: 'Seaside')
+  logToObjectLog;
+  logFilter: [:category | #( #error #debug ) includes: category ];
+  yourself
+```
+
 ###Debugging
 ####Remote Debugging
 ####Interactive Debugging
