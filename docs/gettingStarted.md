@@ -53,12 +53,48 @@ handleBreakpointException: exception
     ifFalse: [ exception pass ]
 ```
 
+###Gem Server Control
+To define a GemServer you specify a name and a list of ports:
+
+```Smalltalk
+FastCGISeasideGemServer register: 'Seaside' on: #( 9001 9002 9003)
+```
+
+Once registered you can refer to the GemServer by name:
+
+```Smalltalk
+GemServerRegistry gemServerNamed: 'Seaside'
+```
+
+Gem servers can be started and stopped from within a development image using the Smalltalk GemServer api:
+
+```Smalltalk
+(GemServerRegistry gemServerNamed: 'Seaside') start.
+(GemServerRegistry gemServerNamed: 'Seaside') restart.
+(GemServerRegistry gemServerNamed: 'Seaside') stop.
+(GemServerRegistry gemServerNamed: 'Seaside') status.
+```
+
+or started and stopped by using a bash script:
+
+```Shell
+startGemServerGem Seaside 9001
+stopGemServerGem Seaside 9001
+```
+
+When using the Smalltalk API, 
+
+```Smalltalk
+| gemServer |
+gemServer := GemServerRegistry gemServerNamed: 'Seaside'.
+```
+
+####Start/Stop from Bash
+####Start/Stop/Restart/Status API
 ###Gem Server Logging
 ####Transcript logging
 ####Object Log Logging
-###Gem Server Control
-####Start/Stop from Bash
-####Start/Stop/Restart/Status API
+###Debugging
 ####Remote Debugging
 ####Interactive Debugging
 ##Gem Server Reference
