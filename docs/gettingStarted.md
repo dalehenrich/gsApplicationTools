@@ -54,6 +54,8 @@ handleBreakpointException: exception
 ```
 
 ###Gem Server Logging
+####Transcript logging
+####Object Log Logging
 ###Gem Server Control
 ####Start/Stop from Bash
 ####Start/Stop/Restart/Status API
