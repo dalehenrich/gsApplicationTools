@@ -48,8 +48,8 @@ browse class --exact --hier ZnExampleStorageRestCall ZnExampleStorageRestServerD
 Mount the example script directory in your `/home` directory:  
 
 ```Shell
-mount /sys/stone/repos/gsApplicationTools/tode/ /home gemServerExample
-cd /home/gemServerExample
+mount /sys/stone/repos/GsApplicationTools/tode/ /home gemServer
+cd /home/gemServer
 ```
 
 Script man page:
@@ -413,8 +413,8 @@ project load --loads=REST --baseline \
         --repository=github://GsDevKit/zinc:issue_58/repository ZincHTTPComponents
 browse class --exact --hier ZnExampleStorageRestCall ZnExampleStorageRestServerDelegate \
        ZnAbstractExampleStorageRestServerDelegateTest ZnGemServer
-mount /sys/stone/repos/gsApplicationTools/tode/ /home gemServerExample
-cd /home/gemServerExample
+mount /sys/stone/repos/GsApplicationTools/tode/ /home gemServer
+cd /home/gemServer
 
 # rest script
 ./rest --help

@@ -1,5 +1,5 @@
 *gsapplicationtools-serverv24
-breakpointExceptionSet
+gemServerExceptionSet
   "Answer exceptionSet for handling Halt and or Breakpoint"
 
   ^ BreakpointNotification , Halt
