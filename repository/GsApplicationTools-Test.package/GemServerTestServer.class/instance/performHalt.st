@@ -1,5 +1,5 @@
 actions
 performHalt
-  Halt signal.
+  self halt.
   actionResult := #'halt'.
   self logAction
