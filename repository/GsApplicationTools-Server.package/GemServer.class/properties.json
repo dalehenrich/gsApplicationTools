@@ -10,7 +10,8 @@
 		"serverClassAssoc",
 		"serverInstance",
 		"ports",
-		"enableRemoteBreakpoints" ],
+		"enableRemoteBreakpoints",
+		"transactionMode" ],
 	"name" : "GemServer",
 	"pools" : [
 		 ],

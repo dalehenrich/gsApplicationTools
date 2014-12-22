@@ -2,10 +2,6 @@
 	"class" : {
 		 },
 	"instance" : {
-		"gemServerName" : "dkh 12/21/2014 14:29",
 		"setUp" : "dkh 12/21/2014 14:29",
-		"testError" : "dkh 12/21/2014 18:54",
-		"testHalt" : "dkh 12/21/2014 18:54",
-		"testPerformMessage" : "dkh 12/21/2014 18:55",
-		"testStartServer" : "dkh 12/21/2014 18:55",
-		"waitForActionResult:" : "dkh 12/21/2014 16:13" } }
+		"startGems:" : "dkh 12/22/2014 11:18",
+		"stopGems:" : "dkh 12/22/2014 11:18" } }

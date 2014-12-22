@@ -4,10 +4,10 @@
 		 ],
 	"classvars" : [
 		 ],
-	"commentStamp" : "",
+	"commentStamp" : "dkh 12/22/2014 11:13",
 	"instvars" : [
 		 ],
-	"name" : "GemServerRemoteVMTests",
+	"name" : "GemServerLocalVMTests",
 	"pools" : [
 		 ],
 	"super" : "GemServerTests",

@@ -4,12 +4,10 @@ testHalt
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer scriptLogEvent: '---->testHalt' object: gemServer.
   [ 
-  gemServer startGems.
+  self startGems: gemServer.
   self waitForActionResult: gemServer.
   self assert: gemServer actionResult == #'started'.
   gemServer performMessage: #'halt'.
   self waitForActionResult: gemServer.
   self assert: gemServer actionResult == #'halt' ]
-    ensure: [ 
-      gemServer stopGems.
-      (Delay forSeconds: 3) wait ]
+    ensure: [ self stopGems: gemServer ]

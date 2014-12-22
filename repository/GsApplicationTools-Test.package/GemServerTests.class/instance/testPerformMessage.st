@@ -4,12 +4,10 @@ testPerformMessage
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer scriptLogEvent: '---->testPerformMessage' object: gemServer.
   [ 
-  gemServer startGems.
+  self startGems: gemServer.
   self waitForActionResult: gemServer.
   self assert: gemServer actionResult == #'started'.
   gemServer performMessage: #'add' with: 41.
   self waitForActionResult: gemServer.
   self assert: gemServer actionResult == 42 ]
-    ensure: [ 
-      gemServer stopGems.
-      (Delay forSeconds: 3) wait ]
+    ensure: [ self stopGems: gemServer ]

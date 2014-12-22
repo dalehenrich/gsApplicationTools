@@ -1,15 +1,15 @@
 service instance-script
-scriptStartServiceOn: port
+scriptStartServiceOn: portOrNil
   "called from shell script"
 
   self
-    scriptLogEvent: '-->>Start ' , self name , ' on ' , port printString
+    scriptLogEvent: '-->>Start ' , self name , ' on ' , portOrNil printString
     object: self.
   self
-    recordGemPid: port;
+    recordGemPid: portOrNil;
     setStatmonCacheName;
     enableRemoteBreakpointHandling.
-  System transactionMode: #'manualBegin'.
+  self transactionMode: #'manualBegin'.
   self
     startSigAbortHandling;
-    startServiceOn: port	"does not return"
+    startServiceOn: portOrNil	"does not return"
