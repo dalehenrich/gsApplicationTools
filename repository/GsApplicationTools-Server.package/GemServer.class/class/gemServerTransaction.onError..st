@@ -11,13 +11,16 @@ gemServerTransaction: aBlock onError: errorBlock
       aBlock
         on: self gemServerExceptionSet
         do: [ :ex | 
-          ex isResumable
+          ((ex isKindOf: Error) or: [ ex isResumable not ])
             ifTrue: [ 
-              self logError: ex titled: 'application error'.
-              ex resume ]
+              self
+                doSimpleTransaction: [ 
+                  self logError: ex titled: 'application error - non resumable'.
+                  errorBlock value: ex ].
+              ^ #'error' ]
             ifFalse: [ 
-              self doSimpleTransaction: [ self logError: ex titled: 'application error' ].
-              errorBlock value: ex ] ].
+              self logError: ex titled: 'application error - resumable'.
+              ex resume ] ].
       ^ self doCommitTransaction
         ifTrue: [ true ]
         ifFalse: [ 

@@ -1,0 +1,19 @@
+{
+	"category" : "GsApplicationTools-Test",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"maintenanceProcess",
+		"messageCount",
+		"actionCount",
+		"messageObject",
+		"actionSymbol",
+		"actionResult" ],
+	"name" : "GemServerTestServer",
+	"pools" : [
+		 ],
+	"super" : "GemServer",
+	"type" : "normal" }
