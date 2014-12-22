@@ -1,6 +1,6 @@
 transactions
 doTransaction: aBlock
-  "No commit if we are already inTransaction."
+  "No commit if we are already in transaction. Should only be used "
 
   | commitResult |
   System inTransaction

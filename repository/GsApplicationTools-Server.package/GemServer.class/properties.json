@@ -11,7 +11,8 @@
 		"serverInstance",
 		"ports",
 		"enableRemoteBreakpoints",
-		"transactionMode" ],
+		"transactionMode",
+		"interactiveMode" ],
 	"name" : "GemServer",
 	"pools" : [
 		 ],

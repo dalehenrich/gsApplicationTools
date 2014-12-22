@@ -1,5 +1,5 @@
 service instance-script
-interactiveStartServiceOn: portOrNil
+unitTestStartServiceOn: portOrNil
   "called from development environment ... service run in current vm."
 
   self
@@ -8,5 +8,5 @@ interactiveStartServiceOn: portOrNil
     object: self.
   self
     transactionMode: #'autoBegin';
-    interactiveMode: true.
+    interactiveMode: false.
   self startServiceOn: portOrNil	"does not return"

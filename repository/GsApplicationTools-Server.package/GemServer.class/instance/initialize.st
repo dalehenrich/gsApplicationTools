@@ -3,4 +3,6 @@ initialize
   super initialize.
   enableRemoteBreakpoints := true.
   ports := self defaultPortList.
-  serverInstance := TransientValue value: nil
+  serverInstance := TransientValue value: nil.
+  interactiveMode := false.
+  transactionMode := #'manualBegin'

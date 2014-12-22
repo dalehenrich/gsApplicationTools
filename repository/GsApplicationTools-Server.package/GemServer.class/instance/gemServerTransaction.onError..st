@@ -1,9 +1,13 @@
 transactions
 gemServerTransaction: aBlock onError: errorBlock
-  System transactionMode == #'autoBegin'
+  self transactionMode == #'autoBegin'
     ifFalse: [ 
       System inTransaction
-        ifTrue: [ self error: 'I should not be called when already in transaction' ] ].
+        ifTrue: [ 
+          "inTransaction and running in #manualBegin transaction mode ... should be outside of transaction"
+          self
+            error:
+              'Expected to be outside of transaction. Try calling doAbortTransaction or doCommitTransaction before calling.' ] ].
   GRPlatform current transactionMutex
     critical: [ 
       | conflicts |

@@ -3,7 +3,8 @@ scriptStartServiceOn: portOrNil
   "called from shell script"
 
   self
-    scriptLogEvent: '-->>Start ' , self name , ' on ' , portOrNil printString
+    scriptLogEvent:
+      '-->>Script Start ' , self name , ' on ' , portOrNil printString
     object: self.
   self
     recordGemPid: portOrNil;

@@ -1,6 +1,6 @@
 server compat
 stop
-  self maintenanceProcess
+  self serverProcess
     ifNotNil: [ :proc | 
-      self maintenanceProcess: nil.
+      self serverProcess: nil.
       proc terminate ]

@@ -2,7 +2,11 @@ actions
 handleAction
   messageCount <= actionCount
     ifTrue: [ ^ self performNoop ].
-  actionCount := actionCount + 1.
+  actionSymbol == #'forceBeginTransaction'
+    ifTrue: [ ^ self performForceBeginTransaction ].
+  actionSymbol == #'forceInternalServerError'
+    ifTrue: [ ^ self performForceInternalServerError ].
+  actionCount := actionCount + 1.	"acknowledge event handled"
   actionSymbol == #'add'
     ifTrue: [ ^ self performAdd ].
   actionSymbol == #'error'

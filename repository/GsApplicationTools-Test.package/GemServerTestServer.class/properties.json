@@ -6,12 +6,14 @@
 		 ],
 	"commentStamp" : "",
 	"instvars" : [
-		"maintenanceProcess",
+		"serverProcess",
 		"messageCount",
 		"actionCount",
 		"messageObject",
 		"actionSymbol",
-		"actionResult" ],
+		"actionResult",
+		"forceBeginTransaction",
+		"forceInternalServerError" ],
 	"name" : "GemServerTestServer",
 	"pools" : [
 		 ],

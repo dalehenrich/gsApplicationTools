@@ -3,5 +3,6 @@
 		 },
 	"instance" : {
 		"setUp" : "dkh 12/22/2014 11:13",
-		"startGems:" : "dkh 12/22/2014 11:43",
-		"stopGems:" : "dkh 12/22/2014 11:20" } }
+		"startGems:" : "dkh 12/22/2014 13:57",
+		"stopGems:" : "dkh 12/22/2014 11:20",
+		"tearDown" : "dkh 12/22/2014 13:53" } }
