@@ -1,4 +1,4 @@
-transactions
+error handling
 handleGemServerException: exception
   "only returns if an error was logged"
 

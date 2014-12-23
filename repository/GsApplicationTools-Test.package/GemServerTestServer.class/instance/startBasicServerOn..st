@@ -10,30 +10,32 @@ startBasicServerOn: ignored
       [ true ]
         whileTrue: [ 
           [ 
-          [ 
-          loopCount := loopCount + 1.
-          self forceBeginTransaction
-            ifTrue: [ 
-              "Enter transaction before calling GemServer>>gemServerTransaction:onError:, which is illegal."
-              self doBeginTransaction.
-              forceBeginTransaction := false ].
-          self forceInternalServerError
-            ifTrue: [ self error: 'internal server error' ].
           self
-            gemServerTransaction: [ self handleAction ]
-            onError: [ :ex | self handleActionError: ex ].
-          (Delay forMilliseconds: 500) wait.
-          self
-            doSimpleTransaction: [ 
+            gemServer: [ 
+              loopCount := loopCount + 1.
+              self forceBeginTransaction
+                ifTrue: [ 
+                  "Enter transaction before calling GemServer>>gemServerTransaction:onError:, which is illegal."
+                  self doBeginTransaction.
+                  forceBeginTransaction := false ].
+              self forceInternalServerError
+                ifTrue: [ self error: 'internal server error' ].
               self
-                logEvent:
-                  'LOOPCOUNT: ' , loopCount printString , ' : ' , actionCount printString
-                object: self copy ] ]
-            on: Error
-            do: [ :ex | 
-              self serverError: ex titled: 'top-level service loop'.
+                gemServerTransaction: [ self handleAction ]
+                onError: [ :ex | self handleActionError: ex ].
+              (Delay forMilliseconds: 500) wait.
               self
                 doSimpleTransaction: [ 
+                  self
+                    logEvent:
+                      'LOOPCOUNT: ' , loopCount printString , ' : ' , actionCount printString
+                    object: self copy ] ]
+            exceptionSet: Error
+            onError: [ :ex | 
+              self
+                serverError: ex
+                titled: 'top-level service loop'
+                inTransactionDo: [ 
                   (forceBeginTransaction or: [ forceInternalServerError ])
                     ifTrue: [ 
                       "acknowledge event handled"
@@ -43,7 +45,11 @@ startBasicServerOn: ignored
                     logEvent:
                       'LOOPCOUNT (internal error): ' , loopCount printString , ' : '
                         , actionCount printString
-                    object: self copy ] ] ]
+                    object: self copy ].
+              System inTransaction
+                ifTrue: [ 
+                  "ensure that error logging info is committed ... when forceBeginTransaction was in effect"
+                  self doCommitTransaction ] ] ]
             on: self gemServerExceptionSet
             do: [ :ex | 
               "Handler for interactive Errors ... record for testing purposes"

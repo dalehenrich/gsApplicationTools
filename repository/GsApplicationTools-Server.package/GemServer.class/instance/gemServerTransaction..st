@@ -1,6 +1,6 @@
-transactions
+gem server api
 gemServerTransaction: aBlock
-  ^ self
+  self
     gemServerTransaction: aBlock
     onError: [ :ex | 
       "server error is already logged"
