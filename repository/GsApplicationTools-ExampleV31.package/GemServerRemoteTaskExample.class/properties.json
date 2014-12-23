@@ -10,9 +10,10 @@
 		"taskBlock",
 		"taskValue",
 		"hasValue",
-		"exception" ],
+		"exception",
+		"shouldError" ],
 	"name" : "GemServerRemoteTaskExample",
 	"pools" : [
 		 ],
-	"super" : "GemServer",
+	"super" : "Object",
 	"type" : "normal" }
