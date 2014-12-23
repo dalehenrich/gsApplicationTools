@@ -1,7 +1,7 @@
 transactions
-gemServerTransaction: aBlock
+gemServer: aBlock
   ^ self
-    gemServerTransaction: aBlock
+    gemServer: aBlock
     onError: [ :ex | 
       "server error is already logged"
        ]

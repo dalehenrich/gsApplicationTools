@@ -1,0 +1,14 @@
+{
+	"category" : "GsApplicationTools-ExampleV31",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "dkh 12/22/2014 18:26",
+	"instvars" : [
+		"serverProcess" ],
+	"name" : "GemServerRemoteAbstractExample",
+	"pools" : [
+		 ],
+	"super" : "GemServer",
+	"type" : "normal" }

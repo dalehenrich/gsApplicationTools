@@ -1,17 +1,21 @@
 error handling
-internalServerError: exception titled: title shouldCommit: shouldCommit
-  "snap off a continuation (if possible) and dump the stack to the gem log"
-
+serverError: exception titled: title inTransactionDo: inTransactionBlock
   | stream stack exDescription |
   stack := GsProcess stackReportToLevel: 300.
   exDescription := exception description.
-  shouldCommit
-    ifTrue: [ self doSimpleTransaction: [ self createContinuation: exDescription ] ]
-    ifFalse: [ self createContinuation: exDescription ].
+  System inTransaction
+    ifTrue: [ 
+      self createContinuation: exDescription.
+      inTransactionBlock value ]
+    ifFalse: [ 
+      self
+        doSimpleTransaction: [ 
+          self createContinuation: exDescription.
+          inTransactionBlock value ] ].
   stream := WriteStream on: String new.
   stream
     nextPutAll:
-      '----------- ' , title , ' Internal Server ERROR Encountered: '
+      '----------- ' , title , ' Server ERROR Encountered: '
         , DateAndTime now printString.
   stream lf.
   stream nextPutAll: exDescription.

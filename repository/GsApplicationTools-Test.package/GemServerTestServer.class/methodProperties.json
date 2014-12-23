@@ -1,6 +1,5 @@
 {
 	"class" : {
-		"gemServerExceptionSet" : "dkh 12/21/2014 16:43",
 		"serverClass" : "dkh 12/21/2014 15:19" },
 	"instance" : {
 		"actionCount" : "dkh 12/21/2014 15:10",
@@ -12,7 +11,6 @@
 		"handleAction" : "dkh 12/22/2014 17:07",
 		"handleActionError:" : "dkh 12/22/2014 15:37",
 		"initialize" : "dkh 12/22/2014 16:41",
-		"internalServerError:titled:" : "dkh 12/22/2014 16:16",
 		"logAction:" : "dkh 12/22/2014 16:58",
 		"logEvent:object:" : "dkh 12/21/2014 14:51",
 		"messageCount" : "dkh 12/21/2014 15:10",
@@ -26,8 +24,9 @@
 		"performMessage:with:" : "dkh 12/22/2014 16:30",
 		"performNoop" : "dkh 12/22/2014 16:17",
 		"performServerStarted" : "dkh 12/22/2014 16:17",
+		"serverError:titled:" : "dkh 12/23/2014 10:55",
 		"serverProcess" : "dkh 12/22/2014 12:04",
 		"serverProcess:" : "dkh 12/22/2014 12:04",
-		"startBasicServerOn:" : "dkh 12/22/2014 16:56",
+		"startBasicServerOn:" : "dkh 12/23/2014 09:56",
 		"stop" : "dkh 12/22/2014 12:06",
 		"unitTestStartServiceOn:" : "dkh 12/22/2014 13:57" } }

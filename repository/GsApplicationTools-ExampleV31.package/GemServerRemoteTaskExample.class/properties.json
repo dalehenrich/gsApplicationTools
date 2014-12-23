@@ -1,0 +1,17 @@
+{
+	"category" : "GsApplicationTools-ExampleV31",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"InProcess",
+		"Queue" ],
+	"commentStamp" : "dkh 12/22/2014 19:47",
+	"instvars" : [
+		"taskBlock",
+		"taskValue",
+		"hasValue" ],
+	"name" : "GemServerRemoteTaskExample",
+	"pools" : [
+		 ],
+	"super" : "GemServer",
+	"type" : "normal" }

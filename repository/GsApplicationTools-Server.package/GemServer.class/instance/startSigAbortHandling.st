@@ -6,8 +6,7 @@ startSigAbortHandling
       "Run the abort in a lowPriority process, since we must acquire the
        transactionMutex."
       [ 
-      GRPlatform current transactionMutex
-        critical: [ GRPlatform current doAbortTransaction ].
+      self transactionMutex critical: [ self doAbortTransaction ].
       System enableSignaledAbortError ]
         forkAt: Processor lowestPriority ]
     category: GemStoneError

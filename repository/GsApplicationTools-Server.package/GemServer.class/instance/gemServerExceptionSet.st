@@ -1,5 +1,3 @@
-breakpoint handling
+error handling
 gemServerExceptionSet
-  "Answer exceptionSet for handling Halt and or Breakpoint"
-
-  ^ self class gemServerExceptionSet
+  ^ Error , self class gemServerExceptionSet

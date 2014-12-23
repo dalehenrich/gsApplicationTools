@@ -1,8 +1,9 @@
 error handling
-internalServerError: exception titled: title
-  self internalServerError: exception titled: title shouldCommit: true.
+serverError: exception titled: title
   self
-    doSimpleTransaction: [ 
+    serverError: exception
+    titled: title
+    inTransactionDo: [ 
       actionResult := #'internalServerError'.
       actionException := exception.
       self logAction: #'internalServerError:titled:' ]

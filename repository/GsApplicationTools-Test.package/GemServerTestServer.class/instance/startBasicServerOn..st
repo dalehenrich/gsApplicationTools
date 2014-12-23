@@ -31,7 +31,7 @@ startBasicServerOn: ignored
                 object: self copy ] ]
             on: Error
             do: [ :ex | 
-              self internalServerError: ex titled: 'top-level service loop'.
+              self serverError: ex titled: 'top-level service loop'.
               self
                 doSimpleTransaction: [ 
                   (forceBeginTransaction or: [ forceInternalServerError ])

@@ -1,0 +1,3 @@
+private
+queueCounterIndex
+  ^ 1

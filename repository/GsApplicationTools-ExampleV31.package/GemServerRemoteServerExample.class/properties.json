@@ -1,0 +1,14 @@
+{
+	"category" : "GsApplicationTools-ExampleV31",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"currentQueueCounter" ],
+	"name" : "GemServerRemoteServerExample",
+	"pools" : [
+		 ],
+	"super" : "GemServerRemoteAbstractExample",
+	"type" : "normal" }

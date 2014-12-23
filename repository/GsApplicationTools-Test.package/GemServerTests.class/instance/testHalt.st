@@ -10,10 +10,7 @@ testHalt
   gemServer performMessage: #'halt'.
   self waitForActionResult: gemServer.
   self assert: gemServer actionResult == self haltSymbol.
-  gemServer actionException
-    ifNotNil: [ :ex | 
-      self assert: gemServer interactiveMode.
-      self assert: (ex isKindOf: Halt) ].
+  gemServer actionException ifNotNil: [ :ex | self assert: (ex isKindOf: Halt) ].
   gemServer performMessage: #'add' with: 41.
   self waitForActionResult: gemServer.
   self assert: gemServer actionResult == 42 ]

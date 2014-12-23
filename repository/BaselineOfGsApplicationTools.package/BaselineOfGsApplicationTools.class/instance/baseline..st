@@ -39,4 +39,11 @@ baseline: spec
           with: [ spec includes: 'GsApplicationTools-ServerV30' ];
         package: 'GsApplicationTools-ServerV30'
           with: [ spec requires: 'GsApplicationTools-Server' ];
+        yourself ].
+  spec
+    for: #(#'gs3.1.x' #'gs3.2.x' #'gs3.3.x')
+    do: [ 
+      spec
+        package: 'GsApplicationTools-ExampleV31'
+          with: [ spec requires: 'GsApplicationTools-Server' ];
         yourself ]
