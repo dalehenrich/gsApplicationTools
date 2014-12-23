@@ -45,5 +45,5 @@ baseline: spec
     do: [ 
       spec
         package: 'GsApplicationTools-ExampleV31'
-          with: [ spec requires: 'GsApplicationTools-Server' ];
+          with: [ spec requires: #('GsApplicationTools-Server' 'GsApplicationTools-Test') ];
         yourself ]

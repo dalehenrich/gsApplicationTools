@@ -3,16 +3,12 @@
 	"classinstvars" : [
 		 ],
 	"classvars" : [
-		"InProcess",
-		"Queue" ],
+		 ],
 	"commentStamp" : "",
 	"instvars" : [
-		"taskBlock",
-		"taskValue",
-		"hasValue",
-		"exception" ],
-	"name" : "GemServerRemoteTaskExample",
+		 ],
+	"name" : "GemServerRemoteServerExampleTests",
 	"pools" : [
 		 ],
-	"super" : "GemServer",
+	"super" : "GemServerAbstractTests",
 	"type" : "normal" }

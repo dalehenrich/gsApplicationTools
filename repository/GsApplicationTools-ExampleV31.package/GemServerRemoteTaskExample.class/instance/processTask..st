@@ -5,6 +5,6 @@ processTask: gemServer
       | value |
       value := taskBlock value.
       gemServer
-        doSimpleTask: [ 
+        doSimpleTransaction: [ 
           taskValue := value.
           hasValue := true ] ]

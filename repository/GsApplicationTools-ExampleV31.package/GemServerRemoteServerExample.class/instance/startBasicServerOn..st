@@ -7,27 +7,38 @@ startBasicServerOn: ignored
       [ 
       [ true ]
         whileTrue: [ 
-          | qcv |
-          self queueCounterValue <= self currentQueueCounter
-            ifTrue: [ (Delay forMilliseconds: 100) wait ].
-          (qcv := self queueCounterValue) > self currentQueueCounter
-            ifTrue: [ 
-              self
-                gemServerTransaction: [ 
-                  self
-                    halt:
-                      'this guy acquires transaction mutex ... might not be cool when forking off servers ... see Issue #12'.
+          self
+            gemServer: [ 
+              | qcv |
+              self queueCounterValue <= self currentQueueCounter
+                ifTrue: [ (Delay forMilliseconds: 100) wait ].
+              (qcv := self queueCounterValue) > self currentQueueCounter
+                ifTrue: [ 
+                  "handle exceptions that occur while managing the queues"
                   [ self queue size > 0 ]
                     whileTrue: [ 
-                      self doSimpleTransaction: [ self inProcess addAll: self queue removeAll ].
-                      [ self inProcess size > 0 ]
-                        whileTrue: [ 
-                          self inProcess anyOne
-                            ifNotNil: [ :task | 
+                      | tasks |
+                      self
+                        doSimpleTransaction: [ self inProcess addAll: (tasks := self queue removeAll) ].
+                      tasks
+                        do: [ :task | 
+                          [ 
+                          self
+                            gemServer: [ 
+                              "handle exceptions (including breakpoints and Halt) that occur while processing individual task"
                               task processTask: self.
                               self
-                                doSimpleTransaction: [ self inProcess remove: task ] ] ] ].
-                  self doSimpleTransaction: [ currentQueueCounter := qcv ] ]
-                onError: [ :ex |  ] ] ] ]
+                                doSimpleTransaction: [ self inProcess remove: task ] ]
+                            onError: [ :ex | 
+                              self
+                                doSimpleTransaction: [ 
+                                  task exception: ex.
+                                  (ObjectLogEntry
+                                    error:
+                                      'Server example task exception: ' , ex description printString
+                                    object: task) addToLog ] ] ]
+                            fork ] ].
+                  self doSimpleTransaction: [ currentQueueCounter := qcv ] ] ]
+            exceptionSet: Error , Halt ] ]
         fork.
   self serverInstance: self	"the serverProcess is session-specific"
