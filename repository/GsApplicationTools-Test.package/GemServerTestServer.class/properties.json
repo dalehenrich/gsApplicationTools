@@ -12,6 +12,7 @@
 		"messageObject",
 		"actionSymbol",
 		"actionResult",
+		"actionException",
 		"forceBeginTransaction",
 		"forceInternalServerError" ],
 	"name" : "GemServerTestServer",

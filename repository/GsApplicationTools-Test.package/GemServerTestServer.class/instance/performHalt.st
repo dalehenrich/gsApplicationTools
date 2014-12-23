@@ -2,4 +2,4 @@ actions
 performHalt
   self halt.
   actionResult := #'halt'.
-  self logAction
+  self logAction: #'performHalt'

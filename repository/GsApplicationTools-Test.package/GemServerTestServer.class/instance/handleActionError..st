@@ -1,3 +1,4 @@
 actions
 handleActionError: ex
-  actionResult := #'ERROR_LOGGED' -> ex
+  actionResult := #'ERROR_LOGGED'.
+  actionException := ex

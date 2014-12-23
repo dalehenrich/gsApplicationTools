@@ -1,0 +1,14 @@
+{
+	"category" : "GsApplicationTools-Test",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "GemServerInteractiveVMTests",
+	"pools" : [
+		 ],
+	"super" : "GemServerLocalVMTests",
+	"type" : "normal" }

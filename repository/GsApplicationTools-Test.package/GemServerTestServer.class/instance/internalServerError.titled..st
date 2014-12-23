@@ -4,4 +4,5 @@ internalServerError: exception titled: title
   self
     doSimpleTransaction: [ 
       actionResult := #'internalServerError'.
-      self logAction ]
+      actionException := exception.
+      self logAction: #'internalServerError:titled:' ]

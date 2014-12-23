@@ -9,7 +9,8 @@ testForceBeginTransaction
   self assert: gemServer actionResult == #'started'.
   gemServer performMessage: #'forceBeginTransaction'.
   self waitForActionResult: gemServer.
-  self assert: gemServer actionResult == #'internalServerError'.
+  self assert: gemServer actionResult == self internalServerErrorSymbol.
+  self assert: (gemServer actionException isKindOf: Error).
   gemServer performMessage: #'add' with: 41.
   self waitForActionResult: gemServer.
   self assert: gemServer actionResult == 42 ]

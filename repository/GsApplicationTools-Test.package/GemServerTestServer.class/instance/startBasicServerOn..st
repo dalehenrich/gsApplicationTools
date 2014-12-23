@@ -10,6 +10,7 @@ startBasicServerOn: ignored
       [ true ]
         whileTrue: [ 
           [ 
+          [ 
           loopCount := loopCount + 1.
           self forceBeginTransaction
             ifTrue: [ 
@@ -23,14 +24,43 @@ startBasicServerOn: ignored
             onError: [ :ex | self handleActionError: ex ].
           (Delay forMilliseconds: 500) wait.
           self
-            doSimpleTransaction: [ self logEvent: 'LOOPCOUNT: ' , loopCount printString object: self ] ]
+            doSimpleTransaction: [ 
+              self
+                logEvent:
+                  'LOOPCOUNT: ' , loopCount printString , ' : ' , actionCount printString
+                object: self copy ] ]
             on: Error
             do: [ :ex | 
               self internalServerError: ex titled: 'top-level service loop'.
               self
                 doSimpleTransaction: [ 
-                  self logEvent: 'LOOPCOUNT: ' , loopCount printString object: self.
+                  (forceBeginTransaction or: [ forceInternalServerError ])
+                    ifTrue: [ 
+                      "acknowledge event handled"
+                      actionCount := actionCount + 1 ].
                   forceBeginTransaction := forceInternalServerError := false.
-                  actionCount := actionCount + 1	"acknowledge event handled" ] ] ] ]
+                  self
+                    logEvent:
+                      'LOOPCOUNT (internal error): ' , loopCount printString , ' : '
+                        , actionCount printString
+                    object: self copy ] ] ]
+            on: self gemServerExceptionSet
+            do: [ :ex | 
+              "Handler for interactive Errors ... record for testing purposes"
+              self
+                doSimpleTransaction: [ 
+                  (forceBeginTransaction or: [ forceInternalServerError ])
+                    ifTrue: [ 
+                      "acknowledge event handled"
+                      actionCount := actionCount + 1 ].
+                  forceBeginTransaction := forceInternalServerError := false.
+                  actionResult := #'interactiveError'.
+                  actionException := ex.
+                  self logAction: #'startBasicServerOn:...interativeError'.
+                  self
+                    logEvent:
+                      'LOOPCOUNT (interactive exception): ' , loopCount printString , ' : '
+                        , actionCount printString
+                    object: self copy ] ] ] ]
         fork.
   self serverInstance: self	"the serverProcess is session-specific"

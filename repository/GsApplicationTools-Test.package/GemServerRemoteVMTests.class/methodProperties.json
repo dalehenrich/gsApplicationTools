@@ -2,7 +2,6 @@
 	"class" : {
 		 },
 	"instance" : {
-		"setUp" : "dkh 12/21/2014 14:29",
 		"startGems:" : "dkh 12/22/2014 11:18",
 		"stopGems:" : "dkh 12/22/2014 11:18",
-		"testForceBeginTransaction" : "dkh 12/22/2014 13:26" } }
+		"testForceBeginTransaction" : "dkh 12/22/2014 15:42" } }

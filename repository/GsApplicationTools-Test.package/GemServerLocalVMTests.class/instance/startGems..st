@@ -1,3 +1,3 @@
 private
 startGems: gemServer
-  process := [ gemServer unitTestStartServiceOn: nil ] fork
+  process := [ self startGemServer: gemServer ] fork

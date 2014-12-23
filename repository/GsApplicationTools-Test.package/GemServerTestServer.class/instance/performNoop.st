@@ -1,3 +1,3 @@
 actions
 performNoop
-  self logAction
+  self logAction: #'performNoop'

@@ -9,4 +9,6 @@ interactiveStartServiceOn: portOrNil
   self
     transactionMode: #'autoBegin';
     interactiveMode: true.
+  System commitTransaction
+    ifFalse: [ self error: 'Commit transaction failed before starting interactive service' ].
   self startServiceOn: portOrNil	"does not return"

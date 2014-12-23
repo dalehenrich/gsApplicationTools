@@ -2,12 +2,16 @@
 	"class" : {
 		"isAbstract" : "dkh 12/22/2014 12:26" },
 	"instance" : {
+		"errorLoggedSymbol" : "dkh 12/22/2014 15:45",
 		"gemServerName" : "dkh 12/22/2014 11:11",
+		"haltSymbol" : "dkh 12/22/2014 15:43",
+		"internalServerErrorSymbol" : "dkh 12/22/2014 15:18",
+		"setUp" : "dkh 12/22/2014 14:54",
 		"startGems:" : "dkh 12/22/2014 11:16",
 		"stopGems:" : "dkh 12/22/2014 11:16",
-		"testError" : "dkh 12/22/2014 11:17",
-		"testForceInternalServerError" : "dkh 12/22/2014 13:27",
-		"testHalt" : "dkh 12/22/2014 11:19",
+		"testError" : "dkh 12/22/2014 16:42",
+		"testForceInternalServerError" : "dkh 12/22/2014 15:44",
+		"testHalt" : "dkh 12/22/2014 15:53",
 		"testPerformMessage" : "dkh 12/22/2014 11:19",
 		"testStartServer" : "dkh 12/22/2014 11:19",
 		"waitForActionResult:" : "dkh 12/22/2014 12:30" } }

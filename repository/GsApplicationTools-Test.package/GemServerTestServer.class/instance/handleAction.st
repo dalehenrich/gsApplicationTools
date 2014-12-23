@@ -1,5 +1,6 @@
 actions
 handleAction
+  [ 
   messageCount <= actionCount
     ifTrue: [ ^ self performNoop ].
   actionSymbol == #'forceBeginTransaction'
@@ -14,4 +15,5 @@ handleAction
   actionSymbol == #'halt'
     ifTrue: [ ^ self performHalt ].
   actionSymbol == #'serverStarted'
-    ifTrue: [ ^ self performServerStarted ]
+    ifTrue: [ ^ self performServerStarted ] ]
+    ensure: [ actionSymbol := nil ]

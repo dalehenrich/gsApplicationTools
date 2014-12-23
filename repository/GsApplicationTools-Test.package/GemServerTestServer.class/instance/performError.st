@@ -2,4 +2,4 @@ actions
 performError
   self foo.
   actionResult := #'RESUMED????'.
-  self logAction
+  self logAction: #'performError'

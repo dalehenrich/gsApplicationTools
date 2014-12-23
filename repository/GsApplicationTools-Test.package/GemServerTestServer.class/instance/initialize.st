@@ -5,4 +5,5 @@ initialize
   messageCount := 1.
   actionSymbol := #'serverStarted'.
   actionCount := 0.
-  messageObject := actionResult := nil
+  messageObject := actionResult := nil.
+  forceBeginTransaction := forceInternalServerError := false

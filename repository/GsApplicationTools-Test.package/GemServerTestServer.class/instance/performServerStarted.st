@@ -1,4 +1,4 @@
 actions
 performServerStarted
   actionResult := #'started'.
-  self logAction
+  self logAction: #'performServerStarted'
