@@ -7,10 +7,11 @@
 		"startGems:" : "dkh 12/23/2014 13:04",
 		"stopGems:" : "dkh 12/23/2014 15:53",
 		"tearDown" : "dkh 12/23/2014 15:48",
-		"testBreakpoint" : "dkh 12/23/2014 16:15",
-		"testError" : "dkh 12/23/2014 15:59",
-		"testExampleHttp" : "dkh 12/23/2014 16:21",
-		"testHalt" : "dkh 12/23/2014 16:24",
-		"testSimple" : "dkh 12/23/2014 15:59",
-		"testTimeInLondon" : "dkh 12/23/2014 15:59",
-		"waitForTasks:for:" : "dkh 12/23/2014 16:26" } }
+		"test100Tasks" : "dkh 12/23/2014 17:44",
+		"testBreakpoint" : "dkh 12/23/2014 17:16",
+		"testError" : "dkh 12/23/2014 17:16",
+		"testExampleHttp" : "dkh 12/23/2014 17:16",
+		"testHalt" : "dkh 12/23/2014 17:44",
+		"testSimple" : "dkh 12/23/2014 17:49",
+		"testTimeInLondon" : "dkh 12/23/2014 17:16",
+		"waitForTasks:for:trace:" : "dkh 12/23/2014 17:15" } }

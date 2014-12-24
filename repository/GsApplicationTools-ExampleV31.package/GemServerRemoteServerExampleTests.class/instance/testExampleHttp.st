@@ -13,7 +13,7 @@ testExampleHttp
     timesRepeat: [ 
       task := client scheduleExampleHttpTask.
       taskList add: task ].
-  completed := self waitForTasks: taskList for: client.
+  completed := self waitForTasks: taskList for: client trace: gemServer tracing.
   completed
     do: [ :each | 
       Transcript

@@ -1,5 +1,5 @@
 private
-waitForTasks: taskList for: client
+waitForTasks: taskList for: client trace: trace
   | tasks loopCount completed target valid |
   loopCount := 0.
   completed := {}.
@@ -11,6 +11,10 @@ waitForTasks: taskList for: client
           client doAbortTransaction.
           (task hasError or: [ task hasValue ])
             ifTrue: [ 
+              trace
+                ifTrue: [ 
+                  client
+                    doSimpleTransaction: [ (ObjectLogEntry trace: task label , ' completed' object: task) addToLog ] ].
               completed add: task.
               tasks remove: task ] ].
       (Delay forSeconds: 1) wait.

@@ -14,10 +14,11 @@ startBasicServerOn: ignored
                 ifTrue: [ (Delay forMilliseconds: 100) wait ].
               qcv := self queueCounterValue.
               self
-                trace: [ 'counters [0]' ]
+                trace: [ 'counters [0] inProcess: ' , self inProcess size printString ]
                 object: [ 
                   {qcv.
-                  currentQueueCounter} ].
+                  currentQueueCounter.
+                  (self inProcess)} ].
               qcv > self currentQueueCounter
                 ifTrue: [ 
                   "handle exceptions that occur while managing the queues"
@@ -35,17 +36,20 @@ startBasicServerOn: ignored
                         object: [ tasks copy ].
                       tasks
                         do: [ :task | 
-                          self trace: [ 'fork task [2]' ] object: [ task ].
+                          self trace: [ 'fork task [2] ' , task label ] object: [ task ].
                           [ 
                           self
                             gemServer: [ 
                               "handle exceptions (including breakpoints and Halt) that occur while processing individual task"
                               self
-                                trace: [ 'process task [3]' ]
+                                trace: [ 'start process task [3] ' , task label ]
                                 object: [ task ].
-                              task processTask: self.
-                              self
-                                doSimpleTransaction: [ self inProcess remove: task ] ]
+                              [ task processTask: self ]
+                                ensure: [ 
+                                  self doSimpleTransaction: [ self inProcess remove: task ].
+                                  self
+                                    trace: [ 'end process task [4] ' , task label ]
+                                    object: [ task ] ] ]
                             onError: [ :ex | 
                               self
                                 doSimpleTransaction: [ 
@@ -54,7 +58,11 @@ startBasicServerOn: ignored
                                     error:
                                       'Server example task exception: ' , ex description printString
                                     object: task) addToLog ] ] ]
-                            fork ] ].
+                            fork.
+                          self
+                            trace: [ 'task [5] inProcess: ' , self inProcess size printString ]
+                            object: [ self inProcess size ].
+                          Processor yield ] ].
                   self doSimpleTransaction: [ currentQueueCounter := qcv ] ] ]
             exceptionSet: Error , Halt ] ]
         fork.

@@ -9,5 +9,5 @@ testError
   | task |
   self startGems: gemServer.
   task := client scheduleErrorTask.
-  completed := self waitForTasks: {task} for: client ]
+  completed := self waitForTasks: {task} for: client trace: gemServer tracing ]
     ensure: [ self stopGems: gemServer ]

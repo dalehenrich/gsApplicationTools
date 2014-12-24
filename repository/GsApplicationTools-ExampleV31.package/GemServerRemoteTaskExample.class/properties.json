@@ -13,7 +13,8 @@
 		"exception",
 		"shouldError",
 		"creation",
-		"valuation" ],
+		"valuation",
+		"label" ],
 	"name" : "GemServerRemoteTaskExample",
 	"pools" : [
 		 ],

@@ -9,5 +9,5 @@ testBreakpoint
   | task |
   self startGems: gemServer.
   task := client scheduleBreakpointTask.
-  completed := self waitForTasks: {task} for: client ]
+  completed := self waitForTasks: {task} for: client trace: gemServer tracing ]
     ensure: [ self stopGems: gemServer ]
