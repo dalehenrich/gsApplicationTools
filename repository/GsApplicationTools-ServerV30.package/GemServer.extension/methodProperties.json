@@ -1,7 +1,8 @@
 {
 	"class" : {
-		"gemServerExceptionSet" : "dkh 12/23/2014 10:27" },
+		"gemServerExceptionSet" : "dkh 12/24/2014 07:51" },
 	"instance" : {
+		"enableAlmostOutOfMemoryHandling" : "dkh 12/24/2014 10:18",
 		"enableRemoteBreakpointHandling" : "dkh 12/10/2014 16:55",
 		"hasNoBreakpointsSet" : "dkh 12/09/2014 14:07",
 		"performOnServer:status:" : "dkh 12/22/2014 13:18" } }

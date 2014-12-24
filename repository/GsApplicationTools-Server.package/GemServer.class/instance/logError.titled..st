@@ -1,4 +1,4 @@
-error handling
+exception handling
 logError: exception titled: title
   "snap off a continuation and dump the stack to the gem log"
 

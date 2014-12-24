@@ -50,6 +50,8 @@ startBasicServerOn: ignored
                                   self
                                     trace: [ 'end process task [4] ' , task label ]
                                     object: [ task ] ] ]
+                            exceptionSet:
+                              GemServerRemoteInternalServerErrorTriggerExample , self gemServerExceptionSet
                             onError: [ :ex | 
                               self
                                 doSimpleTransaction: [ 
@@ -63,7 +65,6 @@ startBasicServerOn: ignored
                             trace: [ 'task [5] inProcess: ' , self inProcess size printString ]
                             object: [ self inProcess size ].
                           Processor yield ] ].
-                  self doSimpleTransaction: [ currentQueueCounter := qcv ] ] ]
-            exceptionSet: Error , Halt ] ]
+                  self doSimpleTransaction: [ currentQueueCounter := qcv ] ] ] ] ]
         fork.
   self serverInstance: self	"the serverProcess is session-specific"

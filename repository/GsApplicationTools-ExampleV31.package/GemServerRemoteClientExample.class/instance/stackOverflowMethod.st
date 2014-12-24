@@ -1,0 +1,3 @@
+operations
+stackOverflowMethod
+  self stackOverflowMethod

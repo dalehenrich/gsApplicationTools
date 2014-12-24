@@ -1,11 +1,6 @@
-error handling
+exception handling
 handleGemServerException: exception
-  "only returns if an error was logged"
+  "if control is returned to receiver, then exception is treated like an error, i.e., 
+   the errorBlock is evaluated and stack is unwound."
 
-  ((exception isKindOf: Error) or: [ exception isResumable not ])
-    ifTrue: [ self serverError: exception titled: self name , ' error/non-resumable exception' ]
-    ifFalse: [ 
-      self interactiveMode
-        ifTrue: [ exception pass ].
-      self serverError: exception titled: self name , ' resumable exception'.
-      exception resume ]
+  ^ exception exceptionHandlingForGemServer: self

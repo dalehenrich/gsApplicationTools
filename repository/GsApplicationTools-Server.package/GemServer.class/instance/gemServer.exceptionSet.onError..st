@@ -3,7 +3,20 @@ gemServer: aBlock exceptionSet: exceptionSet onError: errorBlock
   aBlock
     on: exceptionSet
     do: [ :ex | 
-      self handleGemServerException: ex.	"only returns if an error was logged"
-      errorBlock value: ex.
+      | exception |
+      [ 
+      "only returns if an error was logged"
+      exception := ex.
+      self handleGemServerException: ex ]
+        on: Error
+        do: [ :unexpectedError | 
+          "error while handling the exception"
+          self
+            serverError: unexpectedError
+            titled:
+              self name , ' Internal Server error during handleGemServerException:'.
+          exception := unexpectedError ].
+      errorBlock value: exception.
       self interactiveMode
-        ifTrue: [ ex pass ] ]
+        ifTrue: [ exception pass ].
+      ^ self	"unwind stack" ]

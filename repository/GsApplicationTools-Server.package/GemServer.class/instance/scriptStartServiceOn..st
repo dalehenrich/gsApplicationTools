@@ -13,4 +13,5 @@ scriptStartServiceOn: portOrNil
   self transactionMode: #'manualBegin'.
   self
     startSigAbortHandling;
+    enableAlmostOutOfMemoryHandling;
     startServiceOn: portOrNil	"does not return"

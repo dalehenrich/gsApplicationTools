@@ -19,7 +19,7 @@ waitForTasks: taskList for: client trace: trace
               tasks remove: task ] ].
       (Delay forSeconds: 1) wait.
       loopCount := loopCount + 1.
-      loopCount > (taskList size * 6)
+      loopCount > (taskList size * 12)
         ifTrue: [ self assert: false description: 'all tasks not complete' ] ].
   valid := completed select: [ :each | each isValid ].
   self assert: valid size = completed size description: 'task validation error'.

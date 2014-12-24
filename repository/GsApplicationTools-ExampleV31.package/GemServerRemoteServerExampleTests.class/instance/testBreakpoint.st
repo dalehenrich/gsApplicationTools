@@ -5,9 +5,7 @@ testBreakpoint
   gemServer tracing: false.
   gemServer scriptLogEvent: '---->testBreakpoint' object: gemServer.
   client := GemServerRemoteClientExample new.
-  [ 
-  | task |
-  self startGems: gemServer.
-  task := client scheduleBreakpointTask.
-  completed := self waitForTasks: {task} for: client trace: gemServer tracing ]
-    ensure: [ self stopGems: gemServer ]
+  completed := self
+    runTest: gemServer
+    client: client
+    task: client scheduleBreakpointTask

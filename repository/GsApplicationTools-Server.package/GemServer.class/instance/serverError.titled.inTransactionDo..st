@@ -1,4 +1,4 @@
-error handling
+exception handling
 serverError: exception titled: title inTransactionDo: inTransactionBlock
   | stream stack exDescription |
   stack := GsProcess stackReportToLevel: 300.

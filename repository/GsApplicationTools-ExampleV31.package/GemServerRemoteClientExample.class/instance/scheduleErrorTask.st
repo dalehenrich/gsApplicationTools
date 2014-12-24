@@ -4,5 +4,5 @@ scheduleErrorTask
     value: [ 
       (Delay forSeconds: 3) wait.
       1 foo ])
-    shouldError: true;
+    expectedException: Error;
     addToQueue: self

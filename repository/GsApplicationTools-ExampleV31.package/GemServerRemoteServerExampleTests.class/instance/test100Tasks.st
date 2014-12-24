@@ -11,9 +11,15 @@ test100Tasks
   taskSelectors := {#'scheduleBreakpointTask'.
   #'scheduleErrorTask'.
   #'scheduleExampleHttpTask'.
+  #'scheduleFastTask'.
   #'scheduleHaltTask'.
+  #'scheduleInternalServerError'.
+  #'scheduleOutOfMemoryPersistent'.
+  #'scheduleOutOfMemoryTemp'.
   #'scheduleSimpleTask'.
+  #'scheduleStackOverflow'.
   #'scheduleTimeInLondonTask'.
+  #'scheduleWarning'.
   #'scheduleFastTask'.
   #'scheduleFastTask'.
   #'scheduleFastTask'.
