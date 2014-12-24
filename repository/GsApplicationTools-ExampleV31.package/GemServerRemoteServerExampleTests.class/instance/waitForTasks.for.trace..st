@@ -1,26 +1,10 @@
 private
 waitForTasks: taskList for: client trace: trace
-  | tasks loopCount completed target valid |
-  loopCount := 0.
-  completed := {}.
-  tasks := taskList copy.
-  [ tasks isEmpty ]
-    whileFalse: [ 
-      tasks copy
-        do: [ :task | 
-          client doAbortTransaction.
-          (task hasError or: [ task hasValue ])
-            ifTrue: [ 
-              trace
-                ifTrue: [ 
-                  client
-                    doSimpleTransaction: [ (ObjectLogEntry trace: task label , ' completed' object: task) addToLog ] ].
-              completed add: task.
-              tasks remove: task ] ].
-      (Delay forSeconds: 1) wait.
-      loopCount := loopCount + 1.
-      loopCount > (taskList size * 12)
-        ifTrue: [ self assert: false description: 'all tasks not complete' ] ].
-  valid := completed select: [ :each | each isValid ].
+  | ar completed valid |
+  ar := client waitForTasks: taskList trace: trace.
+  (ar at: 1)
+    ifFalse: [ self assert: false description: 'all tasks not complete' ].
+  completed := ar at: 3.
+  valid := ar at: 4.
   self assert: valid size = completed size description: 'task validation error'.
   ^ valid

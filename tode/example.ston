@@ -1,0 +1,104 @@
+TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :commandNode | 
+  | opts args |
+  \"for help: ./example -h\"
+  command
+    getOptsMixedLongShort:
+      {#(\'help\' $h #\'none\').
+      #(\'register\' nil #\'required\').
+      #(\'client\' nil #\'required\').
+      #(\'start\' nil #\'required\').
+      #(\'trace\' nil #\'none\').
+      #(\'unregister\' nil #\'required\')}
+    optionsAndArguments: [ :options :operands | 
+      opts := options.
+      args := operands ].
+  opts
+    at: \'help\'
+    ifAbsent: [ 
+      | result gemServer trace |
+      trace := false.
+      opts at: \'trace\' ifPresent: [ :ignored | trace := true ].
+      opts
+        at: \'unregister\'
+        ifPresent: [ :serverName | result := GemServerRegistry removeGemServerNamed: serverName ]
+        ifAbsent: [ 
+          opts
+            at: \'register\'
+            ifPresent: [ :serverName | 
+              gemServer := (GemServerRegistry gemServerNamed: serverName)
+                ifNil: [ 
+                  gemServer := (GemServerRemoteServerExample register: serverName)
+                    tracing: trace;
+                    interactiveMode: true;
+                    yourself ] ].
+          result := gemServer ].
+      opts
+        at: \'client\'
+        ifPresent: [ :taskName | 
+          | selectors client task |
+          selectors := Dictionary new
+            at: \'break\' put: #\'scheduleBreakpointTask\';
+            at: \'error\' put: #\'scheduleErrorTask\';
+            at: \'http\' put: #\'scheduleExampleHttpTask\';
+            at: \'fast\' put: #\'scheduleFastTask\';
+            at: \'halt\' put: #\'scheduleHaltTask\';
+            at: \'serverError\' put: #\'scheduleInternalServerError\';
+            at: \'oopPersistent\' put: #\'scheduleOutOfMemoryPersistent\';
+            at: \'oomTemp\' put: #\'scheduleOutOfMemoryTemp\';
+            at: \'simple\' put: #\'scheduleSimpleTask\';
+            at: \'overflow\' put: #\'scheduleStackOverflow\';
+            at: \'time\' put: #\'scheduleTimeInLondonTask\';
+            at: \'warning\' put: #\'scheduleWarning\';
+            yourself.
+          client := GemServerRemoteClientExample new.
+          task := client perform: (selectors at: taskName).
+          result := client waitForTasks: {task} trace: trace ].
+      opts
+        at: \'start\'
+        ifPresent: [ :serverName | 
+          Transcript
+            cr;
+            show:
+                \'starting \' , serverName printString
+                    ,
+                      \' interatively ... will block ... use client option in separate vm\'.
+          result := (GemServerRegistry gemServerNamed: serverName)
+            interactiveStartServiceOn: nil ].
+      result ]
+    ifPresent: [ :ignored | 
+      TDManPage
+        viewManPage:
+          \'NAME
+  example - example sript utility template
+SYNOPSIS
+  example [-h|--help]
+  example --register=<server-name> [--trace]
+  example --unregister=<server-name>
+  example --start=<server-name>
+  example --client=[break|error|http|fast|halt|serverError|oomPersistent|oomTemp|simple|overflow|time|warning] \\
+          [--trace]
+DESCRIPTION
+EXAMPLES
+  ./example --help
+  ./example -h
+
+  ./example --register=example
+  ./example --register=example --trace
+  ./example --unregister=example
+
+  ./example --start=example
+
+  ./example --client=break --trace
+  ./example --client=error --trace
+  ./example --client=http --trace
+  ./example --client=fast --trace
+  ./example --client=halt --trace
+  ./example --client=serverError --trace
+  ./example --client=oomPersistent --trace
+  ./example --client=oomTemp --trace
+  ./example --client=simple --trace
+  ./example --client=overflow --trace
+  ./example --client=time --trace
+  ./example --client=warning --trace
+\'
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2014-12-24T15:42:49.9532330036163-08:00']}

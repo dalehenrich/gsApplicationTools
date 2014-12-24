@@ -13,12 +13,14 @@ startBasicServerOn: ignored
               self queueCounterValue <= self currentQueueCounter
                 ifTrue: [ (Delay forMilliseconds: 100) wait ].
               qcv := self queueCounterValue.
-              self
-                trace: [ 'counters [0] inProcess: ' , self inProcess size printString ]
-                object: [ 
-                  {qcv.
-                  currentQueueCounter.
-                  (self inProcess)} ].
+              self inProcess size > 0
+                ifTrue: [ 
+                  self
+                    trace: [ 'counters [0] inProcess: ' , self inProcess size printString ]
+                    object: [ 
+                      {qcv.
+                      currentQueueCounter.
+                      (self inProcess)} ] ].
               qcv > self currentQueueCounter
                 ifTrue: [ 
                   "handle exceptions that occur while managing the queues"
