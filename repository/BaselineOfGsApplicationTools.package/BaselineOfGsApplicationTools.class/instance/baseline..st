@@ -46,4 +46,7 @@ baseline: spec
       spec
         package: 'GsApplicationTools-ExampleV31'
           with: [ spec requires: #('GsApplicationTools-Server' 'GsApplicationTools-Test') ];
+        yourself.
+      spec
+        group: 'CI' with: #('GsApplicationTools-ExampleV31');
         yourself ]

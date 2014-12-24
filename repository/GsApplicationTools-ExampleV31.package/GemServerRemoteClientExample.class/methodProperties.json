@@ -2,6 +2,11 @@
 	"class" : {
 		 },
 	"instance" : {
+		"breakpointMethod" : "dkh 12/23/2014 16:04",
+		"haltMethod" : "dkh 12/23/2014 16:16",
+		"scheduleBreakpointTask" : "dkh 12/23/2014 16:06",
 		"scheduleErrorTask" : "dkh 12/23/2014 15:05",
+		"scheduleExampleHttpTask" : "dkh 12/23/2014 16:19",
+		"scheduleHaltTask" : "dkh 12/23/2014 16:25",
 		"scheduleSimpleTask" : "dkh 12/23/2014 15:05",
 		"scheduleTimeInLondonTask" : "dkh 12/23/2014 15:19" } }

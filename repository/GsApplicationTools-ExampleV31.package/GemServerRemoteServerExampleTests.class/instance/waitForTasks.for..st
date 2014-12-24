@@ -18,5 +18,5 @@ waitForTasks: taskList for: client
       loopCount > (taskList size * 6)
         ifTrue: [ self assert: false description: 'all tasks not complete' ] ].
   valid := completed select: [ :each | each isValid ].
-  self assert: valid size = completed size.
+  self assert: valid size = completed size description: 'task validation error'.
   ^ valid
