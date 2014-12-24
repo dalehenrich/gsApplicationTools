@@ -3,15 +3,15 @@
 		 },
 	"instance" : {
 		"gemServerName" : "dkh 12/23/2014 13:28",
-		"setUp" : "dkh 12/23/2014 15:47",
+		"setUp" : "dkh 12/23/2014 18:02",
 		"startGems:" : "dkh 12/23/2014 13:04",
 		"stopGems:" : "dkh 12/23/2014 15:53",
-		"tearDown" : "dkh 12/23/2014 15:48",
+		"tearDown" : "dkh 12/23/2014 18:02",
 		"test100Tasks" : "dkh 12/23/2014 17:44",
 		"testBreakpoint" : "dkh 12/23/2014 17:16",
 		"testError" : "dkh 12/23/2014 17:16",
 		"testExampleHttp" : "dkh 12/23/2014 17:16",
 		"testHalt" : "dkh 12/23/2014 17:44",
-		"testSimple" : "dkh 12/23/2014 17:49",
+		"testSimple" : "dkh 12/23/2014 18:01",
 		"testTimeInLondon" : "dkh 12/23/2014 17:16",
 		"waitForTasks:for:trace:" : "dkh 12/23/2014 17:15" } }
