@@ -3,10 +3,11 @@
 		 },
 	"instance" : {
 		"gemServerName" : "dkh 12/23/2014 13:28",
-		"setUp" : "dkh 12/23/2014 13:27",
+		"setUp" : "dkh 12/23/2014 15:47",
 		"startGems:" : "dkh 12/23/2014 13:04",
-		"stopGems:" : "dkh 12/23/2014 13:04",
-		"tearDown" : "dkh 12/23/2014 13:57",
-		"testError" : "dkh 12/23/2014 15:03",
-		"testSimple" : "dkh 12/23/2014 15:03",
-		"waitForTasks:for:" : "dkh 12/23/2014 15:07" } }
+		"stopGems:" : "dkh 12/23/2014 15:53",
+		"tearDown" : "dkh 12/23/2014 15:48",
+		"testError" : "dkh 12/23/2014 15:59",
+		"testSimple" : "dkh 12/23/2014 15:59",
+		"testTimeInLondon" : "dkh 12/23/2014 15:59",
+		"waitForTasks:for:" : "dkh 12/23/2014 15:24" } }

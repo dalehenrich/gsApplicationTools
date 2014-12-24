@@ -1,4 +1,5 @@
 initialization
 initialize
   super initialize.
-  currentQueueCounter := 0
+  currentQueueCounter := 0.
+  tracing := false

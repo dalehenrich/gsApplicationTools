@@ -7,4 +7,5 @@ processTask: gemServer
       gemServer
         doSimpleTransaction: [ 
           taskValue := value.
-          hasValue := true ] ]
+          hasValue := true.
+          valuation := DateAndTime now ] ]

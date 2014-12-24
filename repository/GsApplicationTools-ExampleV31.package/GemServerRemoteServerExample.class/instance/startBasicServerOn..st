@@ -12,20 +12,37 @@ startBasicServerOn: ignored
               | qcv |
               self queueCounterValue <= self currentQueueCounter
                 ifTrue: [ (Delay forMilliseconds: 100) wait ].
-              (qcv := self queueCounterValue) > self currentQueueCounter
+              qcv := self queueCounterValue.
+              self
+                trace: [ 'counters [0]' ]
+                object: [ 
+                  {qcv.
+                  currentQueueCounter} ].
+              qcv > self currentQueueCounter
                 ifTrue: [ 
                   "handle exceptions that occur while managing the queues"
-                  [ self queue size > 0 ]
+                  [ 
+                  self trace: [ 'queue size [1] ' , self queue size printString ] object: [  ].
+                  self queue size > 0 ]
                     whileTrue: [ 
                       | tasks |
                       self
-                        doSimpleTransaction: [ self inProcess addAll: (tasks := self queue removeAll) ].
+                        doSimpleTransaction: [ 
+                          tasks := self queue removeAll.
+                          self inProcess addAll: tasks ].
+                      self
+                        trace: [ 'tasks [1] ' , tasks size printString ]
+                        object: [ tasks copy ].
                       tasks
                         do: [ :task | 
+                          self trace: [ 'fork task [2]' ] object: [ task ].
                           [ 
                           self
                             gemServer: [ 
                               "handle exceptions (including breakpoints and Halt) that occur while processing individual task"
+                              self
+                                trace: [ 'process task [3]' ]
+                                object: [ task ].
                               task processTask: self.
                               self
                                 doSimpleTransaction: [ self inProcess remove: task ] ]

@@ -11,7 +11,9 @@
 		"taskValue",
 		"hasValue",
 		"exception",
-		"shouldError" ],
+		"shouldError",
+		"creation",
+		"valuation" ],
 	"name" : "GemServerRemoteTaskExample",
 	"pools" : [
 		 ],
