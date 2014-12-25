@@ -18,7 +18,8 @@ startBasicServerOn: ignored
                   self
                     trace: [ 'counters [0] inProcess: ' , self inProcess size printString ]
                     object: [ 
-                      {qcv.
+                      {(self status).
+                      qcv.
                       currentQueueCounter.
                       (self inProcess).
                       (self queue).
@@ -73,12 +74,12 @@ startBasicServerOn: ignored
                                 critical: [ self activeProcesses value remove: Processor activeProcess ifAbsent: [  ] ] ] ]
                             fork.
                           activeProcessesMutex
-                            critical: [ self activeProcesses value add: proc ].
+                            critical: [ self activeProcesses add: proc ].
                           self
                             trace: [ 
                               'task [5] inProcess: ' , self inProcess size printString , ' activeProcesses: '
                                 , self activeProcesses size printString ]
-                            object: [ self inProcess size ].
+                            object: [ self status ].
                           Processor yield ] ].
                   self doSimpleTransaction: [ currentQueueCounter := qcv ] ] ] ] ]
         fork.

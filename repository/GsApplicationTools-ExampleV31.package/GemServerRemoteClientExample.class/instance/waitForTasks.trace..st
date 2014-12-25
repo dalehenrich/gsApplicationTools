@@ -67,6 +67,7 @@ waitForTasks: taskList trace: trace
               tasks.
               completed.
               valid.
+              #().
               (self inProcess).
               (self queue)})
             addToLog ] ].
@@ -74,5 +75,6 @@ waitForTasks: taskList trace: trace
   tasks.
   completed.
   valid.
+  (valid collect: [ :each | each value ]).
   (self inProcess).
   (self queue)}

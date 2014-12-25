@@ -10,6 +10,7 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
       #(\'reset\' nil #\'none\').
       #(\'restart\' nil #\'required\').
       #(\'start\' nil #\'required\').
+      #(\'status\' nil #\'required\').
       #(\'stop\' nil #\'required\').
       #(\'trace\' nil #\'none\').
       #(\'unregister\' nil #\'required\')}
@@ -53,17 +54,18 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
             at: \'fast\' put: #\'scheduleFastTask\';
             at: \'halt\' put: #\'scheduleHaltTask\';
             at: \'serverError\' put: #\'scheduleInternalServerError\';
-            at: \'oopPersistent\' put: #\'scheduleOutOfMemoryPersistent\';
+            at: \'oomPersistent\' put: #\'scheduleOutOfMemoryPersistent\';
             at: \'oomTemp\' put: #\'scheduleOutOfMemoryTemp\';
             at: \'simple\' put: #\'scheduleSimpleTask\';
+            at: \'status\' put: #\'scheduleStatusTask\';
             at: \'overflow\' put: #\'scheduleStackOverflow\';
             at: \'time\' put: #\'scheduleTimeInLondonTask\';
             at: \'warning\' put: #\'scheduleWarning\';
             yourself.
           client := GemServerRemoteClientExample new.
           task := client perform: (selectors at: taskName).
-task label: taskName.
-client doCommitTransaction.
+          task label: taskName.
+          client doCommitTransaction.
           result := client waitForTasks: {task} trace: trace ].
       opts
         at: \'stop\'
@@ -71,6 +73,9 @@ client doCommitTransaction.
       opts
         at: \'start\'
         ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) start ].
+      opts
+        at: \'status\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) status ].
       opts
         at: \'restart\'
         ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) restart ].
@@ -85,11 +90,12 @@ SYNOPSIS
   example --register=<server-name> [--trace]
   example --unregister=<server-name>
   example --reset
-  example --clear
   example --start=<server-name>
   example --restart=<server-name>
   example --stop=<server-name>
-  example --client=[break|error|http|fast|halt|serverError|oomPersistent|oomTemp|simple|overflow|time|warning] \\
+  example --status=<server-name>
+  example --clear
+  example --client=[break|error|http|fast|halt|serverError|oomPersistent|oomTemp|simple|status|overflow|time|warning] \\
           [--trace]
 DESCRIPTION
 EXAMPLES
@@ -104,6 +110,7 @@ EXAMPLES
   ./example --start=example
   ./example --stop=example
   ./example --restart=example
+  ./example --status=example
 
   ./example --clear
 
@@ -116,8 +123,9 @@ EXAMPLES
   ./example --client=oomPersistent --trace
   ./example --client=oomTemp --trace
   ./example --client=simple --trace
+  ./example --client=status --trace
   ./example --client=overflow --trace
   ./example --client=time --trace
   ./example --client=warning --trace
 \'
-        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2014-12-24T16:54:22.8569550514221-08:00']}
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2014-12-24T17:45:50.7572529315948-08:00']}

@@ -3,7 +3,7 @@ processTask: gemServer
   self hasValue
     ifFalse: [ 
       | value |
-      value := taskBlock value.
+      value := taskBlock cull: gemServer.
       gemServer
         doSimpleTransaction: [ 
           taskValue := value.
