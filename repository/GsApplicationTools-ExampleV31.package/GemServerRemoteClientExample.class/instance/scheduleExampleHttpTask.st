@@ -2,6 +2,6 @@ tasks
 scheduleExampleHttpTask
   ^ (GemServerRemoteTaskExample
     value: [ 
-      false
+      true
         ifTrue: [ (HTTPSocket httpGet: 'http://example.com') contents ] ])
     addToQueue: self

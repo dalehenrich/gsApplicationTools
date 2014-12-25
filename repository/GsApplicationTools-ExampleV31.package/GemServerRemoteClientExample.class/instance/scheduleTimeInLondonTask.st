@@ -2,7 +2,7 @@ tasks
 scheduleTimeInLondonTask
   ^ (GemServerRemoteTaskExample
     value: [ 
-      false
+      true
         ifTrue: [ 
           | timeInLondon |
           "should extact the time from the html; not the most robust parsing algorithmn"
