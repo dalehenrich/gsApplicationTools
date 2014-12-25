@@ -62,13 +62,15 @@ startBasicServerOn: ignored
                             exceptionSet:
                               GemServerRemoteInternalServerErrorTriggerExample , self gemServerExceptionSet
                             onError: [ :ex | 
-                              self
-                                doSimpleTransaction: [ 
-                                  task exception: ex.
-                                  (ObjectLogEntry
-                                    error:
-                                      'Server example task exception: ' , ex description printString
-                                    object: task) addToLog ] ] ]
+                              false
+                                ifTrue: [ 
+                                  self
+                                    doSimpleTransaction: [ 
+                                      task exception: ex.
+                                      (ObjectLogEntry
+                                        error:
+                                          'Server example task exception: ' , ex description printString
+                                        object: task) addToLog ] ] ] ]
                             ensure: [ 
                               activeProcessesMutex
                                 critical: [ self activeProcesses value remove: Processor activeProcess ifAbsent: [  ] ] ] ]

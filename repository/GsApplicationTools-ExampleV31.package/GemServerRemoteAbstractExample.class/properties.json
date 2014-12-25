@@ -4,7 +4,7 @@
 		 ],
 	"classvars" : [
 		 ],
-	"commentStamp" : "dkh 12/22/2014 18:26",
+	"commentStamp" : "",
 	"instvars" : [
 		"serverProcess" ],
 	"name" : "GemServerRemoteAbstractExample",

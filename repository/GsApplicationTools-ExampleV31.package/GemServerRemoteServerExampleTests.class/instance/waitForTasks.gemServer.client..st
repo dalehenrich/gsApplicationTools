@@ -5,10 +5,10 @@ waitForTasks: taskList gemServer: gemServer client: client
   completed := ar at: 3.
   Transcript
     cr;
-    show: 'Checking completed tasks: ' , (ar at: 1) printString.
-  1 to: completed size do: [ :index | 
+    show: 'Checking tasks: ' , (ar at: 1) printString.
+  1 to: taskList size do: [ :index | 
     | task |
-    task := completed at: index.
+    task := taskList at: index.
     Transcript
       cr;
       show:

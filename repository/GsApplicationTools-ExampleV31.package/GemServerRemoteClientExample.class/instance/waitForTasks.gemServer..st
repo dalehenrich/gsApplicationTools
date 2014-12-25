@@ -55,7 +55,7 @@ waitForTasks: taskList gemServer: gemServer
               tasks remove: task ] ].
       (Delay forSeconds: 1) wait.
       loopCount := loopCount + 1.
-      loopCount > (taskList size * 12)
+      loopCount > (taskList size * 6)
         ifTrue: [ 
           trace
             ifTrue: [ 
