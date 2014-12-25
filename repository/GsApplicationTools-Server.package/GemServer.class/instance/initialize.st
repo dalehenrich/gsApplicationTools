@@ -5,4 +5,5 @@ initialize
   ports := self defaultPortList.
   serverInstance := TransientValue value: nil.
   interactiveMode := false.
-  transactionMode := #'manualBegin'
+  transactionMode := #'manualBegin'.
+  self initCrashLog

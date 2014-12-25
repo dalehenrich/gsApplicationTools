@@ -1,5 +1,6 @@
 service instance-control
 startGems
+  self initCrashLog.
   System commitTransaction
     ifFalse: [ self error: 'Commit transaction failed before startGems' ].
   self logControlEvent: 'Start Gems: ' , self name.

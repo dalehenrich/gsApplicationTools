@@ -1,6 +1,7 @@
 task scheduling
-waitForTasks: taskList trace: trace
-  | tasks loopCount completed target valid |
+waitForTasks: taskList gemServer: gemServer
+  | tasks loopCount completed target valid trace |
+  trace := gemServer tracing.
   trace
     ifTrue: [ 
       self
@@ -21,6 +22,29 @@ waitForTasks: taskList trace: trace
       tasks copy
         do: [ :task | 
           self doAbortTransaction.
+          gemServer crashLog isEmpty
+            ifFalse: [ 
+              Transcript
+                cr;
+                show:
+                    'Server crashed: ' , tasks size printString , ' completed: '
+                        , completed size printString.
+              crashLog
+                do: [ :assoc | 
+                  Transcript
+                    cr;
+                    tab;
+                    show: assoc value label ].
+              trace
+                ifTrue: [ 
+                  self
+                    doSimpleTransaction: [ (ObjectLogEntry trace: '---CRASHED' object: gemServer crashLog) addToLog ] ].
+              ^ {false.
+              tasks.
+              completed.
+              valid.
+              (self inProcess).
+              (self queue)} ].
           (task hasError or: [ task hasValue ])
             ifTrue: [ 
               trace

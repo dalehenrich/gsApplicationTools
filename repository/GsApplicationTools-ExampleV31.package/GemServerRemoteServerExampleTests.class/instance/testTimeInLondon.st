@@ -13,7 +13,7 @@ testTimeInLondon
     timesRepeat: [ 
       task := client scheduleTimeInLondonTask.
       taskList add: task ].
-  completed := self waitForTasks: taskList for: client trace: gemServer tracing.
+  completed := self waitForTasks: taskList gemServer: gemServer client: client.
   completed
     do: [ :each | 
       Transcript

@@ -40,7 +40,7 @@ test100Tasks
     show:
         '============================TASK SCHEDULING COMPLETE============================'.
   System commitTransaction.
-  completed := self waitForTasks: taskList for: client trace: gemServer tracing.
+  completed := self waitForTasks: taskList gemServer: gemServer client: client.
   completed
     do: [ :each | 
       Transcript

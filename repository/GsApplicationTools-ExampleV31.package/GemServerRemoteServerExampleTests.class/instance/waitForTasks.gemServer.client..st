@@ -1,7 +1,7 @@
 private
-waitForTasks: taskList for: client trace: trace
+waitForTasks: taskList gemServer: gemServer client: client
   | ar completed valid |
-  ar := client waitForTasks: taskList trace: trace.
+  ar := client waitForTasks: taskList gemServer: gemServer.
   completed := ar at: 3.
   Transcript
     cr;

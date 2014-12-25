@@ -12,7 +12,8 @@
 		"ports",
 		"enableRemoteBreakpoints",
 		"transactionMode",
-		"interactiveMode" ],
+		"interactiveMode",
+		"crashLog" ],
 	"name" : "GemServer",
 	"pools" : [
 		 ],

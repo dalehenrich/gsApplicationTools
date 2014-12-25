@@ -3,7 +3,7 @@ runTest: gemServer client: client task: task
   | completed |
   [ 
   self startGems: gemServer.
-  completed := self waitForTasks: {task} for: client trace: gemServer tracing ]
+  completed := self waitForTasks: {task} gemServer: gemServer client: client ]
     ensure: [ 
       gemServer tracing
         ifTrue: [ 

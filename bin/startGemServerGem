@@ -32,11 +32,14 @@ run
 %
 
 run
+| logEntry |
 System beginTransaction.
-(ObjectLogEntry
+(logEntry := ObjectLogEntry
   fatal: '${GemServer}_server_${Port}: topaz exit'
   object:
     'pid: ', (System gemVersionReport at: 'processId') printString) addToLog.
+(GemServerRegistry gemServerNamed: '$GemServer')
+  ifNotNil: [:gemServer | gemServer crashLog add: (${Port}) asString -> logEntry ].
 System commitTransaction.
 %
 
