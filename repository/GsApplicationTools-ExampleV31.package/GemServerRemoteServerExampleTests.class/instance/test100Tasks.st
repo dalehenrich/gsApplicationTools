@@ -18,7 +18,7 @@ test100Tasks
   #'scheduleOutOfMemoryTemp'.
   #'scheduleSimpleTask'.
   #'scheduleStackOverflow'.
-  #'scheduleStatus'.
+  #'scheduleStatusTask'.
   #'scheduleTimeInLondonTask'.
   #'scheduleWarning'.
   #'scheduleFastTask'.
