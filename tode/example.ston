@@ -4,9 +4,13 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
   command
     getOptsMixedLongShort:
       {#(\'help\' $h #\'none\').
-      #(\'register\' nil #\'required\').
+      #(\'clear\' nil #\'none\').
       #(\'client\' nil #\'required\').
+      #(\'register\' nil #\'required\').
+      #(\'reset\' nil #\'none\').
+      #(\'restart\' nil #\'required\').
       #(\'start\' nil #\'required\').
+      #(\'stop\' nil #\'required\').
       #(\'trace\' nil #\'none\').
       #(\'unregister\' nil #\'required\')}
     optionsAndArguments: [ :options :operands | 
@@ -17,6 +21,12 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
     ifAbsent: [ 
       | result gemServer trace |
       trace := false.
+      opts
+        at: \'clear\'
+        ifPresent: [ :ignored | topez evaluateCommandString: \'ol clear --age=`1 hour`\' ].
+      opts
+        at: \'reset\'
+        ifPresent: [ :ignored | result := GemServerRemoteTaskExample reset ].
       opts at: \'trace\' ifPresent: [ :ignored | trace := true ].
       opts
         at: \'unregister\'
@@ -52,18 +62,18 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
             yourself.
           client := GemServerRemoteClientExample new.
           task := client perform: (selectors at: taskName).
+task label: taskName.
+client doCommitTransaction.
           result := client waitForTasks: {task} trace: trace ].
       opts
+        at: \'stop\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stop ].
+      opts
         at: \'start\'
-        ifPresent: [ :serverName | 
-          Transcript
-            cr;
-            show:
-                \'starting \' , serverName printString
-                    ,
-                      \' interatively ... will block ... use client option in separate vm\'.
-          result := (GemServerRegistry gemServerNamed: serverName)
-            interactiveStartServiceOn: nil ].
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) start ].
+      opts
+        at: \'restart\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) restart ].
       result ]
     ifPresent: [ :ignored | 
       TDManPage
@@ -74,7 +84,11 @@ SYNOPSIS
   example [-h|--help]
   example --register=<server-name> [--trace]
   example --unregister=<server-name>
+  example --reset
+  example --clear
   example --start=<server-name>
+  example --restart=<server-name>
+  example --stop=<server-name>
   example --client=[break|error|http|fast|halt|serverError|oomPersistent|oomTemp|simple|overflow|time|warning] \\
           [--trace]
 DESCRIPTION
@@ -85,8 +99,13 @@ EXAMPLES
   ./example --register=example
   ./example --register=example --trace
   ./example --unregister=example
+  ./example --reset
 
   ./example --start=example
+  ./example --stop=example
+  ./example --restart=example
+
+  ./example --clear
 
   ./example --client=break --trace
   ./example --client=error --trace
@@ -101,4 +120,4 @@ EXAMPLES
   ./example --client=time --trace
   ./example --client=warning --trace
 \'
-        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2014-12-24T15:42:49.9532330036163-08:00']}
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2014-12-24T16:54:22.8569550514221-08:00']}

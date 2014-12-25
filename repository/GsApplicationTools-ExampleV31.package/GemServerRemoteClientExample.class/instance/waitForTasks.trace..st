@@ -7,7 +7,11 @@ waitForTasks: taskList trace: trace
         doSimpleTransaction: [ 
           (ObjectLogEntry
             trace: '---SCHEDULING tasks (' , taskList size printString , ')'
-            object: taskList) addToLog ] ].
+            object:
+              {taskList.
+              (self inProcess).
+              (self queue)})
+            addToLog ] ].
   loopCount := 0.
   completed := {}.
   valid := #().
@@ -29,6 +33,21 @@ waitForTasks: taskList trace: trace
       loopCount := loopCount + 1.
       loopCount > (taskList size * 12)
         ifTrue: [ 
+          trace
+            ifTrue: [ 
+              self
+                doSimpleTransaction: [ 
+                  (ObjectLogEntry
+                    trace: '---EXPIRED'
+                    object:
+                      {taskList.
+                      false.
+                      tasks.
+                      completed.
+                      valid.
+                      (self inProcess).
+                      (self queue)})
+                    addToLog ] ].
           ^ {false.
           tasks.
           completed.
@@ -36,6 +55,21 @@ waitForTasks: taskList trace: trace
           (self inProcess).
           (self queue)} ] ].
   valid := completed select: [ :each | each isValid ].
+  trace
+    ifTrue: [ 
+      self
+        doSimpleTransaction: [ 
+          (ObjectLogEntry
+            trace: '---COMPLETED'
+            object:
+              {taskList.
+              false.
+              tasks.
+              completed.
+              valid.
+              (self inProcess).
+              (self queue)})
+            addToLog ] ].
   ^ {true.
   tasks.
   completed.

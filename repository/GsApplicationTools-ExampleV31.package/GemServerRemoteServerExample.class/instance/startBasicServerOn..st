@@ -20,7 +20,9 @@ startBasicServerOn: ignored
                     object: [ 
                       {qcv.
                       currentQueueCounter.
-                      (self inProcess)} ] ].
+                      (self inProcess).
+                      (self queue).
+                      self} ] ].
               qcv > self currentQueueCounter
                 ifTrue: [ 
                   "handle exceptions that occur while managing the queues"
@@ -38,7 +40,11 @@ startBasicServerOn: ignored
                         object: [ tasks copy ].
                       tasks
                         do: [ :task | 
-                          self trace: [ 'fork task [2] ' , task label ] object: [ task ].
+                          | proc |
+                          self
+                            trace: [ 'fork task [2] ' , task label ]
+                            object: [ task ].
+                          proc := [ 
                           [ 
                           self
                             gemServer: [ 
@@ -62,9 +68,16 @@ startBasicServerOn: ignored
                                     error:
                                       'Server example task exception: ' , ex description printString
                                     object: task) addToLog ] ] ]
+                            ensure: [ 
+                              activeProcessesMutex
+                                critical: [ self activeProcesses value remove: Processor activeProcess ifAbsent: [  ] ] ] ]
                             fork.
+                          activeProcessesMutex
+                            critical: [ self activeProcesses value add: proc ].
                           self
-                            trace: [ 'task [5] inProcess: ' , self inProcess size printString ]
+                            trace: [ 
+                              'task [5] inProcess: ' , self inProcess size printString , ' activeProcesses: '
+                                , self activeProcesses size printString ]
                             object: [ self inProcess size ].
                           Processor yield ] ].
                   self doSimpleTransaction: [ currentQueueCounter := qcv ] ] ] ] ]
