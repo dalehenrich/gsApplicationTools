@@ -62,7 +62,7 @@ startBasicServerOn: ignored
                             exceptionSet:
                               GemServerRemoteInternalServerErrorTriggerExample , self gemServerExceptionSet
                             onError: [ :ex | 
-                              false
+                              true
                                 ifTrue: [ 
                                   self
                                     doSimpleTransaction: [ 

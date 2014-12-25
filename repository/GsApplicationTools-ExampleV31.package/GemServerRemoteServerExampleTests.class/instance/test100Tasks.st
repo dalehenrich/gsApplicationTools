@@ -14,8 +14,11 @@ test100Tasks
   #'scheduleFastTask'.
   #'scheduleHaltTask'.
   #'scheduleInternalServerError'.
+  #'scheduleOutOfMemoryPersistent'.
+  #'scheduleOutOfMemoryTemp'.
   #'scheduleSimpleTask'.
   #'scheduleStackOverflow'.
+  #'scheduleStatus'.
   #'scheduleTimeInLondonTask'.
   #'scheduleWarning'.
   #'scheduleFastTask'.
