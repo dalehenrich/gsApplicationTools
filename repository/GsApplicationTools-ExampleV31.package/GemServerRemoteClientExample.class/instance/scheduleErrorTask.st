@@ -2,8 +2,9 @@ tasks
 scheduleErrorTask
   ^ (GemServerRemoteTaskExample
     value: [ 
-      false
-        ifTrue: [ (Delay forSeconds: 3) wait ].
+      | delay |
+      delay := TransientStackValue value: (Delay forSeconds: 3).
+      delay value wait.
       1 foo ])
     expectedException: Error;
     addToQueue: self

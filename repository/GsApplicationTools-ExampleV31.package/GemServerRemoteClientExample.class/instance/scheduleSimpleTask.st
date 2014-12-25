@@ -2,7 +2,8 @@ tasks
 scheduleSimpleTask
   ^ (GemServerRemoteTaskExample
     value: [ 
-      false
-        ifTrue: [ (Delay forSeconds: 1) wait ].
+      | delay |
+      delay := TransientStackValue value: (Delay forSeconds: 1).
+      delay value wait.
       DateAndTime now ])
     addToQueue: self

@@ -2,7 +2,8 @@ tasks
 scheduleHaltTask
   ^ (GemServerRemoteTaskExample
     value: [ 
-      false
-        ifTrue: [ (Delay forSeconds: 2) wait ].
+      | delay |
+      delay := TransientStackValue value: (Delay forSeconds: 2).
+      delay value wait.
       self haltMethod ])
     addToQueue: self
