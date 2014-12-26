@@ -1,4 +1,5 @@
 initialization
 value: theTaskBlock
   taskBlock := theTaskBlock.
-  creation := DateAndTime now
+  creation := DateAndTime now.
+  expectedDelay := 1

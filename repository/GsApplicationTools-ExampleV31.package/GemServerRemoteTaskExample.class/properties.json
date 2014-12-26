@@ -14,7 +14,8 @@
 		"creation",
 		"valuation",
 		"label",
-		"expectedException" ],
+		"expectedException",
+		"expectedDelay" ],
 	"name" : "GemServerRemoteTaskExample",
 	"pools" : [
 		 ],

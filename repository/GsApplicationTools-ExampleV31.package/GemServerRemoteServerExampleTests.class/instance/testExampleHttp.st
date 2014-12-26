@@ -4,7 +4,7 @@ testExampleHttp
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer
     enableCreateContinuations: true;
-    tracing: false.
+    tracing: true.
   gemServer scriptLogEvent: '---->testExampleHttp' object: gemServer.
   client := GemServerRemoteClientExample new.
   [ 

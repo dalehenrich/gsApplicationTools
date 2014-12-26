@@ -4,7 +4,7 @@ testStatus
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer
     enableCreateContinuations: true;
-    tracing: false.
+    tracing: true.
   gemServer scriptLogEvent: '---->testStatus' object: gemServer.
   client := GemServerRemoteClientExample new.
   completed := self

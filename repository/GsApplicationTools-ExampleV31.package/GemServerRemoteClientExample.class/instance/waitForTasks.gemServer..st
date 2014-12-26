@@ -1,6 +1,6 @@
 task scheduling
 waitForTasks: taskList gemServer: gemServer
-  | tasks loopCount completed target valid trace |
+  | tasks loopCount completed target valid trace expectedDelay |
   trace := gemServer tracing.
   trace
     ifTrue: [ 
@@ -17,6 +17,8 @@ waitForTasks: taskList gemServer: gemServer
   completed := {}.
   valid := #().
   tasks := taskList copy.
+  expectedDelay := 0.
+  tasks do: [ :each | expectedDelay := expectedDelay + each expectedDelay ].
   [ tasks isEmpty ]
     whileFalse: [ 
       tasks copy
@@ -43,6 +45,7 @@ waitForTasks: taskList gemServer: gemServer
               tasks.
               completed.
               valid.
+              #'crashed'.
               (self inProcess).
               (self queue)} ].
           (task hasError or: [ task hasValue ])
@@ -55,7 +58,7 @@ waitForTasks: taskList gemServer: gemServer
               tasks remove: task ] ].
       (Delay forSeconds: 1) wait.
       loopCount := loopCount + 1.
-      loopCount > (taskList size * 6)
+      loopCount > (expectedDelay * 2)
         ifTrue: [ 
           trace
             ifTrue: [ 
@@ -76,6 +79,7 @@ waitForTasks: taskList gemServer: gemServer
           tasks.
           completed.
           valid.
+          #'timedOut'.
           (self inProcess).
           (self queue)} ] ].
   valid := completed select: [ :each | each isValid ].
@@ -99,6 +103,7 @@ waitForTasks: taskList gemServer: gemServer
   tasks.
   completed.
   valid.
+  #'success'.
   (valid collect: [ :each | each value ]).
   (self inProcess).
   (self queue)}
