@@ -14,7 +14,14 @@ waitForTasks: taskList gemServer: gemServer client: client
     Transcript
       cr;
       show:
-          index printString , '. ' , task label , ' ::: ' , task isValid printString ].
+          index printString , '. ' , task label , ' ::: ' , task isValid printString.
+    task isValid not
+      ifTrue: [ 
+        Transcript
+          cr;
+          tab;
+          show:
+              'value: ' , task value printString , ' exception: ' , task exception printString ] ].
   (ar at: 1)
     ifFalse: [ self assert: false description: 'all tasks not complete' ].
   valid := ar at: 4.
