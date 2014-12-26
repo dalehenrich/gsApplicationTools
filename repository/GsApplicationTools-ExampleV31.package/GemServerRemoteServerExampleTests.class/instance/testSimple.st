@@ -3,7 +3,7 @@ testSimple
   | gemServer client completed |
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer
-    enableCreateContinuations: false;
+    enableCreateContinuations: true;
     tracing: false.
   gemServer scriptLogEvent: '---->testSimple' object: gemServer.
   client := GemServerRemoteClientExample new.

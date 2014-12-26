@@ -3,7 +3,7 @@ testWarning
   | gemServer client completed |
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer
-    enableCreateContinuations: false;
+    enableCreateContinuations: true;
     tracing: true.
   gemServer scriptLogEvent: '---->testWarning' object: gemServer.
   client := GemServerRemoteClientExample new.
