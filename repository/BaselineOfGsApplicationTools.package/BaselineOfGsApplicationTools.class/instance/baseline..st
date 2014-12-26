@@ -12,7 +12,8 @@ baseline: spec
                 repository: 'github://glassdb/glass:master/repository' ];
         yourself.
       spec
-        package: 'GsApplicationTools-Server';
+        package: 'GsApplicationTools-Server'
+          with: [ spec requires: #('GLASS1') ];
         package: 'GsApplicationTools-Test'
           with: [ spec requires: #('GsApplicationTools-Server') ];
         yourself.
