@@ -30,7 +30,10 @@ waitForTasks: taskList gemServer: gemServer
                 cr;
                 show:
                     'Server crashed: ' , tasks size printString , ' completed: '
-                        , completed size printString.
+                        , completed size printString , ' valid: '
+                        , valid size printString , ' queue: '
+                        , self queue size printString , ' inProcess: '
+                        , self inProcess size printString.
               crashLog
                 do: [ :assoc | 
                   Transcript
@@ -60,6 +63,14 @@ waitForTasks: taskList gemServer: gemServer
       loopCount := loopCount + 1.
       loopCount > (expectedDelay * 2)
         ifTrue: [ 
+          Transcript
+            cr;
+            show:
+                'Server timed out: ' , tasks size printString , ' completed: '
+                    , completed size printString , ' valid: '
+                    , valid size printString , ' queue: '
+                    , self queue size printString , ' inProcess: '
+                    , self inProcess size printString.
           trace
             ifTrue: [ 
               self
@@ -83,6 +94,13 @@ waitForTasks: taskList gemServer: gemServer
           (self inProcess).
           (self queue)} ] ].
   valid := completed select: [ :each | each isValid ].
+  Transcript
+    cr;
+    show:
+        'Server completed: ' , tasks size printString , ' completed: '
+            , completed size printString , ' valid: ' , valid size printString
+            , ' queue: ' , self queue size printString , ' inProcess: '
+            , self inProcess size printString.
   trace
     ifTrue: [ 
       self
