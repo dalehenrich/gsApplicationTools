@@ -3,7 +3,7 @@ test100Tasks
   | gemServer taskList client completed |
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer
-    enableCreateContinuations: false;
+    enableCreateContinuations: true;
     tracing: true.
   gemServer scriptLogEvent: '---->test100Tasks' object: gemServer.
   client := GemServerRemoteClientExample new.
