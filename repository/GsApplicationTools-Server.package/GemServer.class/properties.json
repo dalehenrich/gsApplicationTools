@@ -13,7 +13,8 @@
 		"enableRemoteBreakpoints",
 		"transactionMode",
 		"interactiveMode",
-		"crashLog" ],
+		"crashLog",
+		"enableCreateContinuations" ],
 	"name" : "GemServer",
 	"pools" : [
 		 ],

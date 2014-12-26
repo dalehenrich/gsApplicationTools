@@ -2,7 +2,9 @@ tests
 testBreakpoint
   | gemServer client completed |
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
-  gemServer tracing: false.
+  gemServer
+    enableCreateContinuations: false;
+    tracing: false.
   gemServer scriptLogEvent: '---->testBreakpoint' object: gemServer.
   client := GemServerRemoteClientExample new.
   completed := self

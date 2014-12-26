@@ -2,7 +2,9 @@ tests
 testError
   | gemServer client completed |
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
-  gemServer tracing: true.
+  gemServer
+    enableCreateContinuations: false;
+    tracing: true.
   gemServer scriptLogEvent: '---->testError' object: gemServer.
   client := GemServerRemoteClientExample new.
   completed := self

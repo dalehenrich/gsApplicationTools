@@ -2,7 +2,9 @@ tests
 testExampleHttp
   | gemServer taskList client completed |
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
-  gemServer tracing: false.
+  gemServer
+    enableCreateContinuations: false;
+    tracing: false.
   gemServer scriptLogEvent: '---->testExampleHttp' object: gemServer.
   client := GemServerRemoteClientExample new.
   [ 
