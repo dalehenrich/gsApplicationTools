@@ -1,6 +1,6 @@
 tasks
 scheduleTimeInLondonTask
-  ^ (GemServerRemoteTaskExample
+  ^ (self taskClass
     value: [ 
       | timeInLondon |
       "should extact the time from the html; not the most robust parsing algorithmn"

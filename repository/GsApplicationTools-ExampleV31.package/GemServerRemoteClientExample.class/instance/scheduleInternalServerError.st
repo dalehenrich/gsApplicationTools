@@ -1,6 +1,6 @@
 tasks
 scheduleInternalServerError
-  ^ (GemServerRemoteTaskExample
+  ^ (self taskClass
     value: [ GemServerRemoteInternalServerErrorTriggerExample signal ])
     expectedException: ImproperOperation;
     addToQueue: self

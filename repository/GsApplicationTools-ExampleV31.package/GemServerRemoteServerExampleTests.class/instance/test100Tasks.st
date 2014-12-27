@@ -6,29 +6,11 @@ test100Tasks
     enableCreateContinuations: true;
     tracing: true.
   gemServer scriptLogEvent: '---->test100Tasks' object: gemServer.
-  client := GemServerRemoteClientExample new.
+  client := self gemClientClass new.
   [ 
   | task taskSelectors |
   self startGems: gemServer.
-  taskSelectors := {#'scheduleBreakpointTask'.
-  #'scheduleErrorTask'.
-  #'scheduleExampleHttpTask'.
-  #'scheduleFastTask'.
-  #'scheduleHaltTask'.
-  #'scheduleInternalServerError'.
-  #'scheduleOutOfMemoryPersistent'.
-  #'scheduleOutOfMemoryTemp'.
-  #'scheduleSimpleTask'.
-  #'scheduleStackOverflow'.
-  #'scheduleStatusTask'.
-  #'scheduleTimeInLondonTask'.
-  #'scheduleWarning'.
-  #'scheduleFastTask'.
-  #'scheduleFastTask'.
-  #'scheduleFastTask'.
-  #'scheduleFastTask'.
-  #'scheduleFastTask'.
-  #'scheduleFastTask'}.
+  taskSelectors := self scheduledTaskList.
   taskList := {}.
   100
     timesRepeat: [ 

@@ -6,7 +6,7 @@ testTimeInLondon
     enableCreateContinuations: true;
     tracing: true.
   gemServer scriptLogEvent: '---->testTimeInLondon' object: gemServer.
-  client := GemServerRemoteClientExample new.
+  client := self gemClientClass new.
   [ 
   | task |
   self startGems: gemServer.

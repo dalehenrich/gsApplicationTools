@@ -4,12 +4,14 @@
 	"instance" : {
 		"activeProcesses" : "dkh 12/24/2014 16:38",
 		"currentQueueCounter" : "dkh 12/22/2014 19:49",
-		"gemServerHandleAlmostOutOfMemoryException:" : "dkh 12/24/2014 13:06",
+		"doTraceTransaction:" : "dkh 12/26/2014 17:56",
 		"gemServerHandleRemoteInternalServerTriggerException:" : "dkh 12/24/2014 13:02",
 		"initialize" : "dkh 12/24/2014 16:39",
-		"startBasicServerOn:" : "dkh 12/26/2014 07:49",
+		"serviceLoop" : "dkh 12/26/2014 16:27",
+		"startBasicServerOn:" : "dkh 12/26/2014 15:02",
 		"status" : "dkh 12/24/2014 17:35",
 		"stop" : "dkh 12/24/2014 17:01",
-		"trace:object:" : "dkh 12/23/2014 15:33",
+		"taskServiceThreadBlock:" : "dkh 12/26/2014 16:29",
+		"trace:object:" : "dkh 12/26/2014 18:00",
 		"tracing" : "dkh 12/23/2014 15:30",
 		"tracing:" : "dkh 12/23/2014 15:30" } }

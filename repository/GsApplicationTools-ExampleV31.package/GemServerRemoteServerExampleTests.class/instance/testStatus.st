@@ -6,7 +6,7 @@ testStatus
     enableCreateContinuations: true;
     tracing: true.
   gemServer scriptLogEvent: '---->testStatus' object: gemServer.
-  client := GemServerRemoteClientExample new.
+  client := self gemClientClass new.
   completed := self
     runTest: gemServer
     client: client

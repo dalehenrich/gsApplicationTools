@@ -1,5 +1,5 @@
 tasks
 scheduleErrorTask
-  ^ (GemServerRemoteTaskExample value: [ 1 foo ])
+  ^ (self taskClass value: [ 1 foo ])
     expectedException: Error;
     addToQueue: self

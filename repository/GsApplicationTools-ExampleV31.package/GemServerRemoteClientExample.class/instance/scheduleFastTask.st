@@ -1,3 +1,3 @@
 tasks
 scheduleFastTask
-  ^ (GemServerRemoteTaskExample value: [ DateAndTime now ]) addToQueue: self
+  ^ (self taskClass value: [ DateAndTime now ]) addToQueue: self

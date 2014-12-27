@@ -6,7 +6,7 @@ testStackOverflow
     enableCreateContinuations: true;
     tracing: true.
   gemServer scriptLogEvent: '---->testStackOverflow' object: gemServer.
-  client := GemServerRemoteClientExample new.
+  client := self gemClientClass new.
   completed := self
     runTest: gemServer
     client: client

@@ -6,7 +6,7 @@ testInternalServerError
     enableCreateContinuations: true;
     tracing: true.
   gemServer scriptLogEvent: '---->testInternalServerError' object: gemServer.
-  client := GemServerRemoteClientExample new.
+  client := self gemClientClass new.
   completed := self
     runTest: gemServer
     client: client

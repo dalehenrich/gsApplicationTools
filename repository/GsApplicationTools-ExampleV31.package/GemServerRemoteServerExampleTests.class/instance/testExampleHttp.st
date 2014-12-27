@@ -6,7 +6,7 @@ testExampleHttp
     enableCreateContinuations: true;
     tracing: true.
   gemServer scriptLogEvent: '---->testExampleHttp' object: gemServer.
-  client := GemServerRemoteClientExample new.
+  client := self gemClientClass new.
   [ 
   | task |
   self startGems: gemServer.

@@ -4,8 +4,4 @@ processTask: gemServer
     ifFalse: [ 
       | value |
       value := taskBlock cull: gemServer.
-      gemServer
-        doSimpleTransaction: [ 
-          taskValue := value.
-          hasValue := true.
-          valuation := DateAndTime now ] ]
+      self setValue: value gemServer: gemServer ]

@@ -3,4 +3,4 @@ trace: labelBlock object: objectBlock
   self tracing
     ifFalse: [ ^ self ].
   self
-    doSimpleTransaction: [ (ObjectLogEntry trace: labelBlock value object: objectBlock value) addToLog ]
+    doTraceTransaction: [ (ObjectLogEntry trace: labelBlock value object: objectBlock value) addToLog ]

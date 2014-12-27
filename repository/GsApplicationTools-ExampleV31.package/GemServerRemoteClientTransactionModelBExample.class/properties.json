@@ -1,0 +1,14 @@
+{
+	"category" : "GsApplicationTools-ExampleV31",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "dkh 12/26/2014 14:38",
+	"instvars" : [
+		 ],
+	"name" : "GemServerRemoteClientTransactionModelBExample",
+	"pools" : [
+		 ],
+	"super" : "GemServerRemoteClientExample",
+	"type" : "normal" }

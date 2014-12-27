@@ -1,3 +1,3 @@
 tasks
 scheduleHaltTask
-  ^ (GemServerRemoteTaskExample value: [ self haltMethod ]) addToQueue: self
+  ^ (self taskClass value: [ self haltMethod ]) addToQueue: self

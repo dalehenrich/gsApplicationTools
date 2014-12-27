@@ -1,5 +1,5 @@
 tasks
 scheduleStackOverflow
-  ^ (GemServerRemoteTaskExample value: [ self stackOverflowMethod ])
+  ^ (self taskClass value: [ self stackOverflowMethod ])
     expectedException: AlmostOutOfStack;
     addToQueue: self

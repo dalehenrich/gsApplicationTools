@@ -1,0 +1,20 @@
+private
+scheduledTaskList
+  ^ {#'scheduleBreakpointTask'.
+  #'scheduleErrorTask'.
+  #'scheduleExampleHttpTask'.
+  #'scheduleFastTask'.
+  #'scheduleHaltTask'.
+  #'scheduleOutOfMemoryPersistent'.
+  #'scheduleOutOfMemoryTemp'.
+  #'scheduleSimpleTask'.
+  #'scheduleStackOverflow'.
+  #'scheduleStatusTask'.
+  #'scheduleTimeInLondonTask'.
+  #'scheduleWarning'.
+  #'scheduleFastTask'.
+  #'scheduleFastTask'.
+  #'scheduleFastTask'.
+  #'scheduleFastTask'.
+  #'scheduleFastTask'.
+  #'scheduleFastTask'}

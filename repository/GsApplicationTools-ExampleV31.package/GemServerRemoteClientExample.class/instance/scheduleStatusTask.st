@@ -1,4 +1,3 @@
 tasks
 scheduleStatusTask
-  ^ (GemServerRemoteTaskExample value: [ :gemServer | gemServer status ])
-    addToQueue: self
+  ^ (self taskClass value: [ :gemServer | gemServer status ]) addToQueue: self
