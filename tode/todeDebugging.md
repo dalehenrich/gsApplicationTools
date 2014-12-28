@@ -16,7 +16,8 @@
   1. [`mount` man page](#mount-man-page)
   2. [`project entry` man page](#project-entry-man-page)
   3. [`project load` man page](#project-load-man-page)
-  4. [tODE `example` script man page](#tode-example-script-man-page)
+  4. [tODE `example` script](#tode-example-script)
+  5. [tODE `example` script man page](#tode-example-script-man-page)
 
 ##Introduction
 In this tutorial we will go over the steps necessary to debug a *gem server* using tODE.
