@@ -2,7 +2,7 @@ running
 setUp
   | gemServer |
   super setUp.
-  gemServer := GemServerTestServer register: self gemServerName.
+  gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer
     gemServerExceptionSet:
       Error , gemServer class gemServerExceptionSet
