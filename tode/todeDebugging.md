@@ -3,6 +3,10 @@
 ##Table of Contents
 1. [Introduction](#introduction)
 2. [Gem Server Example](#gem-server-example)
+  1. [GemServerRemoteServerTransactionModelBExample](#gemserverremoteservertransactionmodelbexample)
+    1. [Gem Server Registration](#gem-server-registration)
+    2. [Gem Server Start/Stop/Restart/Status](#gem-server-startstoprestartstatus)
+  2. [GemServerRemoteClientTransactionModelBExample](#gemserverremoteclienttransactionmodelbexample)
 3. [Gem Server Installation](#gem-server-installation)
 4. [GemStone Processes and GCI](#gemstone-processes-and-gci)
 5. [Appendix](#appendix)
@@ -126,6 +130,10 @@ logStack: exception titled: title inTransactionDo: inTransactionBlock
 
 If a task has an *error*, then you can look in the object log for a corresponding continuation and debug the continuation.
 
+A task is *valid* if the result of processing was as expected.
+If a task is supposed to return a value, then it is valid if it *hasValue*.
+If a task is supposed to result in an error, then it is valid if it *hasError* and the *exception* matches the *expectedException*.
+
 ####Gem Server Registration
 For debugging purposes, you will create a gem server using the following expression:
 
@@ -200,6 +208,7 @@ The result of the **waitForTasks:gemServer:** message is an array like the follo
   }    
 ```
 
+##tODE Debugging
 ##Gem Server Installation
 Use the following tODE expressions to install the **GemServer** support code and a set of example gem servers:
 
