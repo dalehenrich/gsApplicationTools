@@ -7,9 +7,16 @@
     1. [Gem Server Registration](#gem-server-registration)
     2. [Gem Server Start/Stop/Restart/Status](#gem-server-startstoprestartstatus)
   2. [GemServerRemoteClientTransactionModelBExample](#gemserverremoteclienttransactionmodelbexample)
-3. [Gem Server Installation](#gem-server-installation)
-4. [GemStone Processes and GCI](#gemstone-processes-and-gci)
-5. [Appendix](#appendix)
+    1. [Client Poll for Results](#client-poll-for-results)
+    2. [Client Task Scheduling](#client-task-scheduling)
+3. [tODE Debugging](#tode-debugging)
+4. [Gem Server Installation](#gem-server-installation)
+5. [GemStone Processes and GCI](#gemstone-processes-and-gci)
+6. [Appendix](#appendix)
+  1. [`mount` man page](#mount-man-page)
+  2. [`project entry` man page](#project-entry-man-page)
+  3. [`project load` man page](#project-load-man-page)
+  4. [tODE `example` script man page](#tode-example-script-man-page)
 
 ##Introduction
 In this tutorial we will go over the steps necessary to debug a *gem server* using tODE.
@@ -81,27 +88,7 @@ taskServiceThreadBlock: task
         critical: [ self activeProcesses value remove: Processor activeProcess ifAbsent: [  ] ] ] ]
 ```
 
-A task is an instance of class **GemServerRemoteTaskTransactionModelBExample**.
-*tasks* are created by supply a block:
-
-```Smalltalk
-GemServerRemoteTaskTransactionModelBExample 
-  value: [ (HTTPSocket httpGet: 'http://example.com') contents ]
-```
-
-Once a task has been scheduled, you poll for a result:
-
-```Smalltalk
-  completed := false.
-  [ completed ]
-    whileFalse: [ 
-      (Delay forSeconds: 1) wait.
-      completed := task hasValue or: [ task hasError ] ]
-```
-
-A task is *completed* if processing resulted in a *value* or an *error*.
-If an *error* occured, the exception is recorded with the task.
-When errors occur, the error is logged in the object log and in the gem log:
+When an errors occurs, the error is logged in the object log and in the gem log:
 
 ```Smalltalk
 logStack: exception titled: title inTransactionDo: inTransactionBlock
@@ -127,12 +114,6 @@ logStack: exception titled: title inTransactionDo: inTransactionBlock
   stream lf.
   GsFile gciLogServer: stream contents
 ```
-
-If a task has an *error*, then you can look in the object log for a corresponding continuation and debug the continuation.
-
-A task is *valid* if the result of processing was as expected.
-If a task is supposed to return a value, then it is valid if it *hasValue*.
-If a task is supposed to result in an error, then it is valid if it *hasError* and the *exception* matches the *expectedException*.
 
 ####Gem Server Registration
 For debugging purposes, you will create a gem server using the following expression:
@@ -162,6 +143,37 @@ Once a server has been registered, the following Smalltalk expressions can be us
 Note that these commands are meant to be used in interactive mode and will launch/terminate processes in the current image. Note that the `start` and `restart` messages will cause the UI to block.
 
 ###GemServerRemoteClientTransactionModelBExample
+The gem server client schedules tasks.
+
+A task is an instance of class **GemServerRemoteTaskTransactionModelBExample**.
+*tasks* are created with a block to be processed:
+
+```Smalltalk
+GemServerRemoteTaskTransactionModelBExample 
+  value: [ (HTTPSocket httpGet: 'http://example.com') contents ]
+```
+
+####Client Poll for Results
+Once a task has been scheduled, the client polls for a result:
+
+```Smalltalk
+  completed := false.
+  [ completed ]
+    whileFalse: [ 
+      (Delay forSeconds: 1) wait.
+      completed := task hasValue or: [ task hasError ] ]
+```
+
+A task is *completed* if processing resulted in a *value* or an *error*.
+If an *error* occured, the exception is recorded with the task.
+
+If a task has an *error*, then you can look in the object log for a corresponding continuation and debug the continuation.
+
+A task is *valid* if the result of processing was as expected.
+If a task is supposed to return a value, then it is valid if it *hasValue*.
+If a task is supposed to result in an error, then it is valid if it *hasError* and the *exception* matches the *expectedException*.
+
+####Client Task Scheduling
 The gem server client (**GemServerRemoteClientTransactionModelBExample**) has the following collection of pre-defined tasks defined:
 
 ```
@@ -446,36 +458,61 @@ SEE ALSO
   NOTE - use the `tode it` menu item to run the commands directly from this window.
 ```
 
-##EXTRAS ... eventually deleted
-
-Gem servers are designed to run as stand-alone topaz sessions in **#manualBegin** transaction mode, which is quite different than an interactive tODE session that runs in **#autoBegin** transaction mode.
-
-
-
-
-
-
-
-The following tODE expressions puts a tODE session into **#manualBegin** and turns off auto-commit (which isn't useful in **#manualBgin** mode):
-
-```Shell
-eval `System transactionMode: #manualBegin`
-limit autoCommit false
+###tODE `example` script man page](#tode-example-script-man-page
 ```
+NAME
+  example - example sript utility template
 
+SYNOPSIS
+  example [-h|--help]
+  example --register=<server-name> --model=[A|B] [--trace]
+  example --register=<server-name> --model=[A|B] [--trace]
+  example --unregister=<server-name>
+  example --reset
+  example --start=<server-name>
+  example --restart=<server-name>
+  example --stop=<server-name>
+  example --status=<server-name>
+  example --clear
+  example --client=[break|error|http|fast|halt|serverError|oomPersistent|oomTemp|simple|status|overflow|time|warning] \
+         --server=<server-name>  [--trace]
 
+DESCRIPTION
+  
 
-A gem server is designed to run in a stand-alone topaz session.
-To avoid a commit record backlog gem servers are run in **#manualBegin** transaction mode.
+EXAMPLES
+  ./example --help
+  ./example -h
 
-The standard **GemServer** snaps off a continuation whenever an error is encountered. 
-It is possible to bring up the debugger on the continuation "after the fact" and this is very useful for characterizing bugs that may show up in production.
-However, for development it is preferable to be able to debug gem server errors in tODE.
+  ./example --register=example
+  ./example --register=example --model=A --trace
+  ./example --register=example --model=B --trace
+  ./example --unregister=example
+  ./example --reset
 
+  ./example --start=example
+  ./example --stop=example
+  ./example --restart=example
+  ./example --status=example
 
-While server code is run in tODE the tODE GUI process will be blocked, therefore it is necessary to initiate client-side requests from a second tODE image.
-Also, gem servers must be run in #manualBegin transaction mode to avoid large commit record backlog, while tODE normally runs in #autoBegin transaction mode.
+  ./example --clear
 
+  ./example --client=break --server=example --trace
+  ./example --client=error --server=example --trace
+  ./example --client=http --server=example --trace
+  ./example --client=fast --server=example --trace
+  ./example --client=halt --server=example --trace
+  ./example --client=serverError --server=example --trace
+  ./example --client=oomPersistent --server=example --trace
+  ./example --client=oomTemp --server=example --trace
+  ./example --client=simple --server=example --trace
+  ./example --client=status --server=example --trace
+  ./example --client=overflow --server=example --trace
+  ./example --client=time --server=example --trace
+  ./example --client=warning --server=example --trace
+
+  NOTE - use the `tode it` menu item to run the examples directly from this window.
+```
 
 ---
 
