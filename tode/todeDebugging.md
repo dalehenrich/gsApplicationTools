@@ -11,6 +11,62 @@ The **alternate** layouts are designed to be useable with minimal vertical scree
 While the half-screen images are usable for running client and server code, it is convenient to have a third tODE client that is opened to full screen size for reading and writing code.
 When running with multiple tODE clients connected to the same stone, remember to use the tODE `abort` command whenever you start work in a different tODE client.
 
+In the *development* client, log into your development stone and install the **GsApplicationTools** project, including the example gem servers, by following the [Gem Server Installation instructions](#gem-server-installation).
+
+##Gem Server Example
+
+In this tutorial we will be using the class **GemServerRemoteServerTransactionModelBExample** as our example gem server. This gem server operates by taking tasks off of an RcQueue (**processTasksOnQueue**) and processes each task in a separate thread (**taskServiceThreadBlock:**):
+
+```Smalltalk
+processTasksOnQueue
+  | tasks |
+  self
+    doSimpleTransaction: [ 
+      tasks := self queue removeAll.
+      self inProcess addAll: tasks ].
+  self trace: [ 'tasks [1] ' , tasks size printString ] object: [ tasks copy ].
+  tasks
+    do: [ :task | 
+      | proc |
+      self trace: [ 'fork task [2] ' , task label ] object: [ task ].
+      proc := TransientStackValue
+        value: (self taskServiceThreadBlock: task) fork.
+      activeProcessesMutex critical: [ self activeProcesses add: proc value ].
+      self
+        trace: [ 
+          'task [5] inProcess: ' , self inProcess size printString , ' activeProcesses: '
+            , self activeProcesses size printString ]
+        object: [ self status ].
+      Processor yield ]
+```
+
+```Smalltalk
+taskServiceThreadBlock: task
+  "use GemServer>>gemServerTransaction:exceptionSet:onError: to wrap a transaction around 
+   the gemServerTransaction and onError blocks ... 'seaside-stye' transaction model"
+
+  ^ [ 
+  [ 
+  self
+    gemServerTransaction: [ 
+      "handle exceptions (including breakpoints and Halt) that occur while processing individual task"
+      self trace: [ 'start process task [3] ' , task label ] object: [ task ].
+      [ task processTask: self ]
+        ensure: [ 
+          self inProcess remove: task.
+          self trace: [ 'end process task [4] ' , task label ] object: [ task ] ] ]
+    exceptionSet:
+      GemServerRemoteInternalServerErrorTriggerExample , self gemServerExceptionSet
+    onError: [ :ex | 
+      task exception: ex.
+      (ObjectLogEntry
+        error: 'Server example task exception: ' , ex description printString
+        object: task) addToLog ] ]
+    ensure: [ 
+      activeProcessesMutex
+        critical: [ self activeProcesses value remove: Processor activeProcess ifAbsent: [  ] ] ] ]
+```
+
 ##Gem Server Installation
 Use the following tODE expressions to install the **GemServer** support code and a set of example gem servers:
 
@@ -60,59 +116,6 @@ However, for development it is preferable to be able to debug gem server errors 
 While server code is run in tODE the tODE GUI process will be blocked, therefore it is necessary to initiate client-side requests from a second tODE image.
 Also, gem servers must be run in #manualBegin transaction mode to avoid large commit record backlog, while tODE normally runs in #autoBegin transaction mode.
 
-In this tutorial we will be using the class **GemServerRemoteServerTransactionModelBExample** as our example gem server. This gem server operates by taking tasks off of an RcQueue and processes each task in a separate thread:
-
-```Smalltalk
-processTasksOnQueue
-  | tasks |
-  self
-    doSimpleTransaction: [ 
-      tasks := self queue removeAll.
-      self inProcess addAll: tasks ].
-  self trace: [ 'tasks [1] ' , tasks size printString ] object: [ tasks copy ].
-  tasks
-    do: [ :task | 
-      | proc |
-      self trace: [ 'fork task [2] ' , task label ] object: [ task ].
-      proc := TransientStackValue
-        value: (self taskServiceThreadBlock: task) fork.
-      activeProcessesMutex critical: [ self activeProcesses add: proc value ].
-      self
-        trace: [ 
-          'task [5] inProcess: ' , self inProcess size printString , ' activeProcesses: '
-            , self activeProcesses size printString ]
-        object: [ self status ].
-      Processor yield ]
-```
-
-The forked thread runs in a transaction, so it is not necessary to do any additional transaction management:  
-
-```Smalltalk
-taskServiceThreadBlock: task
-  "use GemServer>>gemServerTransaction:exceptionSet:onError: to wrap a transaction around 
-   the gemServerTransaction and onError blocks ... 'seaside-stye' transaction model"
-
-  ^ [ 
-  [ 
-  self
-    gemServerTransaction: [ 
-      "handle exceptions (including breakpoints and Halt) that occur while processing individual task"
-      self trace: [ 'start process task [3] ' , task label ] object: [ task ].
-      [ task processTask: self ]
-        ensure: [ 
-          self inProcess remove: task.
-          self trace: [ 'end process task [4] ' , task label ] object: [ task ] ] ]
-    exceptionSet:
-      GemServerRemoteInternalServerErrorTriggerExample , self gemServerExceptionSet
-    onError: [ :ex | 
-      task exception: ex.
-      (ObjectLogEntry
-        error: 'Server example task exception: ' , ex description printString
-        object: task) addToLog ] ]
-    ensure: [ 
-      activeProcessesMutex
-        critical: [ self activeProcesses value remove: Processor activeProcess ifAbsent: [  ] ] ] ]
-```
 
 ---
 
