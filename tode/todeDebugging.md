@@ -1,6 +1,6 @@
 #Debugging Gem Servers with tODE
 
-In this tutorial we will go over the steps necessary to debug a gem server using tODE.
+In this tutorial we will go over the steps necessary to debug a *gem server* using tODE.
 
 When debugging a gem server in tODE, [the UI process is blocked](#gemstone-processes-and-gci), which means that it is necessary to run two tODE images: one running as the client and one running as the server.
 
@@ -9,6 +9,7 @@ Use the *alternate-large* window layout (**tODE>>tODE Window Layout>>alternate-l
 The **alternate** layouts are designed to be useable with minimal vertical screen real estate.
 
 While the half-screen images are usable for running client and server code, it is convenient to have a third tODE client that is opened to full screen size for reading and writing code.
+
 When running with multiple tODE clients connected to the same stone, remember to use the tODE `abort` command whenever you start work in a different tODE client.
 
 In the *development* client, log into your development stone and install the **GsApplicationTools** project, including the example gem servers, by following the [Gem Server Installation instructions](#gem-server-installation).
@@ -70,7 +71,7 @@ taskServiceThreadBlock: task
 ##Gem Server Installation
 Use the following tODE expressions to install the **GemServer** support code and a set of example gem servers:
 
-```Shell
+```
 project entry --baseline=GsApplicationTools --repo=github://GsDevKit/gsApplicationTools/repository \
         /sys/stone/projects
 project load --loads='CI' GsApplicationTools
@@ -82,9 +83,209 @@ mount @/sys/stone/dirs/GsApplicationTools/tode /home gemserver
 In order for GemStone Smalltalk code to execute in a GCI[1] application like tODE, the client process must make a blocking or non-blocking GCI call. 
 However, one is not allowed to make multiple, concurrent GCI calls to execute Smalltalk code for the same gem process, so in effect the GCI interface is single threaded with respect to executing GemStone Smalltalk code.
 Since nearly all of tODE's functionality is implemented in GemStone Smalltalk code, it is not practical to allow developers to do much other than wait for processing to complete on the gem.
-tODE uses a non-blocking GCI call to initiate execution of GemStone Smalltalk code and spins in a restless loop polling for the result making it possible to interrupt GemStone processing by using the ALT-. key combination.
+tODE uses a non-blocking GCI call to initiate execution of GemStone Smalltalk code and spins in a restless loop polling for the result making it possible to interrupt GemStone processing by using the **ALT-.** key combination.
+
+##Appendix
+
+###*mount* man page
+```
+NAME
+  mount - mount file directory into tODE object structure
+
+SYNOPSIS
+  mount [-h|--help]
+  mount [--asLeafNode] <directory-or-file-path> <object-path> [<link-name>]
+  mount [--asLeafNode] @<directory-instance-path> <object-path> [<link-name>]
+  mount [--asLeafNode] [--todeRoot | --stoneRoot] <relative-directory-or-file-path> <object-path> [<link-name>]
+
+DESCRIPTION
+  The `mount` command makes it possible to create a link between the server
+  file system and the tODE object structure.
+
+  Once a file system directory or file has been mounted, you can navigate the file system
+  as if it were part of the tODE object structure.
+
+  Files with a `.ston` extension are expected to contain object references 
+  serialized using STON and tODE will automatically materialize the objects 
+  on reference.
+
+  If a <link-name> is not specified, the last element of the <directory-path>
+  is used to name the link node.
+
+OPTIONS
+  --help 
+    Bring up this man page.
+
+  --asLeafNode
+    By default nodes are mounted such that visitors will traverse the children of the
+    node. The typical visitor is recursively searching the node tree for TDLeafNodes and
+    is looking for senders or references to globals in Smalltalk code. If the mount point
+    is for a pure filesystem (like the root node of a git repository), you probably
+    do not want a senders search traversing the entire git repository. Using
+    --asLeafNode will terminate visiting at the gateway node and the gateway node
+    itself will be searched for references. 
+
+  --stoneRoot
+    The <relative-directory-or-file-path> is interpreted as a directory path relative to 
+    `<todeRoot>/sys/stones/stones/<stone-name>`, where <todeRoot> is defined by the 
+    `serverTodeRoot` field of the current sessionDescription (instance of TDSessionDescription).
+    Use `/` to indicate an empty relative path, i.e., mount <stoneRoot> directly.
+
+  --todeRoot
+    The <relative-directory-or-file-path> is interpreted as a path relative to `todeRoot` which 
+    is specified by the `serverTodeRoot` field of the current sessionDescription (instance 
+    of TDSessionDescription). TDTopezServer>>serverTodeRoot: may be used to dynamically change
+    `serverTodeRoot` for the duration of the session. Use `/` to indicate an empty relative path, 
+    i.e., mount <todeRoot> directly.
+
+EXAMPLES
+  mount -h
+
+  mount /opt/git/todeHome/home /
+  mount /opt/git/todeHome/home / todeHome
+  mount /opt/git/todeHome/home.ston / todeHome
+
+  mount --todeRoot / / home
+  mount --stoneRoot / /sys stone
+
+  mount @/sys/stone/dirs/GsApplicationTools/tode /home gemServer
+
+  NOTE - use the `tode it` menu item to run the examples directly from this window.
+
+SEE ALSO
+  edit /tools/shell/bin/mount
+browse method --spec `TDShellTool class>>mount`
+
+  NOTE - use the `tode it` menu item to run the commands directly from this window.
+```
+###*project entry* man page
+```
+NAME
+  project entry - Create a new project entry
+
+SYNOPSIS
+  project entry --baseline=<project-name> --repo=<project-repo> <project-path>
+          entry --config=<project-name> [--version=<project-version>] 
+                --repo=<project-repo> <project-path>
+          entry --git=<project-name> [--repo=<git-repo-path>] <project-path>
+
+DESCRIPTION
+  The project entry specifies project options used by the `project list` window.
+
+  A project entry can be created for loaded projects or for projects that have
+  yet to be loaded. 
+
+  There are two basic types of project entry: Git and Metacello. 
+
+  For Git project entries you define the name of the project and the location on 
+  disk where the git repository is located. For example:
+
+    project entry --git=projectHome --repo=$GS_HOME /home/external
+
+  For Metacello project entries you define the name of the project, the type of
+  the project (baseline or configuration), the repository where the baseline or
+  configuration may be found. For configurations, you also specify the version of 
+  the project to be loaded. For example:
+
+    project entry --config=External 
+                  --version=1.0.0
+                  --repo=http://ss3.gemstone.com/ss/external 
+                  /home/external
+
+    project entry --baseline=External 
+                  --repo=github://dalehenrich/external:master/repository 
+                  /home/external
+
+  Once you have created a project entry, you may change or add attributes. For 
+  example, you may want to change the list of packages/groups/projects loaded or
+  change the status to #inactive.
+
+  Once a project is loaded, only changes to the loads specification, locked
+  attribute and active attribute may have an effect. The remaining information
+  is taken directly from the loaded project itself.
+
+  Any changes you make will take effect after the project list is refreshed.
+
+Project Entry Attributes
+
+  status
+    When a project entry is initially created, the status is set to #active. Active
+    projects are listed in bold and sorted near the top of the project list.
+
+  gitRootPath
+    For projects use github repositories, the gitRootPath specifies a location on 
+    disk where the git repository should be located. This attribute is used by the
+    `project clone` command. If a project entry does not have the gitRootPath
+    explicitly set, then the path returned by 
+    TDProjectEntryDefinition class>>defaultGitRootPath is used. The value of
+    TDProjectEntryDefinition class>>defaultGitRootPath can be set on a session
+    by session basis.
+
+  locked
+    For Metacello projects, you may  specify that the project entry is locked. By
+    locking a project entry you can ensure that the specified project version (if 
+    applicable) and repository will be used whenever the project is loaded by
+    reference from another project.
+
+EXAMPLES
+  project entry --config=External --version=1.0.0 --repo=http://ss3.gemstone.com/ss/external /home/external
+
+  project entry --baseline=External --repo=github://dalehenrich/external:master/repository /home/external
+
+  project entry --git=projectHome --repo=$GS_HOME /home/external
+
+  NOTE - use the `tode it` menu item to run the examples directly from this window.
+
+SEE ALSO
+  browse class --exact --hier TDProjectEntryDefinition
+  "The Metacello Lock Command Reference" [1]
+
+[1] https://github.com/dalehenrich/metacello-work/blob/master/docs/LockCommandReference.md#lock-command-reference
 
 
+  NOTE - use the `tode it` menu item to run the commands directly from this window.
+```
+
+###*project load* man page
+```
+NAME
+  project load - Load the Metacello project
+
+SYNOPSIS
+  project load [--loads=<load-expression>]
+               [--className=<project-class-name]
+               [--no-flush] [--no-get]
+               [ (--baseline | --configuration --version=<version> ) ]
+               [--repository=<repository-reference>]
+               [--onConflict=useNew|useExisting]
+               [--onDowngrade=useNew|useExisting]
+               [--onLock=break|honor]
+               [--onUpgrade=useNew|useExisting]
+               [--ignoreImage] [--silently]
+               [--cacheRepository=@<repository-reference>]
+               [--repositoryOverrides=@<repository-reference>]
+               [--deploy=auto|bulk|none]
+               ( <project-name> | @<project-reference> )
+
+DESCRIPTION
+  Defaults:
+    deploy      - bulk
+    onConflict  - useNew
+    onLock      - honor
+    onDowngrade - useNew
+    onUpgrade   - useNew
+
+EXAMPLES
+  project load Seaside3
+
+  NOTE - use the `tode it` menu item to run the examples directly from this window.
+
+SEE ALSO
+  
+
+
+  NOTE - use the `tode it` menu item to run the commands directly from this window.
+```
 
 ##EXTRAS ... eventually deleted
 
