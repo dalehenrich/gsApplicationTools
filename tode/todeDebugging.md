@@ -1,5 +1,13 @@
 #Debugging Gem Servers with tODE
 
+##Table of Contents
+1. [Introduction](#introduction)
+2. [Gem Server Example](#gem-server-example)
+3. [Gem Server Installation](#gem-server-installation)
+4. [GemStone Processes and GCI](#gemstone-processes-and-gci)
+5. [Appendix](#appendix)
+
+##Introduction
 In this tutorial we will go over the steps necessary to debug a *gem server* using tODE.
 
 When debugging a gem server in tODE, [the UI process is blocked](#gemstone-processes-and-gci), which means that it is necessary to run two tODE images: one running as the client and one running as the server.
@@ -16,6 +24,7 @@ In the *development* client, log into your development stone and install the **G
 
 ##Gem Server Example
 
+###GemServerRemoteServerTransactionModelBExample
 In this tutorial we will be using the class **GemServerRemoteServerTransactionModelBExample** as our example gem server. This gem server operates by taking tasks off of an RcQueue (**processTasksOnQueue**) and processes each task in a separate thread (**taskServiceThreadBlock:**):
 
 ```Smalltalk
@@ -68,14 +77,153 @@ taskServiceThreadBlock: task
         critical: [ self activeProcesses value remove: Processor activeProcess ifAbsent: [  ] ] ] ]
 ```
 
+A task is an instance of class **GemServerRemoteTaskTransactionModelBExample**.
+*tasks* are created by supply a block:
+
+```Smalltalk
+GemServerRemoteTaskTransactionModelBExample 
+  value: [ (HTTPSocket httpGet: 'http://example.com') contents ]
+```
+
+Once a task has been scheduled, you poll for a result:
+
+```Smalltalk
+  completed := false.
+  [ completed ]
+    whileFalse: [ 
+      (Delay forSeconds: 1) wait.
+      completed := task hasValue or: [ task hasError ] ]
+```
+
+A task is *completed* if processing resulted in a *value* or an *error*.
+If an *error* occured, the exception is recorded with the task.
+When errors occur, the error is logged in the object log and in the gem log:
+
+```Smalltalk
+logStack: exception titled: title inTransactionDo: inTransactionBlock
+  | stream stack exDescription |
+  stack := GsProcess stackReportToLevel: 300.
+  exDescription := exception description.
+  System inTransaction
+    ifTrue: [ 
+      self createContinuation: exDescription.
+      inTransactionBlock value ]
+    ifFalse: [ 
+      self
+        doSimpleTransaction: [ 
+          self createContinuation: exDescription.
+          inTransactionBlock value ] ].
+  stream := WriteStream on: String new.
+  stream nextPutAll: '----------- ' , title , DateAndTime now printString.
+  stream lf.
+  stream nextPutAll: exDescription.
+  stream lf.
+  stream nextPutAll: stack.
+  stream nextPutAll: '-----------'.
+  stream lf.
+  GsFile gciLogServer: stream contents
+```
+
+If a task has an *error*, then you can look in the object log for a corresponding continuation and debug the continuation.
+
+####Gem Server Registration
+For debugging purposes, you will create a gem server using the following expression:
+
+```Smalltalk
+(GemServerRemoteServerTransactionModelBExample register: 'example')
+    tracing: true;
+    interactiveMode: true;
+    yourself
+```
+
+Setting `tracing: true` means that the **trace:object** calls as seen in the server code above will be recorded in the object log.
+
+Setting `interactiveMode: true` means that instead of logging errors to object log, the exceptions will be passed so that a debugger will be opened in the tODE server client.
+
+####Gem Server Start/Stop/Restart/Status
+
+Once a server has been registered, the following Smalltalk expressions can be used:
+
+```Smalltalk
+(GemServerRegistry gemServerNamed: 'example') start
+(GemServerRegistry gemServerNamed: 'example') restart
+(GemServerRegistry gemServerNamed: 'example') stop
+(GemServerRegistry gemServerNamed: 'example') status
+```
+
+Note that these commands are meant to be used in interactive mode and will launch/terminate processes in the current image. Note that the `start` and `restart` messages will cause the UI to block.
+
+###GemServerRemoteClientTransactionModelBExample
+The gem server client (**GemServerRemoteClientTransactionModelBExample**) has the following collection of pre-defined tasks defined:
+
+```
+scheduleBreakpointTask
+scheduleErrorTask
+scheduleExampleHttpTask
+scheduleFastTask
+scheduleHaltTask
+scheduleInternalServerError
+scheduleOutOfMemoryPersistent
+scheduleOutOfMemoryTemp
+scheduleSimpleTask
+scheduleStackOverflow
+scheduleStatusTask
+scheduleTimeInLondonTask
+scheduleWarning
+```
+
+The `scheduleBreakpointTask`, `scheduleErrorTask`, `scheduleHaltTask` tasks can be used to simulate development activity 
+
+Tasks can be scheduled on the server by executing the following in the client image:
+
+```Smalltalk
+  | gemServer client task result |
+  gemServer := GemServerRegistry gemServerNamed: 'example'.
+  client := gemServer clientClass new.
+  task := client scheduleErrorTask.
+  task label: 'scheduleErrorTask'.
+  client doCommitTransaction.
+  ^ client waitForTasks: {task} gemServer: gemServer
+```
+
+The result of the **waitForTasks:gemServer:** message is an array like the following:
+
+```Smalltalk
+  {true.                                   "true if all tasks returned a proper value"
+  tasks.                                   "array of tasks passed in as argument"
+  completed.                               "array of completed tasks"
+  valid.                                   "array of valid, completed tasks"
+  status.                                  "#success, #timedOut, or #crashed"
+  (valid collect: [ :each | each value ]). "result value of task"
+  (self inProcess).                        "collection of tasks in process"
+  (self queue)                             "collection of tasks awaiting processing"
+  }    
+```
+
 ##Gem Server Installation
 Use the following tODE expressions to install the **GemServer** support code and a set of example gem servers:
 
 ```
 project entry --baseline=GsApplicationTools --repo=github://GsDevKit/gsApplicationTools/repository \
         /sys/stone/projects
-project load --loads='CI' GsApplicationTools
+project load GsApplicationTools
 mount @/sys/stone/dirs/GsApplicationTools/tode /home gemserver
+```
+
+The [`project entry` command](#project-entry-man-page) creates a *project entry* in the *project list* for this stone (`/sys/stone/projects`). 
+If you want to have the **GsApplicationTools** project show up in *project list* for all of your stones, then create the *project entry* in the `/sys/local/projects` node:
+
+```
+project entry --baseline=GsApplicationTools --repo=github://GsDevKit/gsApplicationTools/repository \
+        /sys/local/projects
+```
+
+The [`project load` command](#project-load-man-page) loads the project as specified by the  *project entry* in the *project list*.
+
+The [`mount` command](#mount-man-page) makes the `tode` directory of the **GsApplicationTools** checkout available from within tODE as the node `/home/gemserver`. Again, if you want the `tode` directory to be available at the some location for all of your stones, use the following command:
+
+```
+mount @/sys/stone/dirs/GsApplicationTools/tode /sys/local/home gemserver
 ```
 
 ##GemStone Processes and GCI
@@ -164,9 +312,10 @@ NAME
   project entry - Create a new project entry
 
 SYNOPSIS
-  project entry --baseline=<project-name> --repo=<project-repo> <project-path>
-          entry --config=<project-name> [--version=<project-version>] 
-                --repo=<project-repo> <project-path>
+  project entry --baseline=<project-name> --repo=<project-repo> [--loads=<load-expression>] \ 
+                <project-path>
+          entry --config=<project-name> [--version=<project-version>] \
+                --repo=<project-repo> [--loads=<load-expression>] <project-path>
           entry --git=<project-name> [--repo=<git-repo-path>] <project-path>
 
 DESCRIPTION
@@ -184,20 +333,21 @@ DESCRIPTION
 
   For Metacello project entries you define the name of the project, the type of
   the project (baseline or configuration), the repository where the baseline or
-  configuration may be found. For configurations, you also specify the version of 
-  the project to be loaded. For example:
+  configuration may be found, and (optionally) the package/project/groups to be loaded.
+  For configurations, you also specify the version of the project to be loaded. For example:
 
-    project entry --config=External 
-                  --version=1.0.0
-                  --repo=http://ss3.gemstone.com/ss/external 
+    project entry --config=External                          \
+                  --version=1.0.0                            \
+                  --repo=http://ss3.gemstone.com/ss/external \
+                  --loads=`#('Core')`                      \
                   /home/external
 
-    project entry --baseline=External 
-                  --repo=github://dalehenrich/external:master/repository 
+    project entry --baseline=External                                    \
+                  --repo=github://dalehenrich/external:master/repository \
                   /home/external
 
-  Once you have created a project entry, you may change or add attributes. For 
-  example, you may want to change the list of packages/groups/projects loaded or
+  If you don't specify a `--loads` option, the 'default' group is loaded. Once you have 
+  created a project entry, you may change or add attributes. For example, you may want to 
   change the status to #inactive.
 
   Once a project is loaded, only changes to the loads specification, locked
@@ -228,9 +378,11 @@ Project Entry Attributes
     reference from another project.
 
 EXAMPLES
-  project entry --config=External --version=1.0.0 --repo=http://ss3.gemstone.com/ss/external /home/external
+  project entry --config=External --version=1.0.0 --repo=http://ss3.gemstone.com/ss/external \
+               --loads=`#('Core')` /home/external
 
-  project entry --baseline=External --repo=github://dalehenrich/external:master/repository /home/external
+  project entry --baseline=External --repo=github://dalehenrich/external:master/repository \
+               --loads=`#('Core')` /home/external
 
   project entry --git=projectHome --repo=$GS_HOME /home/external
 
@@ -241,8 +393,6 @@ SEE ALSO
   "The Metacello Lock Command Reference" [1]
 
 [1] https://github.com/dalehenrich/metacello-work/blob/master/docs/LockCommandReference.md#lock-command-reference
-
-
   NOTE - use the `tode it` menu item to run the commands directly from this window.
 ```
 
