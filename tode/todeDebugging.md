@@ -457,6 +457,157 @@ SEE ALSO
 
   NOTE - use the `tode it` menu item to run the commands directly from this window.
 ```
+###tODE `example` script
+```Smalltalk
+[ :topez :objIn :tokens :command :commandNode | 
+  | opts args |
+  "for help: ./example -h"
+  command
+    getOptsMixedLongShort:
+      {#('help' $h #'none').
+      #('clear' nil #'none').
+      #('client' nil #'required').
+      #('model' nil #'required').
+      #('register' nil #'required').
+      #('reset' nil #'none').
+      #('restart' nil #'required').
+      #('server' nil #'required').
+      #('start' nil #'required').
+      #('status' nil #'required').
+      #('stop' nil #'required').
+      #('trace' nil #'none').
+      #('unregister' nil #'required')}
+    optionsAndArguments: [ :options :operands | 
+      opts := options.
+      args := operands ].
+  opts
+    at: 'help'
+    ifAbsent: [ 
+      | result gemServer trace transModel |
+      trace := false.
+      opts
+        at: 'clear'
+        ifPresent: [ :ignored | topez evaluateCommandString: 'ol clear --age=`1 hour`' ].
+      opts
+        at: 'reset'
+        ifPresent: [ :ignored | result := GemServerRemoteTaskExample reset ].
+      opts at: 'trace' ifPresent: [ :ignored | trace := true ].
+      opts at: 'model' ifPresent: [ :model | transModel := model ].
+      opts
+        at: 'unregister'
+        ifPresent: [ :serverName | result := GemServerRegistry removeGemServerNamed: serverName ]
+        ifAbsent: [ 
+          | serverName serverCls |
+          opts
+            at: 'register'
+            ifPresent: [ :serverNameArg | serverName := serverNameArg ].
+          transModel = 'A'
+            ifTrue: [ serverCls := GemServerRemoteServerTransactionModelAExample ]
+            ifFalse: [ 
+              transModel = 'B'
+                ifTrue: [ serverCls := GemServerRemoteServerTransactionModelBExample ] ].
+          serverName
+            ifNotNil: [ 
+              gemServer := (GemServerRegistry gemServerNamed: serverName)
+                ifNil: [ 
+                  gemServer := (serverCls register: serverName)
+                    tracing: trace;
+                    interactiveMode: true;
+                    yourself ] ].
+          result := gemServer ].
+      opts
+        at: 'client'
+        ifPresent: [ :taskName | 
+          | selectors client task |
+          selectors := Dictionary new
+            at: 'break' put: #'scheduleBreakpointTask';
+            at: 'error' put: #'scheduleErrorTask';
+            at: 'http' put: #'scheduleExampleHttpTask';
+            at: 'fast' put: #'scheduleFastTask';
+            at: 'halt' put: #'scheduleHaltTask';
+            at: 'serverError' put: #'scheduleInternalServerError';
+            at: 'oomPersistent' put: #'scheduleOutOfMemoryPersistent';
+            at: 'oomTemp' put: #'scheduleOutOfMemoryTemp';
+            at: 'simple' put: #'scheduleSimpleTask';
+            at: 'status' put: #'scheduleStatusTask';
+            at: 'overflow' put: #'scheduleStackOverflow';
+            at: 'time' put: #'scheduleTimeInLondonTask';
+            at: 'warning' put: #'scheduleWarning';
+            yourself.
+          opts
+            at: 'server'
+            ifPresent: [ :serverName | 
+              client := (gemServer := GemServerRegistry gemServerNamed: serverName)
+                clientClass new ].
+          task := client perform: (selectors at: taskName).
+          task label: taskName.
+          client doCommitTransaction.
+          result := client waitForTasks: {task} gemServer: gemServer ].
+      opts
+        at: 'stop'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stop ].
+      opts
+        at: 'start'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) start ].
+      opts
+        at: 'status'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) status ].
+      opts
+        at: 'restart'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) restart ].
+      result ]
+    ifPresent: [ :ignored | 
+      TDManPage
+        viewManPage:
+          'NAME
+  example - example sript utility template
+SYNOPSIS
+  example [-h|--help]
+  example --register=<server-name> --model=[A|B] [--trace]
+  example --register=<server-name> --model=[A|B] [--trace]
+  example --unregister=<server-name>
+  example --reset
+  example --start=<server-name>
+  example --restart=<server-name>
+  example --stop=<server-name>
+  example --status=<server-name>
+  example --clear
+  example --client=[break|error|http|fast|halt|serverError|oomPersistent|oomTemp|simple|status|overflow|time|warning] \
+         --server=<server-name>  [--trace]
+DESCRIPTION
+EXAMPLES
+  ./example --help
+  ./example -h
+
+  ./example --register=example
+  ./example --register=example --model=A --trace
+  ./example --register=example --model=B --trace
+  ./example --unregister=example
+  ./example --reset
+
+  ./example --start=example
+  ./example --stop=example
+  ./example --restart=example
+  ./example --status=example
+
+  ./example --clear
+
+  ./example --client=break --server=example --trace
+  ./example --client=error --server=example --trace
+  ./example --client=http --server=example --trace
+  ./example --client=fast --server=example --trace
+  ./example --client=halt --server=example --trace
+  ./example --client=serverError --server=example --trace
+  ./example --client=oomPersistent --server=example --trace
+  ./example --client=oomTemp --server=example --trace
+  ./example --client=simple --server=example --trace
+  ./example --client=status --server=example --trace
+  ./example --client=overflow --server=example --trace
+  ./example --client=time --server=example --trace
+  ./example --client=warning --server=example --trace
+'
+        topez: topez ] ]
+```
 
 ###tODE `example` script man page
 ```
