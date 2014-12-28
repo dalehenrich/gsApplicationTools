@@ -1,5 +1,10 @@
 *gsapplicationtools-serverv30
 gemServerHandleAlmostOutOfStackException: exception
-  "treat like an error and unwind stack"
+  "log the stack trace and unwind stack unless in interactive mode"
 
-  self gemServerHandleErrorException: exception
+  self
+    logStack: exception
+    titled:
+      self name , ' ' , exception class name asString , ' exception encountered: '.
+  self interactiveMode
+    ifTrue: [ exception pass ]

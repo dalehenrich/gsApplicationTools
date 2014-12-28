@@ -6,9 +6,11 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
       {#(\'help\' $h #\'none\').
       #(\'clear\' nil #\'none\').
       #(\'client\' nil #\'required\').
+      #(\'model\' nil #\'required\').
       #(\'register\' nil #\'required\').
       #(\'reset\' nil #\'none\').
       #(\'restart\' nil #\'required\').
+      #(\'server\' nil #\'required\').
       #(\'start\' nil #\'required\').
       #(\'status\' nil #\'required\').
       #(\'stop\' nil #\'required\').
@@ -20,7 +22,7 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
   opts
     at: \'help\'
     ifAbsent: [ 
-      | result gemServer trace |
+      | result gemServer trace transModel |
       trace := false.
       opts
         at: \'clear\'
@@ -29,16 +31,25 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
         at: \'reset\'
         ifPresent: [ :ignored | result := GemServerRemoteTaskExample reset ].
       opts at: \'trace\' ifPresent: [ :ignored | trace := true ].
+      opts at: \'model\' ifPresent: [ :model | transModel := model ].
       opts
         at: \'unregister\'
         ifPresent: [ :serverName | result := GemServerRegistry removeGemServerNamed: serverName ]
         ifAbsent: [ 
+          | serverName serverCls |
           opts
             at: \'register\'
-            ifPresent: [ :serverName | 
+            ifPresent: [ :serverNameArg | serverName := serverNameArg ].
+          transModel = \'A\'
+            ifTrue: [ serverCls := GemServerRemoteServerTransactionModelAExample ]
+            ifFalse: [ 
+              transModel = \'B\'
+                ifTrue: [ serverCls := GemServerRemoteServerTransactionModelBExample ] ].
+          serverName
+            ifNotNil: [ 
               gemServer := (GemServerRegistry gemServerNamed: serverName)
                 ifNil: [ 
-                  gemServer := (GemServerRemoteServerExample register: serverName)
+                  gemServer := (serverCls register: serverName)
                     tracing: trace;
                     interactiveMode: true;
                     yourself ] ].
@@ -62,11 +73,15 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
             at: \'time\' put: #\'scheduleTimeInLondonTask\';
             at: \'warning\' put: #\'scheduleWarning\';
             yourself.
-          client := GemServerRemoteClientExample new.
+          opts
+            at: \'server\'
+            ifPresent: [ :serverName | client := (gemServer := GemServerRegistry gemServerNamed: serverName) clientClass new ].
           task := client perform: (selectors at: taskName).
           task label: taskName.
           client doCommitTransaction.
-          result := client waitForTasks: {task} trace: trace ].
+          result := client waitForTasks: {task} gemServer: gemServer
+
+].
       opts
         at: \'stop\'
         ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stop ].
@@ -87,7 +102,8 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
   example - example sript utility template
 SYNOPSIS
   example [-h|--help]
-  example --register=<server-name> [--trace]
+  example --register=<server-name> --model=[A|B] [--trace]
+  example --register=<server-name> --model=[A|B] [--trace]
   example --unregister=<server-name>
   example --reset
   example --start=<server-name>
@@ -96,14 +112,15 @@ SYNOPSIS
   example --status=<server-name>
   example --clear
   example --client=[break|error|http|fast|halt|serverError|oomPersistent|oomTemp|simple|status|overflow|time|warning] \\
-          [--trace]
+         --server=<server-name>  [--trace]
 DESCRIPTION
 EXAMPLES
   ./example --help
   ./example -h
 
   ./example --register=example
-  ./example --register=example --trace
+  ./example --register=example --model=A --trace
+  ./example --register=example --model=B --trace
   ./example --unregister=example
   ./example --reset
 
@@ -114,18 +131,18 @@ EXAMPLES
 
   ./example --clear
 
-  ./example --client=break --trace
-  ./example --client=error --trace
-  ./example --client=http --trace
-  ./example --client=fast --trace
-  ./example --client=halt --trace
-  ./example --client=serverError --trace
-  ./example --client=oomPersistent --trace
-  ./example --client=oomTemp --trace
-  ./example --client=simple --trace
-  ./example --client=status --trace
-  ./example --client=overflow --trace
-  ./example --client=time --trace
-  ./example --client=warning --trace
+  ./example --client=break --server=example --trace
+  ./example --client=error --server=example --trace
+  ./example --client=http --server=example --trace
+  ./example --client=fast --server=example --trace
+  ./example --client=halt --server=example --trace
+  ./example --client=serverError --server=example --trace
+  ./example --client=oomPersistent --server=example --trace
+  ./example --client=oomTemp --server=example --trace
+  ./example --client=simple --server=example --trace
+  ./example --client=status --server=example --trace
+  ./example --client=overflow --server=example --trace
+  ./example --client=time --server=example --trace
+  ./example --client=warning --server=example --trace
 \'
-        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2014-12-24T17:45:50.7572529315948-08:00']}
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2014-12-27T08:37:26.3118619918823-08:00']}
