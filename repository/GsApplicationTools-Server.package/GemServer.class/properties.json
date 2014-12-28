@@ -14,7 +14,8 @@
 		"transactionMode",
 		"interactiveMode",
 		"crashLog",
-		"enableCreateContinuations" ],
+		"enableCreateContinuations",
+		"gemServerExceptionSet" ],
 	"name" : "GemServer",
 	"pools" : [
 		 ],
