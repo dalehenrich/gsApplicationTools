@@ -458,7 +458,7 @@ SEE ALSO
   NOTE - use the `tode it` menu item to run the commands directly from this window.
 ```
 
-###tODE `example` script man page](#tode-example-script-man-page
+###tODE `example` script man page
 ```
 NAME
   example - example sript utility template
