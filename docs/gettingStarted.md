@@ -2,6 +2,7 @@
 
 ##Table of Contents
 - [What is a Gem Server](#what-is-a-gemserver)
+  - [Gem Server Service Loop](#gem-server-service-loop)
 - [Basic Gem Server Structure](#basic-gem-server-structure)
 - [Seaside Gem Servers](#seaside-gem-servers)
 - [ServiceVM Gem Servers](#servicevm-gem-servers)
@@ -28,30 +29,54 @@ startBasicServerOn: ignored
       count := 0.
       [ true ]
         whileTrue: [ 
-          [ 
-          "run maintenance tasks"
-          self taskClass performTasks: count.
-          (Delay forMilliseconds: self delayTimeMs) wait.
-          count := count + 1 ]
-            on: self class breakpointExceptionSet
-            do: [ :ex | self handleBreakpointException: ex ] ] ]
+          self
+            gemServer: [ 
+              "run maintenance tasks"
+              self taskClass performTasks: count ].
+          (Delay forMilliseconds: self delayTimeMs) wait.	"Sleep for a minute"
+          count := count + 1 ] ]
         fork.
-  self serverInstance: self
+  self serverInstance: self	"the maintenanceProcess is session-specific"
 ```
 
-As you can see, this is a classic *forever* loop that performs tasks every *delayTimeMs*. 
-If an exception occurs (**Error**, **Halt**, or **Breakpoint**), the exception is handled by snapping off a continuation and resuming the exception (if possible):
+This is a classic *forever* loop that performs a task every *delayTimeMs* (60,000 ms for the maintenance vm). 
+
+Exceptions (Error, Break, Breakpoint, Halt, AlmostOutOfMemory, AlmostOutOfStack by default) are handled by the **gemServer:** method. 
+When an exception occurs, the default behavior is to (see GemServer>>logStack:titled:inTransactionDo:):
+  - snap off a continuation to the object log
+  - dump stack trace to the gem log
+
+Custom handling can be defined for each of the exceptions using the following methods:
+  - gemServerHandleAlmostOutOfMemoryException:
+  - gemServerHandleAlmostOutOfStackException:
+  - gemServerHandleBreakException:
+  - gemServerHandleBreakpointException:
+  - gemServerHandleErrorException:
+  - gemServerHandleHaltException:
+  - gemServerHandleNonResumableException:
+  - gemServerHandleNotificationException:
+  - gemServerHandleResumableException:
+
+For example, here is the handling for a non-resumable exception (i.e., Error):
 
 ```Smalltalk
-handleBreakpointException: exception
-  "Snap off continuation, then resume if possible"
+gemServerHandleNonResumableException: exception
+  "log the stack trace and unwind stack, unless in interactive mode"
 
-  GRPlatform current
-    doTransaction: [ DebuggerLogEntry createContinuationLabeled: exception description ].
-  exception isResumable
-    ifTrue: [ exception resume ]
-    ifFalse: [ exception pass ]
+  self
+    logStack: exception
+    titled:
+      self name , ' ' , exception class name asString , ' exception encountered: '.
+  self interactiveMode
+    ifTrue: [ exception pass ]
 ```
+
+The following variants of the **gemServer:** method are defined:
+  - gemServer:
+  - gemServer:exceptionSet:
+  - gemServer:exceptionSet:onError:
+  - gemServer:onError:
+
 
 ###Gem Server Control
 To define a GemServer you specify a name and a list of ports:
