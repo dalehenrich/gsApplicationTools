@@ -1,6 +1,7 @@
 transactions-support
 doSimpleTransaction: aBlock
-  "I do an unconditional commit. Caller is responsible for restoring proper commit state"
+  "I do an unconditional commit. If running in manual transaction mode, the system will be outside 
+   of transaction upon returning. "
 
   self transactionMutex
     critical: [ 

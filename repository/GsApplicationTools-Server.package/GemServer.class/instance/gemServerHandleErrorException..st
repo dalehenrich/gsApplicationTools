@@ -1,7 +1,10 @@
 exception dispatching
 gemServerHandleErrorException: exception
-  "unwind stack"
+  "log the stack trace and unwind stack, unless in interactive mode"
 
   self
-    serverError: exception
-    titled: self name , ' ' , exception class name asString , ' exception'
+    logStack: exception
+    titled:
+      self name , ' ' , exception class name asString , ' exception encountered: '.
+  self interactiveMode
+    ifTrue: [ exception pass ]

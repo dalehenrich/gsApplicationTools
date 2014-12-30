@@ -3,7 +3,7 @@ scheduleTimeInLondonTask
   ^ (self taskClass
     value: [ 
       | timeInLondon |
-      "should extact the time from the html; not the most robust parsing algorithmn"
+      "should extract the time from the html; not the most robust parsing algorithmn"
       timeInLondon := (HTTPSocket
         httpGet: 'http://www.time.org/zones/Europe/London.php')
         throughAll: 'Europe/London - ';
