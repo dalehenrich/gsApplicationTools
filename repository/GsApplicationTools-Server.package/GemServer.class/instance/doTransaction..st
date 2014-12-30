@@ -4,4 +4,10 @@ doTransaction: aBlock
 
   self
     doTransaction: aBlock
-    onConflict: [ :ignored | self error: 'commit conflicts' ]
+    onConflict: [ :conflicts | 
+      (self
+        doBasicTransaction: [ ObjectLogEntry warn: 'Commit failure ' object: conflicts ])
+        ifTrue: [ self error: 'commit conflicts' ]
+        ifFalse: [ 
+          self doAbortTransaction.
+          self error: 'commit conflicts - could not log conflict dictionary' ] ]
