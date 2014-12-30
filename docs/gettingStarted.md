@@ -35,7 +35,7 @@ startBasicServerOn: ignored
         whileTrue: [ 
           self
             gemServer: [ 
-              "run maintenance tasks"
+              "run maintenance tasks in parallel mode"
               self taskClass performTasks: count ].
           (Delay forMilliseconds: self delayTimeMs) wait.	"Sleep for a minute"
           count := count + 1 ] ]
@@ -83,8 +83,12 @@ The [view of the repository](#gemstone-transaction) is shared by all of the thre
 Consequently, one must take great care in managing transaction boundaries when running a multi-threaded application in a *gem server*.
 
 The **GemServer** code has been designed to support two use cases:
- - Serial Mode
- - Parallel Mode
+
+  **Serial Mode**
+  Where each thread is serialized via a *transaction mutex*.
+
+  **Parallel Mode**
+  Where multiple threads may run in parallel, but all transactions are serialized via a *transaction mutex*.
 
 ####Serial Mode
 ####Parallel Mode
