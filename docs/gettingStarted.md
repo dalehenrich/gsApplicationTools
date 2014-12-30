@@ -5,8 +5,9 @@
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
   - [Gem Server Transaction Model](#gem-server-transaction-model)
-    - [Serial Mode](#serial-mode)
-    - [Parallel Mode](#parallel-mode)
+    - [Parallel Processing Mode](#parallel-processing-mode)
+    - [Serial Processing Mode](#serial-processing-mode)
+    - [Handling Transaction Conflicts](#handling-transaction-conflicts)
 - [Basic Gem Server Structure](#basic-gem-server-structure)
 - [Seaside Gem Servers](#seaside-gem-servers)
 - [ServiceVM Gem Servers](#servicevm-gem-servers)
@@ -24,8 +25,6 @@ Here is the **startBasicServerOn:** method for a [maintenance vm](#maintenance-v
 
 ```Smalltalk
 startBasicServerOn: ignored
-  "start server in current vm. expected to return."
-
   self
     maintenanceProcess:
       [ 
@@ -33,21 +32,17 @@ startBasicServerOn: ignored
       count := 0.
       [ true ]
         whileTrue: [ 
-          self
-            gemServer: [ 
-              "run maintenance tasks in parallel mode"
-              self taskClass performTasks: count ].
-          (Delay forMilliseconds: self delayTimeMs) wait.	"Sleep for a minute"
+          self gemServer: [ self taskClass performTasks: count ].
+          (Delay forMilliseconds: self delayTimeMs) wait.
           count := count + 1 ] ]
         fork.
-  self serverInstance: self	"the maintenanceProcess is session-specific"
 ```
 
-This is a classic *forever* loop that performs a task every *delayTimeMs* (60,000 ms for the maintenance vm). 
+This is a classic *forever* loop that performs a task every *delayTimeMs*. 
 
 ###Gem Server Exception Handling
 
-Exceptions (**Error**, **Break**, **Breakpoint**, **Halt**, **AlmostOutOfMemory**, **AlmostOutOfStack** by default) are handled by the **gemServer:** method. 
+If an exception (**Error**, **Break**, **Breakpoint**, **Halt**, **AlmostOutOfMemory**, **AlmostOutOfStack** by default) occurs while the **performTasks:** executes the **gemServer:** method has default handling rules defined. 
 For example, when an **Error** is signalled, the following method is called:
 
 ```Smalltalk
@@ -82,56 +77,20 @@ In a *gem server*, when an abort or begin transaction is executed all un-committ
 The [view of the repository](#gemstone-transaction) is shared by all of the threads in the vm.
 Consequently, one must take great care in managing transaction boundaries when running a multi-threaded application in a *gem server*.
 
-The **GemServer** code has been designed to support two use cases:
+####Parallel Processing Mode
+In *parallel processing mode* multiple threads may be employed in a *gem server* where 
+updates to persistent objects must be made within a critical section that:
+  - acquires the *transaction mutex* (see `GemServer>>transactionMutex`)
+  - performs an abort or begin transaction
+  - updates the persistent objects
+  - performs a commit
 
-  1. **Serial Mode** where each thread is serialized via a *transaction mutex*.
-  2. **Parallel Mode** where multiple threads may run in parallel, but all transactions are serialized via a *transaction mutex*.
-
-####Serial Mode
-####Parallel Mode
-In *parallel mode*, multiple threads may be employed in concurrent operations that by convention only make changes to non-persistent objects. 
-Updates to persistent objects must be made within a critical section that acquires the *transaction mutex* (see `GemServer>>transactionMutex`), performs a begin transaction, updates the persistent objects and finishes with a commit.
-
-For example, in the following code:
-
-```Smalltalk
-| timeInLondon |
-  timeInLondon := (HTTPSocket
-    httpGet: 'http://www.time.org/zones/Europe/London.php')
-    throughAll: 'Europe/London - ';
-    upTo: Character space.
-  UserGlobals
-    at: #'TimeInLondon'
-    put: '(from http://www.time.org), time in London is: ' , timeInLondon
-```
-
-there are two distinct operations:
-  1. the acquisition and parsing of the HTTP request.
-  2. storing the parsed response into a **UserGlobals**, a persistent object.
-
-One can imagine that it should be possible to have 100's of http requests in process at any one time, especially since the response time for HTTP requests can vary all over the map.
-The parsing of the response can easily take place involving only temporary objects.
-It is only necessary to be in transaction when the time is stored into **UserGlobals**.
-
-Here is the recoded to be executable in *parallel mode*:
-
-```Smalltalk
-| timeInLondon |
-  timeInLondon := (HTTPSocket
-    httpGet: 'http://www.time.org/zones/Europe/London.php')
-    throughAll: 'Europe/London - ';
-    upTo: Character space.
-  gemServer doSimpleTransaction: [
-    UserGlobals
-      at: #'TimeInLondon'
-      put: '(from http://www.time.org), time in London is: ' , timeInLondon ].
-```
-
-where **doSimpleTransaction:** is implemented as the following:
+For convenience, the method `GemServer>>doSimpleTransaction:` has been written to provide a safe way to update persistent objects in "parallel processing mode":
 
 ```Smalltalk
 doSimpleTransaction: aBlock
-  "I do an unconditional commit. Caller is responsible for restoring proper commit state"
+  "I do an unconditional commit. If running in manual transaction mode, the system will be 
+   outside of transaction upon returning. "
 
   self transactionMutex
     critical: [ 
@@ -142,46 +101,62 @@ doSimpleTransaction: aBlock
         ifFalse: [ 
           self doBeginTransaction.
           aBlock value ] ]
-        ensure: [ 
-          "workaround for Bug 42963: ensure: block executed twice (don't return from ensure: block)"
-          commitResult := self doCommitTransaction ].
+        ensure: [ commitResult := self doCommitTransaction ].
       ^ commitResult ]
 ```
 
-
-
-
-
-A *transaction mutex* is provided (see `GemServer>>transactionMutex`) to help serialize the management of transactions boundaries across multiple threads, however, 
-
-
-Gem servers run in [manual transaction mode](#manual-transaction-mode) in order to avoid excessive [commit record backlogs](#commit-record-backlog). 
-
-In *manual transaction mode* it is necessary to explicitly define transaction boundaries.
-For Seaside, transaction boundaries are defined to correspond to the HTTP request boundaries:
-  1. begin transaction before handling the HTTP request
-  2. commit transaction before returning HTTP response to the clent
-  3. on conflict, abort transaction and retry HTTP request at Step 1.
-
-In [manual transaction mode](#manual-transaction-mode) it can be difficult to correctly define transaction boundaries.
-The following family of methods have been created t
-
-it is necessary to 
-Two methods are supplied for performing a block within a discrete transaction:
-  - doSimpleTransaction:
-  - doComplexTransaction:onConflict:
-
-
-
-
-Two transaction models are supported by the
-The following variants of the **gemServer:** method are defined:
+Here are the *gem server* methods for invoking *parallel processing mode*:
   - gemServer:
   - gemServer:exceptionSet:
   - gemServer:exceptionSet:onError:
   - gemServer:onError:
 
+With the **exceptionSet:** argument, you may specify an alternate list of exceptions to handle.
+Make sure that the implementation of **exceptionHandlingForGemServer:** has been correctly defined for each of the exceptions in your alternate list.
 
+With the **onError:** block, you may specify additional processing for exceptions beyond the default logging.
+For a web application, you may want to return a response with the appropriate 4xx or 5xx status.
+
+####Serial Processing Mode
+It may not always be practical or necessary to employ *parallel processing mode* in a *gem server*.
+In [Seaside][4] applications, for example, transaction boundaries are defined to correspond to the HTTP request boundaries:
+  1. begin transaction before handling the HTTP request
+  2. commit transaction before returning HTTP response to the clent
+  3. on conflict, abort transaction and retry HTTP request.
+The transaction boundaries are managed by the Seaside framework and it is not necessary to complicate the application code with transaction management.
+
+For concurrent processing, one may run multiple gems in parallel.
+
+Here are the *gem server* methods for invoking *serial processing mode*:
+  - gemServerTransaction:
+  - gemServerTransaction:exceptionSet:
+  - gemServerTransaction:exceptionSet:onError:
+  - gemServerTransaction:exceptionSet:onError:onConflict:
+  - gemServerTransaction:onConflict:
+  - gemServerTransaction:onError:
+  - gemServerTransaction:onError:onConflict:
+
+With the **onConflict:** block you may specify the actions you want taken in the event of a [commit conflict](#transaction-conflict). 
+####Handling Transaction Conflicts
+The default behavior for the **onConflict:** is as follows:
+
+```Smalltalk
+gemServerTransaction: aBlock exceptionSet: exceptionSet onError: errorBlock
+  self
+    gemServerTransaction: aBlock
+    exceptionSet: exceptionSet
+    onError: errorBlock
+    onConflict: [ :conflicts | 
+      self doAbortTransaction.
+      self
+        doSimpleTransaction: [ ObjectLogEntry warn: 'Commit failure ' object: conflicts ] ]
+```
+
+The *conflicts* argument to the block is a [transaction conflict dictionary](#transaction-conflict-dictionary).
+By default, the *transaction conflict dictionary* is written to the [object log](#object-log) for analysis.
+
+For a web server, in addition to logging the *transaction conflict dictionary*, it may make sense to simply retry the request again, as is done for *Seaside*.
+###Gem Server Service Loop Considerations
 ###Gem Server Control
 To define a GemServer you specify a name and a list of ports:
 
@@ -495,6 +470,35 @@ and Querying.*
 commit. This mode allows an occasional out-of-date entry to overwrite a more current
 one. You can use object locks to enforce more stringent control if you can anticipate the
 problem.*
+
+---
+
+###Transaction Conflict Dictionary
+**From the comment of the method System class>>transactionConflicts**
+
+---
+
+*Returns a SymbolDictionary that contains an Association whose key is #commitResult and whose value is one of the following Symbols: #success, #failure, #retryFailure, #commitDisallowed, or #rcFailure .*
+
+*The remaining Associations in the dictionary are used to report the conflicts found.  Each Association's key indicates the kind of conflict detected; its associated value is an Array of OOPs for the objects that are conflicting. If there are no conflicts for the transaction, the returned SymbolDictionary has no additional Associations.*
+
+*The conflict sets are cleared at the beginning of a commit or abort and therefore may be examined until the next commit, continue or abort.*
+
+ *The keys for the conflicts are as follows:*
+
+|Key|Conflicts|
+|---|---------|
+|Read-Write|StrongReadSet and WriteSetUnion conflicts.|
+|Write-Write|WriteSet and WriteSetUnion conflicts.|
+|Write-Dependency|WriteSet and DependencyChangeSetUnion conflicts.|
+|Write-WriteLock|WriteSet and WriteLockSet conflicts.|
+|Write-ReadLock|WriteSet and ReadLockSet conflicts.|
+|Rc-Write-Write|Logical write-write conflict on reduced conflict object.|
+|WriteWrite_minusRcReadSet|(WriteSet and WriteSetUnion conflicts) - RcReadSet)|
+
+*The Read-Write conflict set has already had RcReadSet subtracted from it. The Write-Write conflict set does not have RcReadSet subtracted .*
+
+*The Write-Dependency conflict set contains objects modified (including DependencyMap operations) in the current transaction that were either added to, removed from,  or changed in the DependencyMap by another transaction. Objects in the  Write-Dependency conflict set may be in the Write-Write conflict set.*
 
 ---
 
