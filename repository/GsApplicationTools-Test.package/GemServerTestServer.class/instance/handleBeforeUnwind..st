@@ -1,4 +1,4 @@
 actions
-handleActionError: ex
+handleBeforeUnwind: ex
   actionResult := #'ERROR_LOGGED'.
   actionException := ex

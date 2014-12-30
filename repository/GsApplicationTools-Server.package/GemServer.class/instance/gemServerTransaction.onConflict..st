@@ -3,7 +3,7 @@ gemServerTransaction: aBlock onConflict: conflictBlock
   self
     gemServerTransaction: aBlock
     exceptionSet: self gemServerExceptionSet
-    onError: [ :ex | 
+    beforeUnwind: [ :ex | 
       "server error is already logged"
        ]
     onConflict: conflictBlock

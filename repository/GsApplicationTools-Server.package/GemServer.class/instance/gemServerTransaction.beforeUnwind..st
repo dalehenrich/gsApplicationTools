@@ -1,6 +1,6 @@
 gem server api
-gemServerTransaction: aBlock onError: errorBlock
+gemServerTransaction: aBlock beforeUnwind: beforeUnwindBlock
   self
     gemServerTransaction: aBlock
     exceptionSet: self gemServerExceptionSet
-    onError: errorBlock
+    beforeUnwind: beforeUnwindBlock

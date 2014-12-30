@@ -2,6 +2,6 @@ gem server api
 gemServerTransaction: aBlock
   self
     gemServerTransaction: aBlock
-    onError: [ :ex | 
+    beforeUnwind: [ :ex | 
       "server error is already logged"
        ]

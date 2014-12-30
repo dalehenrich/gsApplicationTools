@@ -3,6 +3,6 @@ gemServerTransaction: aBlock exceptionSet: exceptionSet
   self
     gemServerTransaction: aBlock
     exceptionSet: exceptionSet
-    onError: [ :ex | 
+    beforeUnwind: [ :ex | 
       "server error is already logged"
        ]

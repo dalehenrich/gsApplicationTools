@@ -22,7 +22,7 @@ startBasicServerOn: ignored
                 ifTrue: [ self error: 'internal server error' ].
               self
                 gemServerTransaction: [ self handleAction ]
-                onError: [ :ex | self handleActionError: ex ].
+                beforeUnwind: [ :ex | self handleBeforeUnwind: ex ].
               (Delay forMilliseconds: 500) wait.
               self
                 doTransaction: [ 
@@ -31,7 +31,7 @@ startBasicServerOn: ignored
                       'LOOPCOUNT: ' , loopCount printString , ' : ' , actionCount printString
                     object: self copy ] ]
             exceptionSet: Error
-            onError: [ :ex | 
+            beforeUnwind: [ :ex | 
               self
                 serverError: ex
                 titled: 'top-level service loop'

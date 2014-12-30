@@ -15,7 +15,7 @@ taskServiceThreadBlock: task
           self trace: [ 'end process task [4] ' , task label ] object: [ task ] ] ]
     exceptionSet:
       GemServerRemoteInternalServerErrorTriggerExample , self gemServerExceptionSet
-    onError: [ :ex | 
+    beforeUnwind: [ :ex | 
       task exception: ex.
       (ObjectLogEntry
         error: 'Server example task exception: ' , ex description printString
