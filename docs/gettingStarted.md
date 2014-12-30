@@ -142,7 +142,10 @@ Custom exception handlers are defined for each of the exceptions:
   - gemServerHandleNotificationException:
   - gemServerHandleResumableException:
 
-These methods may be specialized each gem server instance and/or custom behavior may be defined for additional exception classes.
+There are two options for handling exceptions in these methods: 
+- *resume* the exception, in which case processing continues uninterrupted
+- *return* from the method, in which case the stack is unwound to point of the **gemserver:** method call. 
+  The **onError:** block can be used to perform any additional actions that might need to be performed before unwinding the stack.
 
 ###Gem Server Transaction Model
 In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
