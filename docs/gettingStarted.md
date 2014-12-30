@@ -42,9 +42,15 @@ startBasicServerOn: ignored
 This is a classic *forever* loop that performs a task every *delayTimeMs*. 
 
 ###Gem Server Exception Handling
+The **gemServer:** method has default exception handlers for the following exceptions:
+  - **Error**
+  - **Break**
+  - **Breakpoint**
+  - **Halt**
+  - **AlmostOutOfMemory**
+  - **AlmostOutOfStack** 
 
-If an exception (**Error**, **Break**, **Breakpoint**, **Halt**, **AlmostOutOfMemory**, **AlmostOutOfStack** by default) occurs while the **performTasks:** executes the **gemServer:** method has default handling rules defined. 
-For example, when an **Error** is signalled, the following method is called:
+For example, when an **Error** exception is handled, the following method is called:
 
 ```Smalltalk
 gemServerHandleErrorException: exception
@@ -60,7 +66,7 @@ gemServerHandleErrorException: exception
 
 The **logStack:titled:** method snaps off a continuation and saves it to the [object log](#object-log), then dumps a stack trace to the gem log.
 
-Custom exception handling is defined in the following methods:
+Custom exception handlers are defined for each of the exceptions:
   - gemServerHandleAlmostOutOfMemoryException:
   - gemServerHandleAlmostOutOfStackException:
   - gemServerHandleBreakException:
@@ -71,7 +77,7 @@ Custom exception handling is defined in the following methods:
   - gemServerHandleNotificationException:
   - gemServerHandleResumableException:
 
-These methods may be specialized for your particular gem server instance and/or you may define custom behavior for additional exceptions.
+These methods may be specialized each gem server instance and/or custom behavior may be defined for additional exception classes.
 
 ###Gem Server Transaction Model
 In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
