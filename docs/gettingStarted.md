@@ -74,7 +74,7 @@ The **gemServer:** method has default exception handlers for the following excep
   - **AlmostOutOfMemory**
   - **AlmostOutOfStack** 
 
-For example, when an **Error** exception is handled, the following method is called:
+For example, when an **Error** exception is handled, the following method is invoked:
 
 ```Smalltalk
 gemServerHandleErrorException: exception
@@ -84,11 +84,18 @@ gemServerHandleErrorException: exception
     logStack: exception
     titled:
       self name , ' ' , exception class name asString , ' exception encountered: '.
-  self interactiveMode
-    ifTrue: [ exception pass ]
 ```
 
 The **logStack:titled:** method snaps off a continuation and saves it to the [object log](#object-log):
+
+```Smalltalk
+logStack: exception titled: title inTransactionDo: inTransactionBlock
+  self
+    saveContinuationFor: exception
+    titled: title
+    inTransactionDo: inTransactionBlock.
+  self writeGemLogEntryFor: exception titled: title
+```
 
 ```Smalltalk
 saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
