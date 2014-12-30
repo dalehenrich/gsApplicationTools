@@ -1,3 +1,3 @@
-private
-gemClientClass
+accessing
+clientClass
   ^ GemServerRemoteClientParallelProcessingExample

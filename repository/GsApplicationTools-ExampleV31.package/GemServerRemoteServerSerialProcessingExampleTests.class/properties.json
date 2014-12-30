@@ -4,11 +4,11 @@
 		 ],
 	"classvars" : [
 		 ],
-	"commentStamp" : "",
+	"commentStamp" : "dkh 12/30/2014 12:46",
 	"instvars" : [
 		 ],
-	"name" : "GemServerRemoteServerTransactionModelAExample",
+	"name" : "GemServerRemoteServerSerialProcessingExampleTests",
 	"pools" : [
 		 ],
-	"super" : "GemServerRemoteServerExample",
+	"super" : "GemServerRemoteServerExampleTests",
 	"type" : "normal" }
