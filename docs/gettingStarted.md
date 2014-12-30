@@ -3,6 +3,10 @@
 ##Table of Contents
 - [What is a Gem Server](#what-is-a-gemserver)
   - [Gem Server Service Loop](#gem-server-service-loop)
+  - [Gem Server Exception Handling](#gem-server-exception-handling)
+  - [Gem Server Transaction Model](#gem-server-transaction-model)
+    - [Serial Mode](#serial-mode)
+    - [Parallel Mode](#parallel-mode)
 - [Basic Gem Server Structure](#basic-gem-server-structure)
 - [Seaside Gem Servers](#seaside-gem-servers)
 - [ServiceVM Gem Servers](#servicevm-gem-servers)
@@ -41,26 +45,13 @@ startBasicServerOn: ignored
 
 This is a classic *forever* loop that performs a task every *delayTimeMs* (60,000 ms for the maintenance vm). 
 
-Exceptions (Error, Break, Breakpoint, Halt, AlmostOutOfMemory, AlmostOutOfStack by default) are handled by the **gemServer:** method. 
-When an exception occurs, the default behavior is to (see GemServer>>logStack:titled:inTransactionDo:):
-  - snap off a continuation to the object log
-  - dump stack trace to the gem log
+###Gem Server Exception Handling
 
-Custom handling can be defined for each of the exceptions using the following methods:
-  - gemServerHandleAlmostOutOfMemoryException:
-  - gemServerHandleAlmostOutOfStackException:
-  - gemServerHandleBreakException:
-  - gemServerHandleBreakpointException:
-  - gemServerHandleErrorException:
-  - gemServerHandleHaltException:
-  - gemServerHandleNonResumableException:
-  - gemServerHandleNotificationException:
-  - gemServerHandleResumableException:
-
-For example, here is the handling for a non-resumable exception (i.e., Error):
+Exceptions (**Error**, **Break**, **Breakpoint**, **Halt**, **AlmostOutOfMemory**, **AlmostOutOfStack** by default) are handled by the **gemServer:** method. 
+For example, when an **Error** is signalled, the following method is called:
 
 ```Smalltalk
-gemServerHandleNonResumableException: exception
+gemServerHandleErrorException: exception
   "log the stack trace and unwind stack, unless in interactive mode"
 
   self
@@ -71,6 +62,118 @@ gemServerHandleNonResumableException: exception
     ifTrue: [ exception pass ]
 ```
 
+The **logStack:titled:** method snaps off a continuation and saves it to the [object log](#object-log), then dumps a stack trace to the gem log.
+
+Custom exception handling is defined in the following methods:
+  - gemServerHandleAlmostOutOfMemoryException:
+  - gemServerHandleAlmostOutOfStackException:
+  - gemServerHandleBreakException:
+  - gemServerHandleBreakpointException:
+  - gemServerHandleErrorException:
+  - gemServerHandleHaltException:
+  - gemServerHandleNonResumableException:
+  - gemServerHandleNotificationException:
+  - gemServerHandleResumableException:
+
+These methods may be specialized for your particular gem server instance and/or you may define custom behavior for additional exceptions.
+
+###Gem Server Transaction Model
+In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
+The [view of the repository](#gemstone-transaction) is shared by all of the threads in the vm.
+Consequently, one must take great care in managing transaction boundaries when running a multi-threaded application in a *gem server*.
+
+The **GemServer** code has been designed to support two use cases:
+ - Serial Mode
+ - Parallel Mode
+
+####Serial Mode
+####Parallel Mode
+In *parallel mode*, multiple threads may be employed in concurrent operations that by convention only make changes to non-persistent objects. 
+Updates to persistent objects must be made within a critical section that acquires the *transaction mutex* (see `GemServer>>transactionMutex`), performs a begin transaction, updates the persistent objects and finishes with a commit.
+
+For example, in the following code:
+
+```Smalltalk
+| timeInLondon |
+  timeInLondon := (HTTPSocket
+    httpGet: 'http://www.time.org/zones/Europe/London.php')
+    throughAll: 'Europe/London - ';
+    upTo: Character space.
+  UserGlobals
+    at: #'TimeInLondon'
+    put: '(from http://www.time.org), time in London is: ' , timeInLondon
+```
+
+there are two distinct operations:
+  1. the acquisition and parsing of the HTTP request.
+  2. storing the parsed response into a **UserGlobals**, a persistent object.
+
+One can imagine that it should be possible to have 100's of http requests in process at any one time, especially since the response time for HTTP requests can vary all over the map.
+The parsing of the response can easily take place involving only temporary objects.
+It is only necessary to be in transaction when the time is stored into **UserGlobals**.
+
+Here is the recoded to be executable in *parallel mode*:
+
+```Smalltalk
+| timeInLondon |
+  timeInLondon := (HTTPSocket
+    httpGet: 'http://www.time.org/zones/Europe/London.php')
+    throughAll: 'Europe/London - ';
+    upTo: Character space.
+  gemServer doSimpleTransaction: [
+    UserGlobals
+      at: #'TimeInLondon'
+      put: '(from http://www.time.org), time in London is: ' , timeInLondon ].
+```
+
+where **doSimpleTransaction:** is implemented as the following:
+
+```Smalltalk
+doSimpleTransaction: aBlock
+  "I do an unconditional commit. Caller is responsible for restoring proper commit state"
+
+  self transactionMutex
+    critical: [ 
+      | commitResult |
+      [ 
+      System inTransaction
+        ifTrue: [ aBlock value ]
+        ifFalse: [ 
+          self doBeginTransaction.
+          aBlock value ] ]
+        ensure: [ 
+          "workaround for Bug 42963: ensure: block executed twice (don't return from ensure: block)"
+          commitResult := self doCommitTransaction ].
+      ^ commitResult ]
+```
+
+
+
+
+
+A *transaction mutex* is provided (see `GemServer>>transactionMutex`) to help serialize the management of transactions boundaries across multiple threads, however, 
+
+
+Gem servers run in [manual transaction mode](#manual-transaction-mode) in order to avoid excessive [commit record backlogs](#commit-record-backlog). 
+
+In *manual transaction mode* it is necessary to explicitly define transaction boundaries.
+For Seaside, transaction boundaries are defined to correspond to the HTTP request boundaries:
+  1. begin transaction before handling the HTTP request
+  2. commit transaction before returning HTTP response to the clent
+  3. on conflict, abort transaction and retry HTTP request at Step 1.
+
+In [manual transaction mode](#manual-transaction-mode) it can be difficult to correctly define transaction boundaries.
+The following family of methods have been created t
+
+it is necessary to 
+Two methods are supplied for performing a block within a discrete transaction:
+  - doSimpleTransaction:
+  - doComplexTransaction:onConflict:
+
+
+
+
+Two transaction models are supported by the
 The following variants of the **gemServer:** method are defined:
   - gemServer:
   - gemServer:exceptionSet:
@@ -266,6 +369,21 @@ session.*
 
 ---
 
+###Commit Record Backlog
+**Excerpted from [System Administration Guide for GemStone/S 64 Bit][7], Section 4.9**
+
+---
+
+*Sessions only update their view of the repository when they commit or abort. The repository must keep a copy of each session’s view so long as the session is using it, even if other sessions frequently commit changes and create new views (commit records). Storing the original view and all the intermediate views uses up space in the repository, and can result in the repository running out of space. To avoid this problem, all sessions in a busy system should commit or abort regularly.*
+
+*For a session that is not in a transaction, if the number of commit records exceeds the
+value of STN_CR_BACKLOG_THRESHOLD, the Stone repository monitor signals the session to abort by signaling TransactionBacklog (also called “sigAbort”). If the session does not abort, the Stone repository monitor reinitializes the session or terminates it, depending on the value of STN_GEM_LOSTOT_TIMEOUT.*
+
+*Sessions that are in transaction are not subject to losing their view forcibly. Sessions in
+transaction enable receipt of the signal TransactionBacklog, and handle it appropriately, but it is optional. It is important that sessions do not stay in transaction for long periods in busy systems; this can result in the Stone running out of space and shutting down. However, sessions that run in automatic transaction mode are always in transaction; as soon as they commit or abort, they begin a new transaction. (For a discussion of automatic and manual transaction modes, see the “Transactions and Concurrency Control” chapter of the GemStone/S 64 Bit Programming Guide.) *
+
+---
+
 ###Commit Transaction
 **Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.2**
 
@@ -296,7 +414,6 @@ other users in an up-to-date view of the repository.*
 ---
 
 ###GemStone Transaction
-
 **Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.1**
 
 ---
@@ -326,11 +443,36 @@ committed by other users become visible to you...*
 
 ---
 
+###Manual Transaction Mode
+**Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.1**
+
+---
+
+####*Manual transaction mode*
+
+*In this mode, you can be logged in and outside of a transaction. You explicitly control whether your session starts a transaction, makes changes, and commits. Although a transaction is started for you when you log in, you can set the transaction mode to manual, which aborts the current transaction and leaves you outside a transaction. You can subsequently start a transaction when you are ready to commit. Manual transaction mode provides a method of minimizing the transactions, while still managing the repository for concurrent access.*
+
+*In manual transaction mode, you can view the repository, browse objects, and make computations based upon object values. You cannot, however, make your changes permanent, nor can you add any new objects you may have created while outside a transaction. You can start a transaction at any time during a session; you can carry temporary results that you may have computed while outside a transaction into your new transaction, where they can be committed, subject to the usual constraints of conflict-checking.*
+
+---
+
 ###Maintenance VM
 The *maintenance vm* is a gem server that must be run while serving Seaside requests.
 The main job of the *maintenance vm* is to reap expired session state.
 The *maintenance vm* also runs an hourly *mark For collect*.
 For large Seaside installations (a stone where the entire GemStone repository cannot fit into the Shared Page Cache), the *mark for collect* should be moved into a separate gem server and run during off-peak hours.
+
+###Object Log
+The *object log* is a persistent, reduced conflict collection of **ObjectLogEntry** instances.
+An **ObjectLogEntry** records the following information:
+  - *pid* of the gem in which the instance is created
+  - instance creation time stamp
+  - user-defined label
+  - priority (debug, error, fatal, info, interaction, trace, or transcript)
+  - user-defined object
+  - user-defined tag
+
+One can add arbitrary labeled  objects to the *object log*, so it can function as a very sophisticated form of *print statement debugging*.
 
 ###Transaction Conflict
 **Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.2**
@@ -355,9 +497,16 @@ problem.*
 
 ---
 
+####Transaction State
+**Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.1**
+
+---
+---
+
 [1]: https://gemstonesoup.wordpress.com/2007/05/10/porting-application-specific-seaside-threads-to-gemstone/
 [2]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-Topaz-3.2.pdf
 [3]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-ProgGuide-3.2.pdf
 [4]: https://github.com/GsDevKit/Seaside31#seaside31
 [5]: https://github.com/Monty/GemStone_daemontools_setup#daemontools-setup-scripts-for-gemstones-on-ubuntu-or-other-debian-systems
 [6]: http://mmonit.com/monit/
+[7]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-SysAdminGuide-3.2.pdf
