@@ -39,10 +39,34 @@ startBasicServerOn: ignored
         fork.
 ```
 
-This is a classic *forever* loop that performs a task every *delayTimeMs*. 
+This is a classic *forever* loop that performs a task every *delayTimeMs*.
+The task is performed in a block that is passed into the **gemServer:** method. 
+
+The **gemServer:** method is but one method in a family of methods that provide a standardardized set of *gem server* services.
+The services can be divided into two broad categories: [exception handling](#gem-server-exception-handling) and [transaction management](#gem-server-transaction-model).
+
+These methods provide *exception handling* services only:  
+  - gemServer:
+  - gemServer:exceptionSet:
+  - gemServer:exceptionSet:onError:
+  - gemServer:onError:
+These methods provide for *exception handling* and *transaction management*:
+  - gemServerTransaction:
+  - gemServerTransaction:exceptionSet:
+  - gemServerTransaction:exceptionSet:onError:
+  - gemServerTransaction:exceptionSet:onError:onConflict:
+  - gemServerTransaction:onConflict:
+  - gemServerTransaction:onError:
+  - gemServerTransaction:onError:onConflict:
+
+With the **exceptionSet:** argument, you may specify a custom list of exceptions to handle.
+
+With the **onError:** block, you may specify custom processing for errors and non-resumable exceptions beyond the standard logging service. 
+
+With the **onConflict:** block you may specify custom processing in the event of a [commit conflict](#transaction-conflict)
 
 ###Gem Server Exception Handling
-The **gemServer:** method has default exception handlers for the following exceptions:
+The **gemServer:** method has default exception handlers for the following exceptions (the list of default exceptions is slightly different for [GemStone 2.4.x][8]):
   - **Error**
   - **Break**
   - **Breakpoint**
@@ -585,3 +609,4 @@ problem.*
 [5]: https://github.com/Monty/GemStone_daemontools_setup#daemontools-setup-scripts-for-gemstones-on-ubuntu-or-other-debian-systems
 [6]: http://mmonit.com/monit/
 [7]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-SysAdminGuide-3.2.pdf
+[8]: http://gemtalksystems.com/products/gs64/versions24x/
