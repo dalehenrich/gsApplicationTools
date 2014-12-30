@@ -64,7 +64,39 @@ gemServerHandleErrorException: exception
     ifTrue: [ exception pass ]
 ```
 
-The **logStack:titled:** method snaps off a continuation and saves it to the [object log](#object-log), then dumps a stack trace to the gem log.
+The **logStack:titled:** method snaps off a continuation and saves it to the [object log](#object-log):
+
+```Smalltalk
+saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
+  | label |
+  label := title , ': ' , exception description.
+  System inTransaction
+    ifTrue: [ 
+      self createContinuation: label.
+      inTransactionBlock value ]
+    ifFalse: [ 
+      self
+        doTransaction: [ 
+          self createContinuation: label.
+          inTransactionBlock value ] ]
+```
+
+then dumps a stack trace to the gem log:
+
+```Smalltalk
+writeGemLogEntryFor: exception titled: title
+  | stream stack |
+  stack := GsProcess stackReportToLevel: self stackReportLimit.
+  stream := WriteStream on: String new.
+  stream nextPutAll: '----------- ' , title , DateAndTime now printString.
+  stream lf.
+  stream nextPutAll: exception description.
+  stream lf.
+  stream nextPutAll: stack.
+  stream nextPutAll: '-----------'.
+  stream lf.
+  GsFile gciLogServer: stream contents
+```
 
 Custom exception handlers are defined for each of the exceptions:
   - gemServerHandleAlmostOutOfMemoryException:
@@ -92,24 +124,26 @@ updates to persistent objects must be made within a critical section that:
   - updates the persistent objects
   - performs a commit
 
-For convenience, the method `GemServer>>doSimpleTransaction:` has been written to provide a safe way to update persistent objects in "parallel processing mode":
+For convenience, the methods `GemServer>>doTransaction:` and `GemServer>>doTransaction:OnConflict:` have been written to provide a safe way to update persistent objects in *parallel processing mode*:
 
 ```Smalltalk
-doSimpleTransaction: aBlock
-  "I do an unconditional commit. If running in manual transaction mode, the system will be 
-   outside of transaction upon returning. "
+doTransaction: aBlock onConflict: conflictBlock
+  "Perform a transaction. If the transaction fails, evaluate <conflictBlock> with transaction 
+   conflicts dictionary."
 
-  self transactionMutex
-    critical: [ 
-      | commitResult |
-      [ 
-      System inTransaction
-        ifTrue: [ aBlock value ]
-        ifFalse: [ 
-          self doBeginTransaction.
-          aBlock value ] ]
-        ensure: [ commitResult := self doCommitTransaction ].
-      ^ commitResult ]
+  (self doBasicTransaction: aBlock)
+    ifFalse: [ 
+      self doAbortTransaction.
+      conflictBlock value: System transactionConflicts ]
+```
+
+```Smalltalk
+doTransaction: aBlock
+  "Perform a transaction. If the transaction fails, signal an Error."
+
+  self
+    doTransaction: aBlock
+    onConflict: [ :ignored | self error: 'commit conflicts' ]
 ```
 
 Here are the *gem server* methods for invoking *parallel processing mode*:
