@@ -8,7 +8,7 @@ interactiveStartServiceOn: portOrNil transactionMode: mode
     scriptLogEvent:
       '-->>Interactive Start ' , self name , ' on ' , portOrNil printString
     object: self.
-  self doSimpleTransaction: [ self interactiveMode: true ].
+  self doTransaction: [ self interactiveMode: true ].
   self transactionMode: mode.
   mode == #'manualBegin'
     ifTrue: [ self startSigAbortHandling ].

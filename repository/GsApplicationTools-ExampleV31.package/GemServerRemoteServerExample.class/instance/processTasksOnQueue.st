@@ -2,7 +2,7 @@ service instance-server
 processTasksOnQueue
   | tasks |
   self
-    doSimpleTransaction: [ 
+    doTransaction: [ 
       tasks := self queue removeAll.
       self inProcess addAll: tasks ].
   self trace: [ 'tasks [1] ' , tasks size printString ] object: [ tasks copy ].

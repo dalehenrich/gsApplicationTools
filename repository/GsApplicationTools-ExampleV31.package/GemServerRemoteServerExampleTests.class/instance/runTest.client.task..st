@@ -8,6 +8,6 @@ runTest: gemServer client: client task: task
       gemServer tracing
         ifTrue: [ 
           gemServer
-            doSimpleTransaction: [ (ObjectLogEntry trace: task label printString , ' ensure : stopGems') addToLog ] ].
+            doTransaction: [ (ObjectLogEntry trace: task label printString , ' ensure : stopGems') addToLog ] ].
       self stopGems: gemServer ].
   ^ completed

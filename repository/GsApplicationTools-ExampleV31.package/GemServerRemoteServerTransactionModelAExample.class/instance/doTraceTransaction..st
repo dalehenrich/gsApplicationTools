@@ -1,3 +1,3 @@
 transactions-support
 doTraceTransaction: aBlock
-  self doSimpleTransaction: aBlock
+  self doTransaction: aBlock

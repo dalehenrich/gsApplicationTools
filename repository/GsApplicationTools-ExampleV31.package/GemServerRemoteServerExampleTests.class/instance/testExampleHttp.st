@@ -23,5 +23,5 @@ testExampleHttp
         show: each elapsedTime printString ] ]
     ensure: [ 
       gemServer
-        doSimpleTransaction: [ (ObjectLogEntry trace: 'testExampleHttp ensure : stopGems') addToLog ].
+        doTransaction: [ (ObjectLogEntry trace: 'testExampleHttp ensure : stopGems') addToLog ].
       self stopGems: gemServer ]

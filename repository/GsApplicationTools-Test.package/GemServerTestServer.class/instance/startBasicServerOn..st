@@ -25,7 +25,7 @@ startBasicServerOn: ignored
                 onError: [ :ex | self handleActionError: ex ].
               (Delay forMilliseconds: 500) wait.
               self
-                doSimpleTransaction: [ 
+                doTransaction: [ 
                   self
                     logEvent:
                       'LOOPCOUNT: ' , loopCount printString , ' : ' , actionCount printString
@@ -54,7 +54,7 @@ startBasicServerOn: ignored
             do: [ :ex | 
               "Handler for interactive Errors ... record for testing purposes"
               self
-                doSimpleTransaction: [ 
+                doTransaction: [ 
                   (forceBeginTransaction or: [ forceInternalServerError ])
                     ifTrue: [ 
                       "acknowledge event handled"

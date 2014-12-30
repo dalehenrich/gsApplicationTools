@@ -16,4 +16,4 @@ serviceLoop
       self trace: [ 'queue size [1] ' , self queue size printString ] object: [  ].
       self queue size > 0 ]
         whileTrue: [ self processTasksOnQueue ].
-      self doSimpleTransaction: [ currentQueueCounter := qcv ] ]
+      self doTransaction: [ currentQueueCounter := qcv ] ]

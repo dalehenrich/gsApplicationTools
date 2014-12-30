@@ -5,7 +5,7 @@ waitForTasks: taskList gemServer: gemServer
   trace
     ifTrue: [ 
       self
-        doSimpleTransaction: [ 
+        doTransaction: [ 
           (ObjectLogEntry
             trace: '---SCHEDULING tasks (' , taskList size printString , ')'
             object:
@@ -43,7 +43,7 @@ waitForTasks: taskList gemServer: gemServer
               trace
                 ifTrue: [ 
                   self
-                    doSimpleTransaction: [ (ObjectLogEntry trace: '---CRASHED' object: gemServer crashLog) addToLog ] ].
+                    doTransaction: [ (ObjectLogEntry trace: '---CRASHED' object: gemServer crashLog) addToLog ] ].
               ^ {false.
               tasks.
               completed.
@@ -56,7 +56,7 @@ waitForTasks: taskList gemServer: gemServer
               trace
                 ifTrue: [ 
                   self
-                    doSimpleTransaction: [ (ObjectLogEntry trace: task label , ' completed' object: task) addToLog ] ].
+                    doTransaction: [ (ObjectLogEntry trace: task label , ' completed' object: task) addToLog ] ].
               completed add: task.
               tasks remove: task ] ].
       (Delay forSeconds: 1) wait.
@@ -75,7 +75,7 @@ waitForTasks: taskList gemServer: gemServer
           trace
             ifTrue: [ 
               self
-                doSimpleTransaction: [ 
+                doTransaction: [ 
                   (ObjectLogEntry
                     trace: '---EXPIRED'
                     object:
@@ -105,7 +105,7 @@ waitForTasks: taskList gemServer: gemServer
   trace
     ifTrue: [ 
       self
-        doSimpleTransaction: [ 
+        doTransaction: [ 
           (ObjectLogEntry
             trace: '---COMPLETED'
             object:

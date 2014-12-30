@@ -17,7 +17,7 @@ test100Tasks
       | sel |
       sel := taskSelectors atRandom.
       task := client perform: sel.
-      gemServer doSimpleTransaction: [ task label: sel asString ].
+      gemServer doTransaction: [ task label: sel asString ].
       Transcript
         cr;
         show: task label.
@@ -35,5 +35,5 @@ test100Tasks
         show: each label , ': ' , each elapsedTime printString ] ]
     ensure: [ 
       gemServer
-        doSimpleTransaction: [ (ObjectLogEntry trace: 'test100Tasks ensure : stopGems') addToLog ].
+        doTransaction: [ (ObjectLogEntry trace: 'test100Tasks ensure : stopGems') addToLog ].
       self stopGems: gemServer ]

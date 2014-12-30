@@ -4,7 +4,4 @@ gemServerTransaction: aBlock exceptionSet: exceptionSet onError: errorBlock
     gemServerTransaction: aBlock
     exceptionSet: exceptionSet
     onError: errorBlock
-    onConflict: [ :conflicts | 
-      self doAbortTransaction.
-      self
-        doSimpleTransaction: [ ObjectLogEntry warn: 'Commit failure ' object: conflicts ] ]
+    onConflict: [ :conflicts | self doTransaction: [ ObjectLogEntry warn: 'Commit failure ' object: conflicts ] ]

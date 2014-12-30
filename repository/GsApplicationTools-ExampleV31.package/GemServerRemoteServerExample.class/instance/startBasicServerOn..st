@@ -3,7 +3,7 @@ startBasicServerOn: ignored
   "start server in current vm. expected to return."
 
   self
-    doSimpleTransaction: [ 
+    doTransaction: [ 
       "prime the pump"
       currentQueueCounter := 0 ].
   self

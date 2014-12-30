@@ -6,5 +6,5 @@ gemServerTransaction: aBlock exceptionSet: exceptionSet onError: errorBlock onCo
         error:
           'Expected to be outside of transaction. Use doAbortTransaction or doCommitTransaction before calling.' ].
   self
-    doComplexTransaction: [ self gemServer: aBlock exceptionSet: exceptionSet onError: errorBlock ]
+    doTransaction: [ self gemServer: aBlock exceptionSet: exceptionSet onError: errorBlock ]
     onConflict: conflictBlock

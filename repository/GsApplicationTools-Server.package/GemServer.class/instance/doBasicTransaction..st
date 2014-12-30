@@ -1,7 +1,11 @@
 transactions-support
-doSimpleTransaction: aBlock
-  "I do an unconditional commit. If running in manual transaction mode, the system will be outside 
-   of transaction upon returning. "
+doBasicTransaction: aBlock
+  "I do an unconditional commit. 
+   If running in manual transaction mode, the system will be outside of transaction upon 
+    returning.
+   Return true, if the transaction completed without conflicts.
+   If the transaction fails, return false and the caller is responsible for post commit failure
+   processing."
 
   self transactionMutex
     critical: [ 

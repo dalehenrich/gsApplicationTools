@@ -23,5 +23,5 @@ testTimeInLondon
         show: each elapsedTime printString ] ]
     ensure: [ 
       gemServer
-        doSimpleTransaction: [ (ObjectLogEntry trace: 'testTimeInLondon ensure : stopGems') addToLog ].
+        doTransaction: [ (ObjectLogEntry trace: 'testTimeInLondon ensure : stopGems') addToLog ].
       self stopGems: gemServer ]

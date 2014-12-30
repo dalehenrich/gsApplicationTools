@@ -1,7 +1,7 @@
 operations
 outOfMemoryPersistentMethod
   self
-    doSimpleTransaction: [ 
+    doTransaction: [ 
       | set aom |
       set := UserGlobals at: #'GemServer_OutOfMemorySet' put: IdentitySet new.
       aom := 0.

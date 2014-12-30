@@ -8,7 +8,7 @@ taskServiceThreadBlock: task
       self trace: [ 'start process task [3] ' , task label ] object: [ task ].
       [ task processTask: self ]
         ensure: [ 
-          self doSimpleTransaction: [ self inProcess remove: task ].
+          self doTransaction: [ self inProcess remove: task ].
           self trace: [ 'end process task [4] ' , task label ] object: [ task ] ] ]
     exceptionSet:
       GemServerRemoteInternalServerErrorTriggerExample , self gemServerExceptionSet
@@ -16,7 +16,7 @@ taskServiceThreadBlock: task
       true
         ifTrue: [ 
           self
-            doSimpleTransaction: [ 
+            doTransaction: [ 
               task exception: ex.
               (ObjectLogEntry
                 error:
