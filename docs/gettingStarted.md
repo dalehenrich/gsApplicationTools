@@ -46,22 +46,22 @@ The services can be divided into two broad categories: [exception handling](#gem
 
 These methods provide the standard set of *exception handling* services and operate in [parallel processing mode](#parallel-processing-mode):  
   - gemServer:
+  - gemServer:beforeUnwind:
   - gemServer:exceptionSet:
-  - gemServer:exceptionSet:onError:
-  - gemServer:onError:
+  - gemServer:exceptionSet:beforeUnwind:
 
 These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode):
   - gemServerTransaction:
+  - gemServerTransaction:beforeUnwind:
+  - gemServerTransaction:beforeUnwind:onConflict:
   - gemServerTransaction:exceptionSet:
-  - gemServerTransaction:exceptionSet:onError:
-  - gemServerTransaction:exceptionSet:onError:onConflict:
+  - gemServerTransaction:exceptionSet:beforeUnwind:
+  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:
   - gemServerTransaction:onConflict:
-  - gemServerTransaction:onError:
-  - gemServerTransaction:onError:onConflict:
 
 With the **exceptionSet:** argument, you may specify a custom list of exceptions to handle.
 
-With the **onError:** block, you may specify custom processing for errors and non-resumable exceptions beyond the standard logging service. 
+With the **beforeUnwind:** block, you may specify custom processing for exceptions before the stack is unwound. 
 
 With the **onConflict:** block you may specify custom processing in the event of a [commit conflict](#transaction-conflict)
 
@@ -144,8 +144,8 @@ Custom exception handlers are defined for each of the exceptions:
 
 There are two options for handling exceptions in these methods: 
 - *resume* the exception, in which case processing continues uninterrupted
-- *return* from the method, in which case the stack is unwound to point of the **gemserver:** method call. 
-  The **onError:** block can be used to perform any additional actions that might need to be performed before unwinding the stack.
+- *return* from the method, in which case the stack is unwound to point of the **gemServer:** method call. 
+  The **beforeUnwind:** block can be used to perform any additional actions that might need to be performed before unwinding the stack.
 
 ###Gem Server Transaction Model
 In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
@@ -188,17 +188,6 @@ doTransaction: aBlock
           self error: 'commit conflicts - could not log conflict dictionary' ] ]
 ```
 
-Here are the *gem server* methods for invoking *parallel processing mode*:
-  - gemServer:
-  - gemServer:exceptionSet:
-  - gemServer:exceptionSet:onError:
-  - gemServer:onError:
-
-With the **exceptionSet:** argument, you may specify an alternate list of exceptions to handle.
-Make sure that the implementation of **exceptionHandlingForGemServer:** has been correctly defined for each of the exceptions in your alternate list.
-
-With the **onError:** block, you may specify additional processing for exceptions beyond the default logging.
-For a web application, you may want to return a response with the appropriate 4xx or 5xx status.
 
 ####Serial Processing Mode
 It may not always be practical or necessary to employ *parallel processing mode* in a *gem server*.
@@ -210,25 +199,15 @@ The transaction boundaries are managed by the Seaside framework and it is not ne
 
 For concurrent processing, one may run multiple gems in parallel.
 
-Here are the *gem server* methods for invoking *serial processing mode*:
-  - gemServerTransaction:
-  - gemServerTransaction:exceptionSet:
-  - gemServerTransaction:exceptionSet:onError:
-  - gemServerTransaction:exceptionSet:onError:onConflict:
-  - gemServerTransaction:onConflict:
-  - gemServerTransaction:onError:
-  - gemServerTransaction:onError:onConflict:
-
-With the **onConflict:** block you may specify the actions you want taken in the event of a [commit conflict](#transaction-conflict). 
 ####Handling Transaction Conflicts
 The default behavior for the **onConflict:** block is as follows:
 
 ```Smalltalk
-gemServerTransaction: aBlock exceptionSet: exceptionSet onError: errorBlock
+gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock
   self
     gemServerTransaction: aBlock
     exceptionSet: exceptionSet
-    onError: errorBlock
+    beforeUnwind: beforeUnwindBlock
     onConflict: [ :conflicts | 
       self doAbortTransaction.
       self
