@@ -86,7 +86,7 @@ gemServerHandleErrorException: exception
       self name , ' ' , exception class name asString , ' exception encountered: '.
 ```
 
-The **logStack:titled:** method snaps off a continuation and saves it to the [object log](#object-log):
+The **logStack:titled:** method:
 
 ```Smalltalk
 logStack: exception titled: title inTransactionDo: inTransactionBlock
@@ -96,6 +96,8 @@ logStack: exception titled: title inTransactionDo: inTransactionBlock
     inTransactionDo: inTransactionBlock.
   self writeGemLogEntryFor: exception titled: title
 ```
+
+snaps off a continuation and saves it to the [object log](#object-log):
 
 ```Smalltalk
 saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
