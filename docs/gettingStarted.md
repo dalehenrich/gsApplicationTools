@@ -8,7 +8,6 @@
     - [Parallel Processing Mode](#parallel-processing-mode)
     - [Serial Processing Mode](#serial-processing-mode)
     - [Handling Transaction Conflicts](#handling-transaction-conflicts)
-  - [Additional Gem Server Service Loop Considerations](#additional-gem-server-service-loop-considerations)
 - [Basic Gem Server Structure](#basic-gem-server-structure)
 - [Seaside Gem Servers](#seaside-gem-servers)
 - [ServiceVM Gem Servers](#servicevm-gem-servers)
@@ -45,13 +44,13 @@ The task is performed in a block that is passed into the **gemServer:** method.
 The **gemServer:** method is but one method in a family of methods that provide a standardardized set of *gem server* services.
 The services can be divided into two broad categories: [exception handling](#gem-server-exception-handling) and [transaction management](#gem-server-transaction-model).
 
-These methods provide the standard set of *exception handling* services and operate in [parallel processing mode](#parallel-processing-mode) for *transaction management*:  
+These methods provide the standard set of *exception handling* services and operate in [parallel processing mode](#parallel-processing-mode):  
   - gemServer:
   - gemServer:exceptionSet:
   - gemServer:exceptionSet:onError:
   - gemServer:onError:
 
-These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode) for *transaction management*:
+These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode):
   - gemServerTransaction:
   - gemServerTransaction:exceptionSet:
   - gemServerTransaction:exceptionSet:onError:
@@ -228,29 +227,6 @@ The *conflicts* argument to the block is a [transaction conflict dictionary](#tr
 By default, the *transaction conflict dictionary* is written to the [object log](#object-log) for analysis.
 
 For a web server, in addition to logging the *transaction conflict dictionary*, it may make sense to simply retry the request again, as is done for *Seaside*.
-###Additional Gem Server Service Loop Considerations
-It is important to point out the importance of the basic structure or the *gem server* service loop:
-
-```Smalltalk
-startBasicServerOn: ignored
-      [ 
-      [ true ]
-        whileTrue: [ 
-          self gemServer: [ "do some work in parallel processing mode" ] ] ]
-        fork.
-```
-
-or:
-
-```Smalltalk
-startBasicServerOn: ignored
-      [ 
-      [ true ]
-        whileTrue: [ 
-          self gemServerTransaction: [ "do some work in serial processing mode" ] ] ]
-        fork.
-```
-
 
 ###Gem Server Control
 To define a GemServer you specify a name and a list of ports:
