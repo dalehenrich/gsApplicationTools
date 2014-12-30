@@ -50,6 +50,7 @@ These methods provide *exception handling* services only:
   - gemServer:exceptionSet:
   - gemServer:exceptionSet:onError:
   - gemServer:onError:
+
 These methods provide for *exception handling* and *transaction management*:
   - gemServerTransaction:
   - gemServerTransaction:exceptionSet:
