@@ -84,10 +84,10 @@ Consequently, one must take great care in managing transaction boundaries when r
 
 The **GemServer** code has been designed to support two use cases:
 
-  **Serial Mode**
+  - **Serial Mode**
   Where each thread is serialized via a *transaction mutex*.
 
-  **Parallel Mode**
+  - **Parallel Mode**
   Where multiple threads may run in parallel, but all transactions are serialized via a *transaction mutex*.
 
 ####Serial Mode
