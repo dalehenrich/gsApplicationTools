@@ -45,13 +45,13 @@ The task is performed in a block that is passed into the **gemServer:** method.
 The **gemServer:** method is but one method in a family of methods that provide a standardardized set of *gem server* services.
 The services can be divided into two broad categories: [exception handling](#gem-server-exception-handling) and [transaction management](#gem-server-transaction-model).
 
-These methods provide *exception handling* services only:  
+These methods provide the standard set of *exception handling* services and operate in [parallel processing mode](#parallel-processing-mode) for *transaction management*:  
   - gemServer:
   - gemServer:exceptionSet:
   - gemServer:exceptionSet:onError:
   - gemServer:onError:
 
-These methods provide for *exception handling* and *transaction management*:
+These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode) for *transaction management*:
   - gemServerTransaction:
   - gemServerTransaction:exceptionSet:
   - gemServerTransaction:exceptionSet:onError:
