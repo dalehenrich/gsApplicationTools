@@ -4,7 +4,7 @@ basicServerOn: port
 
   | listeningSocket |
   self
-    gemserver: [ 
+    gemServer: [ 
       | requestSocket |
       listeningSocket := self acceptOn: port.
       [ true ]

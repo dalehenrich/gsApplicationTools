@@ -15,12 +15,12 @@ handleRequestFromX: requestSocket
               httpResponse := self processHttpRequest: httpRequest.
               self
                 gemServerTransaction: [ ^ self writeResponse: httpResponse to: requestSocket ]
+                exceptionSet: Error
+                beforeUnwind: [ :ex | ^ self writeServerErrorTo: requestSocket ]
                 onConflict: [ :conflicts | 
                   "log conflict and retry"
                   self
-                    doTransaction: [ ObjectLogEntry error: 'Commit failure ' object: conflicts ] ]
-                exceptionSet: Error
-                beforeUnwind: [ :ex | ^ self writeServerErrorTo: requestSocket ] ].
+                    doTransaction: [ ObjectLogEntry error: 'Commit failure ' object: conflicts ] ] ].
           retryCount := retryCount + 1 ] ]
     exceptionSet: Error
     beforeUnwind: [ :ex | ^ self writeServerErrorTo: requestSocket ]
