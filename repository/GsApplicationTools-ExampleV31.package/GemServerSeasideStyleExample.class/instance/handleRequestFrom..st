@@ -9,19 +9,13 @@ handleRequestFrom: requestSocket
       retryCount := 0.
       [ retryCount < 11 ]
         whileTrue: [ 
-          self
-            gemServer: [ 
-              | httpResponse |
-              httpResponse := self processHttpRequest: httpRequest.
-              self
-                gemServerTransaction: [ ^ self writeResponse: httpResponse to: requestSocket ]
-                onConflict: [ :conflicts | 
-                  "log conflict and retry"
-                  self
-                    doTransaction: [ ObjectLogEntry error: 'Commit failure ' object: conflicts ] ]
-                exceptionSet: Error
-                beforeUnwind: [ :ex | ^ self writeServerErrorTo: requestSocket ] ].
+          "somehow need to be able to exit if there was success"
+          (self
+            processHttpRequest: httpRequest
+            beforeUnwind: [ :ex | ^ self writeServerError: ex to: requestSocket ]
+            from: requestSocket) ~~ #'retry'
+            ifTrue: [ ^ self ].
           retryCount := retryCount + 1 ] ]
     exceptionSet: Error
-    beforeUnwind: [ :ex | ^ self writeServerErrorTo: requestSocket ]
+    beforeUnwind: [ :ex | ^ self writeServerError: ex to: requestSocket ]
     ensure: [ requestSocket close ]
