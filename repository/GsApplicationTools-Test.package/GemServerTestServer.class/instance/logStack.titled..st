@@ -1,7 +1,7 @@
 error handling
-serverError: exception titled: title
+logStack: exception titled: title
   self
-    serverError: exception
+    logStack: exception
     titled: title
     inTransactionDo: [ 
       actionResult := #'internalServerError'.
