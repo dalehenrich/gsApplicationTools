@@ -1,2 +1,2 @@
-private
+http server simulation
 writeServerErrorTo: aSocket
