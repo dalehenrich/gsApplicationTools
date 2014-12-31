@@ -5,5 +5,7 @@ doTransaction: aBlock onConflict: conflictBlock
 
   (self doBasicTransaction: aBlock)
     ifFalse: [ 
+      | conflicts |
+      conflicts := System transactionConflicts.
       self doAbortTransaction.
-      conflictBlock value: System transactionConflicts ]
+      conflictBlock value: conflicts ]

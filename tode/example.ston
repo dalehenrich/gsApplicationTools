@@ -6,6 +6,7 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
       {#(\'help\' $h #\'none\').
       #(\'clear\' nil #\'none\').
       #(\'client\' nil #\'required\').
+      #(\'interactive\' nil #\'none\').
       #(\'model\' nil #\'required\').
       #(\'register\' nil #\'required\').
       #(\'reset\' nil #\'none\').
@@ -22,14 +23,15 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
   opts
     at: \'help\'
     ifAbsent: [ 
-      | result gemServer trace transModel |
-      trace := false.
+      | result gemServer trace transModel interactive |
+      interactive := trace := false.
       opts
         at: \'clear\'
         ifPresent: [ :ignored | topez evaluateCommandString: \'ol clear --age=`1 hour`\' ].
       opts
         at: \'reset\'
         ifPresent: [ :ignored | result := GemServerRemoteTaskExample reset ].
+      opts at: \'interactive\' ifPresent: [ :ignored | interactive := true ].
       opts at: \'trace\' ifPresent: [ :ignored | trace := true ].
       opts at: \'model\' ifPresent: [ :model | transModel := model ].
       opts
@@ -39,21 +41,21 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
           | serverName serverCls |
           opts
             at: \'register\'
-            ifPresent: [ :serverNameArg | serverName := serverNameArg ].
-          transModel = \'A\'
-            ifTrue: [ serverCls := GemServerRemoteServerTransactionModelAExample ]
+            ifPresent: [ :serverNameArg | serverName := serverNameArg .
+          transModel = \'parallel\'
+            ifTrue: [ serverCls := GemServerRemoteServerParallelProcessingExample ]
             ifFalse: [ 
-              transModel = \'B\'
-                ifTrue: [ serverCls := GemServerRemoteServerTransactionModelBExample ] ].
+              transModel = \'serial\'
+                ifTrue: [ serverCls := GemServerRemoteServerSerialProcessingExample ] ].
           serverName
             ifNotNil: [ 
               gemServer := (GemServerRegistry gemServerNamed: serverName)
-                ifNil: [ 
-                  gemServer := (serverCls register: serverName)
-                    tracing: trace;
-                    interactiveMode: true;
-                    yourself ] ].
-          result := gemServer ].
+                ifNil: [ gemServer := serverCls register: serverName ] ].
+          gemServer
+            tracing: trace;
+            interactiveMode: interactive;
+            yourself.
+          result := gemServer] ].
       opts
         at: \'client\'
         ifPresent: [ :taskName | 
@@ -75,13 +77,13 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
             yourself.
           opts
             at: \'server\'
-            ifPresent: [ :serverName | client := (gemServer := GemServerRegistry gemServerNamed: serverName) clientClass new ].
+            ifPresent: [ :serverName | 
+              client := (gemServer := GemServerRegistry gemServerNamed: serverName)
+                clientClass new ].
           task := client perform: (selectors at: taskName).
           task label: taskName.
           client doCommitTransaction.
-          result := client waitForTasks: {task} gemServer: gemServer
-
-].
+          result := client waitForTasks: {task} gemServer: gemServer ].
       opts
         at: \'stop\'
         ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stop ].
@@ -102,8 +104,7 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
   example - example sript utility template
 SYNOPSIS
   example [-h|--help]
-  example --register=<server-name> --model=[A|B] [--trace]
-  example --register=<server-name> --model=[A|B] [--trace]
+  example --register=<server-name> --model=[parallel|serial] [--trace] [--interactive]
   example --unregister=<server-name>
   example --reset
   example --start=<server-name>
@@ -119,8 +120,8 @@ EXAMPLES
   ./example -h
 
   ./example --register=example
-  ./example --register=example --model=A --trace
-  ./example --register=example --model=B --trace
+  ./example --register=example --model=parallel --trace --interactive
+  ./example --register=example --model=serial --trace --interactive
   ./example --unregister=example
   ./example --reset
 
@@ -145,4 +146,4 @@ EXAMPLES
   ./example --client=time --server=example --trace
   ./example --client=warning --server=example --trace
 \'
-        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2014-12-27T08:37:26.3118619918823-08:00']}
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2014-12-31T11:12:50.0536150932312-08:00']}
