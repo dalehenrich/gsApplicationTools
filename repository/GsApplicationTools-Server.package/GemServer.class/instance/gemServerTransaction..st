@@ -1,7 +1,8 @@
 gem server api
 gemServerTransaction: aBlock
-  self
+  ^ self
     gemServerTransaction: aBlock
     beforeUnwind: [ :ex | 
       "server error is already logged"
        ]
+    ensure: [  ]

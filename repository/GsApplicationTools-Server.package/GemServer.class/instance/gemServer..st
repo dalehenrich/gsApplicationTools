@@ -1,7 +1,8 @@
 gem server api
 gemServer: aBlock
-  self
+  ^ self
     gemServer: aBlock
     beforeUnwind: [ :ex | 
       "server error is already logged"
        ]
+    ensure: [  ]

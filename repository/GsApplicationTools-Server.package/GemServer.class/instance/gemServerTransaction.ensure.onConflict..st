@@ -1,10 +1,10 @@
 gem server api
-gemServerTransaction: aBlock onConflict: conflictBlock
+gemServerTransaction: aBlock ensure: ensureBlock onConflict: conflictBlock
   self
     gemServerTransaction: aBlock
     exceptionSet: self gemServerExceptionSet
     beforeUnwind: [ :ex | 
       "server error is already logged"
        ]
-    ensure: [  ]
+    ensure: ensureBlock
     onConflict: conflictBlock

@@ -47,23 +47,39 @@ The services can be divided into two broad categories: [exception handling](#gem
 These methods provide the standard set of *exception handling* services and operate in [parallel processing mode](#parallel-processing-mode):  
   - gemServer:
   - gemServer:beforeUnwind:
+  - gemServer:beforeUnwind:ensure:
+  - gemServer:ensure:
   - gemServer:exceptionSet:
   - gemServer:exceptionSet:beforeUnwind:
+  - gemServer:exceptionSet:beforeUnwind:ensure:
+  - gemServer:exceptionSet:ensure:
 
 These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode):
   - gemServerTransaction:
   - gemServerTransaction:beforeUnwind:
+  - gemServerTransaction:beforeUnwind:ensure:
   - gemServerTransaction:beforeUnwind:onConflict:
+  - gemServerTransaction:beforeUnwind:onConflict:ensure:
+  - gemServerTransaction:ensure:
   - gemServerTransaction:exceptionSet:
   - gemServerTransaction:exceptionSet:beforeUnwind:
+  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:
   - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:
+  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:ensure:
+  - gemServerTransaction:exceptionSet:ensure:
   - gemServerTransaction:onConflict:
+  - gemServerTransaction:onConflict:ensure:
 
-With the **exceptionSet:** argument, you may specify a custom list of exceptions to handle.
+With the **exceptionSet:** argument, you may specify a custom list of exceptions to be handled.
 
-With the **beforeUnwind:** block, you may specify custom processing for exceptions before the stack is unwound. 
+With the **beforeUnwind:** block, you may specify custom exception processing that is invoked after the exception-specific exception handling has run and before the stack is unwound.
+For an HTTP server, this is the point in the stack where you would return a 5xx response.
 
-With the **onConflict:** block you may specify custom processing in the event of a [commit conflict](#transaction-conflict)
+With the **onConflict:** block you may specify custom processing in the event of a [commit conflict](#transaction-conflict). 
+By default, the [transaction conflict dictionary](#transaction-conflict-dictionary) is written to the [object log](#object-log).
+
+With the **ensure:** block, you may specify an processing to be performed when the **gemServer:** call returns.
+Typically the **ensure:** block is used to clean up any resources that may have been alocated for processing, such as sockets or files.
 
 ###Gem Server Exception Handling
 The **gemServer:** method has default exception handlers for the following exceptions (the list of default exceptions is slightly different for [GemStone 2.4.x][8]):
@@ -142,6 +158,16 @@ Custom exception handlers are defined for each of the exceptions:
   - gemServerHandleNotificationException:
   - gemServerHandleResumableException:
 
+These messages are *double dispatched* via the `GemServer>>handleGemServerException:` method:
+
+```Smalltalk
+handleGemServerException: exception
+  "if control is returned to receiver, then exception is treated like an error, i.e., 
+   the beforeUnwindBlock is invoked and stack is unwound."
+
+  ^ exception exceptionHandlingForGemServer: self
+```
+
 There are two options for handling exceptions in these methods: 
 - *resume* the exception, in which case processing continues uninterrupted
 - *return* from the method, in which case the stack is unwound to point of the **gemServer:** method call. 
@@ -160,7 +186,7 @@ updates to persistent objects must be made within a critical section that:
   - updates the persistent objects
   - performs a commit
 
-For convenience, the methods `GemServer>>doTransaction:` and `GemServer>>doTransaction:OnConflict:` have been written to provide a safe way to update persistent objects in *parallel processing mode*:
+For convenience, the methods `GemServer>>doTransaction:` and `GemServer>>doTransaction:onConflict:` provide a safe way to update persistent objects in *parallel processing mode*:
 
 ```Smalltalk
 doTransaction: aBlock onConflict: conflictBlock
@@ -196,6 +222,10 @@ In [Seaside][4] applications, for example, transaction boundaries are defined to
   2. commit transaction before returning HTTP response to the clent
   3. on conflict, abort transaction and retry HTTP request.
 The transaction boundaries are managed by the Seaside framework and it is not necessary to complicate the application code with transaction management.
+
+#####Seaside-style structure...
+```Smalltalk
+```
 
 For concurrent processing, one may run multiple gems in parallel.
 
