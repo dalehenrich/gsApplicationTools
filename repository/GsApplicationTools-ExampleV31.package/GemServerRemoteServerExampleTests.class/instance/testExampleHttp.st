@@ -15,12 +15,7 @@ testExampleHttp
     timesRepeat: [ 
       task := client scheduleExampleHttpTask.
       taskList add: task ].
-  completed := self waitForTasks: taskList gemServer: gemServer client: client.
-  completed
-    do: [ :each | 
-      Transcript
-        cr;
-        show: each elapsedTime printString ] ]
+  self waitForTasks: taskList gemServer: gemServer client: client ]
     ensure: [ 
       gemServer
         doTransaction: [ (ObjectLogEntry trace: 'testExampleHttp ensure : stopGems') addToLog ].

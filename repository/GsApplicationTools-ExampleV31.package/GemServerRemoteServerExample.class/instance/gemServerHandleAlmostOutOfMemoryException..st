@@ -4,8 +4,8 @@ gemServerHandleAlmostOutOfMemoryException: exception
 
   | inTransaction |
   AlmostOutOfMemory enable.
-  inTransaction := false.
-  System inTransaction
+  inTransaction := System inTransaction.
+  inTransaction
     ifTrue: [ 
       inTransaction := true.
       self doCommitTransaction.

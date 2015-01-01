@@ -1,6 +1,6 @@
 tests
 test100Tasks
-  | gemServer taskList client completed |
+  | gemServer taskList client |
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer
     enableCreateContinuations: true;
@@ -27,12 +27,7 @@ test100Tasks
     show:
         '============================TASK SCHEDULING COMPLETE============================'.
   System commitTransaction.
-  completed := self waitForTasks: taskList gemServer: gemServer client: client.
-  completed
-    do: [ :each | 
-      Transcript
-        cr;
-        show: each label , ': ' , each elapsedTime printString ] ]
+  self waitForTasks: taskList gemServer: gemServer client: client ]
     ensure: [ 
       gemServer
         doTransaction: [ (ObjectLogEntry trace: 'test100Tasks ensure : stopGems') addToLog ].

@@ -1,6 +1,6 @@
 tests
 testTimeInLondon
-  | gemServer taskList client completed |
+  | gemServer taskList client |
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer
     enableCreateContinuations: true;
@@ -15,12 +15,7 @@ testTimeInLondon
     timesRepeat: [ 
       task := client scheduleTimeInLondonTask.
       taskList add: task ].
-  completed := self waitForTasks: taskList gemServer: gemServer client: client.
-  completed
-    do: [ :each | 
-      Transcript
-        cr;
-        show: each elapsedTime printString ] ]
+  self waitForTasks: taskList gemServer: gemServer client: client ]
     ensure: [ 
       gemServer
         doTransaction: [ (ObjectLogEntry trace: 'testTimeInLondon ensure : stopGems') addToLog ].

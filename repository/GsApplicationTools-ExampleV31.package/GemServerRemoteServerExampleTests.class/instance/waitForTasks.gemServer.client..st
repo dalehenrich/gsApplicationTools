@@ -15,8 +15,13 @@ waitForTasks: taskList gemServer: gemServer client: client
       cr;
       show:
           index printString , '. ' , task label , ' ::: ' , task isValid printString.
-    task isValid not
+    task isValid
       ifTrue: [ 
+        Transcript
+          cr;
+          tab;
+          show: task label , 'completed in: ' , task elapsedTime printString ]
+      ifFalse: [ 
         Transcript
           cr;
           tab;
@@ -25,5 +30,4 @@ waitForTasks: taskList gemServer: gemServer client: client
   (ar at: 1)
     ifFalse: [ self assert: false description: 'all tasks not complete' ].
   valid := ar at: 4.
-  self assert: valid size = completed size description: 'task validation error'.
-  ^ valid
+  self assert: valid size = completed size description: 'task validation error'

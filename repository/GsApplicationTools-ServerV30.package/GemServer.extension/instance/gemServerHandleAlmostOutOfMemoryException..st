@@ -1,6 +1,6 @@
 *gsapplicationtools-serverv30
 gemServerHandleAlmostOutOfMemoryException: exception
-  "re-enable OOM, log the stack trace and unwind stack unless EVEN in interactive mode"
+  "re-enable OOM, log the stack trace and unwind stack EVEN in interactive mode"
 
   AlmostOutOfMemory enable.
   self

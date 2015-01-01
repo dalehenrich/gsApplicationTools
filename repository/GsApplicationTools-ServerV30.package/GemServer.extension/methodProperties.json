@@ -5,7 +5,7 @@
 	"instance" : {
 		"enableAlmostOutOfMemoryHandling" : "dkh 12/26/2014 13:15",
 		"enableRemoteBreakpointHandling" : "dkh 12/10/2014 16:55",
-		"gemServerHandleAlmostOutOfMemoryException:" : "dkh 12/27/2014 12:35",
+		"gemServerHandleAlmostOutOfMemoryException:" : "dkh 01/01/2015 10:53",
 		"gemServerHandleAlmostOutOfStackException:" : "dkh 12/31/2014 21:22",
 		"gemServerHandleBreakException:" : "dkh 12/24/2014 07:34",
 		"hasNoBreakpointsSet" : "dkh 12/09/2014 14:07",
