@@ -12,7 +12,7 @@ outOfMemoryTempMethod
     whileFalse: [ 
       "consume chunks of memory on stack until we fill up TOC"
       Transcript show: '.'.
-      set add: (Array new: 100000 withAll: Object new) ] ]
+      set add: (Array new: 10000 withAll: Object new) ] ]
     on: AlmostOutOfMemory
     do: [ :ex | 
       aom := true.	"avoid infinite loop"

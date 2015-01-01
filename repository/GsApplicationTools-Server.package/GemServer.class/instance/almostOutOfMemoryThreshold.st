@@ -1,3 +1,3 @@
 server specialization
 almostOutOfMemoryThreshold
-  ^ 85
+  ^ 75

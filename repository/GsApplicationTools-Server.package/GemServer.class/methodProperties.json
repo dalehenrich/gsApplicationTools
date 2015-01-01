@@ -9,7 +9,7 @@
 		"serverClass" : "dkh 11/29/2014 06:32" },
 	"instance" : {
 		"activeProcessIsNative" : "dkh 12/09/2014 14:22",
-		"almostOutOfMemoryThreshold" : "dkh 12/24/2014 10:12",
+		"almostOutOfMemoryThreshold" : "dkh 01/01/2015 13:19",
 		"bounceServerAfterSetOrClearBreakpoints:" : "dkh 12/09/2014 14:12",
 		"bounceServerForBreakpointHandling" : "dkh 12/10/2014 14:48",
 		"clearAllBreakpoints:" : "dkh 12/07/2014 18:24",
