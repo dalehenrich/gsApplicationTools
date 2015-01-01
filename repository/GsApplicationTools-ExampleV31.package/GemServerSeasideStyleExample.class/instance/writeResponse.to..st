@@ -1,2 +1,2 @@
 http server simulation
-writeResponse: httpResponse to: aSocket
+writeResponse: response to: task

@@ -1,15 +1,15 @@
 service instance-server
-basicServerOn: port
+basicServerOn: ignored
   "forked by called"
 
-  | listeningSocket |
   self
     gemServer: [ 
-      | requestSocket |
-      listeningSocket := self acceptOn: port.
-      [ true ]
+      | taskList |
+      taskList := self tasks.
+      [ taskList notEmpty ]
         whileTrue: [ 
-          requestSocket := self listenOn: listeningSocket.
-          [ self handleRequestFrom: requestSocket ] fork ] ]
+          | task |
+          task := taskList first.
+          taskList remove: task.
+          [ self handleRequestFrom: task ] fork ] ]
     exceptionSet: Error
-    ensure: [ listeningSocket ifNotNil: [ listeningSocket close ] ]

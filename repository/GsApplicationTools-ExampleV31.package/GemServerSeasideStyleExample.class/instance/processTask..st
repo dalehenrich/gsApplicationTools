@@ -1,2 +1,2 @@
 http server simulation
-acceptOn: port
+processTask: task

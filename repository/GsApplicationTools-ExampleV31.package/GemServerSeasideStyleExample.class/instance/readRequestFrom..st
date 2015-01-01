@@ -1,2 +1,2 @@
 http server simulation
-readRequestFrom: aSocket
+readRequestFrom: task

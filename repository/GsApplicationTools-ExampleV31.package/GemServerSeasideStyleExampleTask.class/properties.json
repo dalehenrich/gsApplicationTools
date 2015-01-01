@@ -4,11 +4,12 @@
 		 ],
 	"classvars" : [
 		 ],
-	"commentStamp" : "",
+	"commentStamp" : "dkh 01/01/2015 11:31",
 	"instvars" : [
-		"tasks" ],
-	"name" : "GemServerSeasideStyleExample",
+		"request",
+		"response" ],
+	"name" : "GemServerSeasideStyleExampleTask",
 	"pools" : [
 		 ],
-	"super" : "GemServerRemoteAbstractExample",
+	"super" : "Object",
 	"type" : "normal" }

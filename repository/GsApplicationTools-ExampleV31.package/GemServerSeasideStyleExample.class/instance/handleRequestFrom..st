@@ -1,20 +1,17 @@
 service instance-server
-handleRequestFrom: requestSocket
+handleRequestFrom: task
   "forked by caller"
 
   self
     gemServer: [ 
-      | httpRequest retryCount |
-      httpRequest := self readRequestFrom: requestSocket.
+      | retryCount |
       retryCount := 0.
       [ retryCount < 11 ]
         whileTrue: [ 
           self
-            processHttpRequest: httpRequest
-            onSuccess: [ :httpResponse | ^ self writeResponse: httpResponse to: requestSocket ]
-            onError: [ :ex | ^ self writeServerError: ex to: requestSocket ]
-            from: requestSocket.
+            processTask: task
+            onSuccess: [ :response | ^ self writeResponse: response to: task ]
+            onError: [ :ex | ^ self writeServerError: ex to: task ].
           retryCount := retryCount + 1 ] ]
     exceptionSet: Error
-    beforeUnwind: [ :ex | ^ self writeServerError: ex to: requestSocket ]
-    ensure: [ requestSocket close ]
+    beforeUnwind: [ :ex | ^ self writeServerError: ex to: task ]

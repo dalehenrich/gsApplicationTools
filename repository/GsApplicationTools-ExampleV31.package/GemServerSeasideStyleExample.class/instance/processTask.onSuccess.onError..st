@@ -1,11 +1,11 @@
 service instance-server
-processHttpRequest: httpRequest onSuccess: successBlock onError: errorBlock from: requestSocket
+processTask: task onSuccess: successBlock onError: errorBlock
   "Both <successBlock> and errorBlock are expected to do a non-local return.
    If this method returns normally, the request should be retried. "
 
-  | httpResponse |
-  httpResponse := self
-    gemServerTransaction: [ self processHttpRequest: httpRequest ]
+  | taskResult |
+  taskResult := self
+    gemServerTransaction: [ self processTask: task ]
     exceptionSet: Error
     beforeUnwind: errorBlock
     onConflict: [ :conflicts | 
@@ -13,4 +13,4 @@ processHttpRequest: httpRequest onSuccess: successBlock onError: errorBlock from
       self
         doTransaction: [ ObjectLogEntry error: 'Commit failure ' object: conflicts ].
       ^ self	"retry" ].
-  successBlock value: httpResponse
+  successBlock value: taskResult
