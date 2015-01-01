@@ -13,15 +13,13 @@ taskServiceThreadBlock: task
     exceptionSet:
       GemServerRemoteInternalServerErrorTriggerExample , self gemServerExceptionSet
     beforeUnwind: [ :ex | 
-      true
-        ifTrue: [ 
-          self
-            doTransaction: [ 
-              task exception: ex.
-              (ObjectLogEntry
-                error:
-                  'Server example task exception: ' , ex description printString
-                object: task) addToLog ] ] ] ]
+      self
+        doTransaction: [ 
+          task exception: ex.
+          (ObjectLogEntry
+            error:
+              'Server example task exception: ' , ex description printString
+            object: task) addToLog ] ] ]
     ensure: [ 
       activeProcessesMutex
         critical: [ self activeProcesses value remove: Processor activeProcess ifAbsent: [  ] ] ] ]

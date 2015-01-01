@@ -16,6 +16,7 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
           self
             serverError: unexpectedError
             titled: self name , ' Internal Server error handling exception: '.
+          beforeUnwindBlock value: unexpectedError.
           self interactiveMode
             ifTrue: [ unexpectedError pass ].
           unexpectedError return: nil	"unwind error stack" ].

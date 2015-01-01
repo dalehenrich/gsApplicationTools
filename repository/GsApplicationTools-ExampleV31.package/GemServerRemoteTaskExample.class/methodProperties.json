@@ -1,12 +1,12 @@
 {
 	"class" : {
 		"inProcess" : "dkh 12/22/2014 19:47",
-		"initialize" : "dkh 12/22/2014 19:47",
+		"initialize" : "dkh 12/31/2014 21:13",
 		"queue" : "dkh 12/22/2014 19:47",
 		"queueCounterIncrement" : "dkh 12/22/2014 19:47",
 		"queueCounterIndex" : "dkh 12/22/2014 19:47",
 		"queueCounterValue" : "dkh 12/22/2014 19:47",
-		"reset" : "dkh 12/22/2014 19:47",
+		"reset" : "dkh 12/31/2014 21:13",
 		"value:" : "dkh 12/22/2014 19:47" },
 	"instance" : {
 		"addToQueue:" : "dkh 12/30/2014 07:28",
