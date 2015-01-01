@@ -3,8 +3,7 @@ gemServerHandleResumableException: exception
   "in interactive mode pass exception without logging.
    Otherwise, log the stack trace and then resume the exception."
 
-  self interactiveMode
-    ifTrue: [ exception pass ].
+  self doInteractiveModePass: exception.
   self
     logStack: exception
     titled:

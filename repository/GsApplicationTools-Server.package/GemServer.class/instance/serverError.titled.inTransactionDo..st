@@ -4,5 +4,4 @@ serverError: exception titled: title inTransactionDo: inTransactionBlock
     logStack: exception
     titled: title , ' Server error encountered: '
     inTransactionDo: inTransactionBlock.
-  self interactiveMode
-    ifTrue: [ exception pass ]
+  self doInteractiveModePass: exception

@@ -6,5 +6,4 @@ gemServerHandleAlmostOutOfStackException: exception
     logStack: exception
     titled:
       self name , ' ' , exception class name asString , ' exception encountered: '.
-  self interactiveMode
-    ifTrue: [ exception pass ]
+  self doInteractiveModePass: exception
