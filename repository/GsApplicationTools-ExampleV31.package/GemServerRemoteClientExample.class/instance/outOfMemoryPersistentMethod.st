@@ -1,5 +1,9 @@
 operations
 outOfMemoryPersistentMethod
+  Transcript
+    cr;
+    show: 'outOfMemoryPersistentMethod'.
+  self assert: AlmostOutOfMemory enabled.
   self
     doTransaction: [ 
       | set aom |
