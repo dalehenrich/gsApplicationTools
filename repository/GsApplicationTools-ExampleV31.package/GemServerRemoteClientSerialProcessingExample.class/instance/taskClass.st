@@ -1,3 +1,3 @@
 accessing
 taskClass
-  ^ GemServerRemoteTaskTransactionModelBExample
+  ^ GemServerRemoteTaskSerialProcessingExample
