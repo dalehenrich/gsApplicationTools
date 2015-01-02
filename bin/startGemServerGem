@@ -3,6 +3,8 @@
 GemServer="$1"
 Port="$2"
 
+set -e # exit on error
+
 # Debugging controls - uncomemnt and edit debugging env vars as desired:
 
 # The default behaviour is to delete this process's log file if it exits
@@ -36,14 +38,16 @@ else
 fi
 
 if [ "${3}x" = "x" ] ; then
-  ExeArg=
+  ExeArg="-e $(dirname $0)/gem.conf"
 else
   ExeArg="-e $3"
 fi
 
-echo "Starting $GemServer on $Port using $ExeConf ..."
+logFile="${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.log"
 
-cat << EOF | nohup $GEMSTONE/bin/topaz -l ${ExeArg} 2>&1 >> ${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.log &
+echo "Starting $GemServer on $Port exeConf: -$ExeConf- logFile: -$logFile-"
+
+cat << EOF | nohup $GEMSTONE/bin/topaz -l ${ExeArg} >> $logFile 2>&1 &
 
 set user DataCurator pass $GEMSTONE_CURATOR_PASS gems $GEMSTONE_NAME
 
