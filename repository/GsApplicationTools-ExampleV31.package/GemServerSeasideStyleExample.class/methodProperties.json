@@ -4,12 +4,14 @@
 	"instance" : {
 		"basicServerOn:" : "dkh 01/02/2015 09:43",
 		"basicServerProcess:" : "dkh 12/31/2014 14:09",
-		"handleRequestFrom:" : "dkh 01/01/2015 11:38",
-		"processTask:" : "dkh 01/01/2015 11:36",
-		"processTask:onSuccess:onError:" : "dkh 01/01/2015 11:39",
-		"readRequestFrom:" : "dkh 01/01/2015 11:40",
+		"expectedLoopCount" : "dkh 01/02/2015 12:02",
+		"expectedLoopCount:" : "dkh 01/02/2015 12:01",
+		"handleRequestFrom:" : "dkh 01/02/2015 12:13",
+		"processRequest:" : "dkh 01/02/2015 12:14",
+		"processRequest:onSuccess:onError:" : "dkh 01/02/2015 11:31",
 		"requests" : "dkh 01/02/2015 10:21",
 		"requests:" : "dkh 01/02/2015 10:21",
 		"startBasicServerOn:" : "dkh 12/30/2014 17:01",
-		"writeResponse:to:" : "dkh 01/01/2015 11:40",
-		"writeServerError:to:" : "dkh 01/01/2015 11:40" } }
+		"writeApplicationError:to:" : "dkh 01/02/2015 12:16",
+		"writeResponse:to:" : "dkh 01/02/2015 12:15",
+		"writeServerError:to:" : "dkh 01/02/2015 12:16" } }

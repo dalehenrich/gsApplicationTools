@@ -1,0 +1,12 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"gemServerName" : "dkh 01/02/2015 11:10",
+		"runTest:" : "dkh 01/02/2015 11:45",
+		"setUp" : "dkh 01/02/2015 11:10",
+		"startGems:" : "dkh 01/02/2015 11:11",
+		"stopGems:" : "dkh 01/02/2015 11:11",
+		"tearDown" : "dkh 01/02/2015 11:10",
+		"testSeasideStyleSimple" : "dkh 01/02/2015 11:44",
+		"waitAndValidateResponse:" : "dkh 01/02/2015 12:05" } }

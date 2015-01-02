@@ -34,7 +34,7 @@ waitForTasks: taskList gemServer: gemServer
                         , valid size printString , ' queue: '
                         , self queue size printString , ' inProcess: '
                         , self inProcess size printString.
-              crashLog
+              gemServer crashLog
                 do: [ :assoc | 
                   Transcript
                     cr;
@@ -43,7 +43,9 @@ waitForTasks: taskList gemServer: gemServer
               trace
                 ifTrue: [ 
                   self
-                    doTransaction: [ (ObjectLogEntry trace: '---CRASHED' object: gemServer crashLog) addToLog ] ].
+                    doTransaction: [ 
+                      (ObjectLogEntry trace: '---CRASHED' object: gemServer gemServer crashLog)
+                        addToLog ] ].
               ^ {false.
               tasks.
               completed.

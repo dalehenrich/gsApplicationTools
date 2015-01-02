@@ -1,4 +1,3 @@
 accessing
-request: anObject
-
-   request := anObject
+request: requestBlock
+  request := requestBlock

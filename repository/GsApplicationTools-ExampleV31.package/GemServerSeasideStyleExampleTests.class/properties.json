@@ -6,10 +6,9 @@
 		 ],
 	"commentStamp" : "",
 	"instvars" : [
-		"requests",
-		"expectedLoopCount" ],
-	"name" : "GemServerSeasideStyleExample",
+		 ],
+	"name" : "GemServerSeasideStyleExampleTests",
 	"pools" : [
 		 ],
-	"super" : "GemServerRemoteAbstractExample",
+	"super" : "GemServerAbstractTests",
 	"type" : "normal" }

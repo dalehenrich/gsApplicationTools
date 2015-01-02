@@ -1,5 +1,5 @@
 service instance-server
-handleRequestFrom: task
+handleRequestFrom: request
   "forked by caller"
 
   self
@@ -9,9 +9,9 @@ handleRequestFrom: task
       [ retryCount < 11 ]
         whileTrue: [ 
           self
-            processTask: task
-            onSuccess: [ :response | ^ self writeResponse: response to: task ]
-            onError: [ :ex | ^ self writeServerError: ex to: task ].
+            processRequest: request
+            onSuccess: [ :response | ^ self writeResponse: response to: request ]
+            onError: [ :ex | ^ self writeApplicationError: ex to: request ].
           retryCount := retryCount + 1 ] ]
     exceptionSet: Error
-    beforeUnwind: [ :ex | ^ self writeServerError: ex to: task ]
+    beforeUnwind: [ :ex | ^ self writeServerError: ex to: request ]

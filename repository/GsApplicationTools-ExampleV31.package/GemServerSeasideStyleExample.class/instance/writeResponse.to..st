@@ -1,2 +1,4 @@
 http server simulation
-writeResponse: response to: task
+writeResponse: response to: request
+  request response: response.
+  request status: #'success'
