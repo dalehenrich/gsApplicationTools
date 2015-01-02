@@ -5,4 +5,5 @@ tearDown
   super tearDown.
   gemServer
     doCommitTransaction;
-    stopGems
+    stopGems.
+  (Delay forSeconds: 3) wait

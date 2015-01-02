@@ -12,4 +12,3 @@ basicServerOn: ignored
           request := requests first.
           requests remove: request.
           [ self handleRequestFrom: request ] fork ] ]
-    exceptionSet: Error

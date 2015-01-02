@@ -6,7 +6,6 @@ processRequest: request onSuccess: successBlock onError: errorBlock
   | requestResult |
   requestResult := self
     gemServerTransaction: [ self processRequest: request ]
-    exceptionSet: Error
     beforeUnwind: errorBlock
     onConflict: [ :conflicts | 
       "log conflict and retry"

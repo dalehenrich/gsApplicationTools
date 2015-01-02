@@ -4,9 +4,10 @@
 	"instance" : {
 		"gemServerName" : "dkh 01/02/2015 11:10",
 		"runTest:" : "dkh 01/02/2015 11:45",
-		"setUp" : "dkh 01/02/2015 11:10",
+		"setUp" : "dkh 01/02/2015 14:45",
 		"startGems:" : "dkh 01/02/2015 11:11",
 		"stopGems:" : "dkh 01/02/2015 11:11",
-		"tearDown" : "dkh 01/02/2015 11:10",
-		"testSeasideStyleSimple" : "dkh 01/02/2015 11:44",
+		"tearDown" : "dkh 01/02/2015 14:50",
+		"testSeasideStyleError" : "dkh 01/02/2015 14:35",
+		"testSeasideStyleSimple" : "dkh 01/02/2015 12:33",
 		"waitAndValidateResponse:" : "dkh 01/02/2015 12:05" } }

@@ -1,4 +1,4 @@
-tests
+private
 runTest: gemServer
   [ 
   self startGems: gemServer.

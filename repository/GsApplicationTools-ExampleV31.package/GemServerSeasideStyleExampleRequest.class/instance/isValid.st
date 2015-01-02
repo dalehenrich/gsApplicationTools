@@ -6,6 +6,7 @@ isValid
     ifFalse: [ ^ false ].
   self expectedException
     ifNil: [ self exception ifNotNil: [ ^ false ] ]
-    ifNotNIl: [ :expected | 
+    ifNotNil: [ :expected | 
       (self exception isKindOf: expected)
-        ifFalse: [ ^ false ] ]
+        ifFalse: [ ^ false ] ].
+  ^ true

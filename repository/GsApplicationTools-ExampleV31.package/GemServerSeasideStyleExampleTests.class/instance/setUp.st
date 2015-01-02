@@ -1,4 +1,5 @@
 running
 setUp
   super setUp.
-  (self gemServerClass register: self gemServerName) stopGems
+  (GemServerSeasideStyleExample register: self gemServerName) stopGems.
+  System commitTransaction

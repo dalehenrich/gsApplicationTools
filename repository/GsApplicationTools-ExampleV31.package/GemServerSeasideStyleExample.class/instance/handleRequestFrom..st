@@ -13,5 +13,4 @@ handleRequestFrom: request
             onSuccess: [ :response | ^ self writeResponse: response to: request ]
             onError: [ :ex | ^ self writeApplicationError: ex to: request ].
           retryCount := retryCount + 1 ] ]
-    exceptionSet: Error
     beforeUnwind: [ :ex | ^ self writeServerError: ex to: request ]

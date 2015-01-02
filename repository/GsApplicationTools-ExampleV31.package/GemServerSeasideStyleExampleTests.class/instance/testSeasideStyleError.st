@@ -1,15 +1,15 @@
 tests
-testSeasideStyleSimple
+testSeasideStyleError
   | gemServer client |
   gemServer := GemServerRegistry gemServerNamed: self gemServerName.
   gemServer enableCreateContinuations: true.
-  gemServer scriptLogEvent: '---->testSeasideStyleSimple' object: gemServer.
+  gemServer scriptLogEvent: '---->testSeasideStyleError' object: gemServer.
   gemServer
     requests:
       {(GemServerSeasideStyleExampleRequest new
-        request: [ :request | request requestAdd: 3 to: 4 ];
-        expectedResponse: 7;
-        expectedStatus: #'success';
+        request: [ :request | request requestError ];
+        expectedException: Error;
+        expectedStatus: #'error';
         yourself)}.
   gemServer doCommitTransaction.
   self runTest: gemServer

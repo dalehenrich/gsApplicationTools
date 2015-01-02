@@ -1,4 +1,4 @@
-tests
+private
 waitAndValidateResponse: gemServer
   | loopCount done |
   loopCount := 0.
