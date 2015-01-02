@@ -6,7 +6,8 @@
 		 ],
 	"commentStamp" : "",
 	"instvars" : [
-		"tasks" ],
+		"tasks",
+		"requests" ],
 	"name" : "GemServerSeasideStyleExample",
 	"pools" : [
 		 ],

@@ -4,12 +4,12 @@ basicServerOn: ignored
 
   self
     gemServer: [ 
-      | taskList |
-      taskList := self tasks.
-      [ taskList notEmpty ]
+      | requests |
+      requests := self requests.
+      [ requests notEmpty ]
         whileTrue: [ 
-          | task |
-          task := taskList first.
-          taskList remove: task.
-          [ self handleRequestFrom: task ] fork ] ]
+          | request |
+          request := requests first.
+          requests remove: request.
+          [ self handleRequestFrom: request ] fork ] ]
     exceptionSet: Error

@@ -14,7 +14,8 @@ test100Tasks
   taskList := {}.
   true
     ifTrue: [ 
-      self taskList100
+      "trying to find a combo that passes consistently"
+      taskSelectors
         do: [ :sel | 
           task := client perform: sel.
           gemServer doTransaction: [ task label: sel asString ].
@@ -23,16 +24,27 @@ test100Tasks
             show: task label.
           taskList add: task ] ]
     ifFalse: [ 
-      100
-        timesRepeat: [ 
-          | sel |
-          sel := taskSelectors atRandom.
-          task := client perform: sel.
-          gemServer doTransaction: [ task label: sel asString ].
-          Transcript
-            cr;
-            show: task label.
-          taskList add: task ] ].
+      true
+        ifTrue: [ 
+          self taskList100
+            do: [ :sel | 
+              task := client perform: sel.
+              gemServer doTransaction: [ task label: sel asString ].
+              Transcript
+                cr;
+                show: task label.
+              taskList add: task ] ]
+        ifFalse: [ 
+          100
+            timesRepeat: [ 
+              | sel |
+              sel := taskSelectors atRandom.
+              task := client perform: sel.
+              gemServer doTransaction: [ task label: sel asString ].
+              Transcript
+                cr;
+                show: task label.
+              taskList add: task ] ] ].
   Transcript
     cr;
     show:
