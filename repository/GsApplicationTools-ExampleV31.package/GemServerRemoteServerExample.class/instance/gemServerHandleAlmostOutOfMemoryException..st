@@ -3,7 +3,6 @@ gemServerHandleAlmostOutOfMemoryException: exception
   "unwind stack, when commit doesn't gain back temp space."
 
   | inTransaction |
-  AlmostOutOfMemory enable.
   inTransaction := System inTransaction.
   inTransaction
     ifTrue: [ 
@@ -14,7 +13,9 @@ gemServerHandleAlmostOutOfMemoryException: exception
         ifTrue: [ 
           "dropped below the threshold, the commit gained some space, so continue processing."
           self doBeginTransaction.	"put us back in transaction before resuming"
+          AlmostOutOfMemory enable.
           exception resume ] ].
+  AlmostOutOfMemory enable.
   inTransaction
     ifTrue: [ 
       "Put back into transaction before unwinding the stack"
