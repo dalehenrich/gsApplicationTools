@@ -63,7 +63,7 @@ The task itself is performed in a block that is passed into the `gemServer:` met
 
 ###Gem Server Exception Handling
 
-Here's the implementation of the fully qualified `gemServer:exceptionSet:beforeUnwind:ensure:` method:
+Here's the implementation of the `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` method:
 
 ```Smalltalk
 gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock
@@ -91,7 +91,7 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
     ensure: ensureBlock
 ```
 
-The exception handling block in the `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` has been structured to allow for a number of customizations:
+The exception handling block in this method has been structured to allow for a number of customizations:
   1. The `exceptionSet` argument allows you to specify the set of [exceptions to be handled](#gem-server-default-exception-set).
   2. The `GemServer>>handleGemServerException:` method invokes [a custom exception handling method](#gem-server-default-exception-handlers).
   3. If the `GemServer>>handleGemServerException:` method returns, the [`beforeUnwindBlock`](#gem-server-beforunwindblock) is invoked.
