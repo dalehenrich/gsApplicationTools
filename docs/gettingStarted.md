@@ -33,7 +33,7 @@ The **GemServer** class provides a framework for standardized:
 *Gem servers* have been defined for:
   - [Seaside][4] web servers
   - [Zinc][11] web servers
-  - [Zinc][11] WebSocket servers]()
+  - [Zinc][11] WebSocket servers
   - [Zinc][11] REST servers
   - [GsDevKit ServiceVm][10] servers
 
@@ -95,7 +95,7 @@ The exception handling block in the `GemServer>>gemServer:exceptionSet:beforeUnw
   1. The `exceptionSet` argument allows you to specify the set of [exceptions to be handled](#gem-server-default-exception-set).
   2. The `GemServer>>handleGemServerException:` method invokes [a custom exception handling method](#gem-server-default-exception-handlers).
   3. If the `GemServer>>handleGemServerException:` method returns, the [`beforeUnwindBlock`](#gem-server-beforunwindblock) is invoked.
-  4. If the `beforeUnwindBlock` returns...
+  4. If the [`beforeUnwindBlock`](#gem-server-beforunwindblock) returns...
   5. `GemServer>>doInteractiveModePass:`
   6. Handler blocks falls off end and the stack is unwound.
   7. If an error occures while processing steps 3 and 4, ...
@@ -124,7 +124,8 @@ handleGemServerException: exception
   ^ exception exceptionHandlingForGemServer: self
 ```
 
-Secondary methods have been defined for each of the [default exceptions](#gem-server-default-exception-set):
+The `exceptionHandlingForGemServer:` has been implemented in the [default exception classes](#gem-server-default-exception-set).
+The following secondary methods have been defined in the **GemServer** class:
   - gemServerHandleAlmostOutOfMemoryException:
   - gemServerHandleAlmostOutOfStackException:
   - gemServerHandleBreakException:
