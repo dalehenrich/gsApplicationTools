@@ -4,10 +4,17 @@
 - [What is a Gem Server](#what-is-a-gem-server)
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
-  - [Gem Server Transaction Model](#gem-server-transaction-model)
+    - [Gem Server Default Exception Set](#gem-server-default-exception-set)
+    - [Gem Server Default Exception Handlers](#gem-server-default-exception-handlers)
+    - [Gem Server `beforeUnwindBlock`](#gem-server-beforeunwindblock)
+    - [Gem Server Default Exception Logging](#gem-server-default-exception-logging)
+  - [Gem Server Transaction Management](#gem-server-transaction-management)
     - [Parallel Processing Mode](#parallel-processing-mode)
     - [Serial Processing Mode](#serial-processing-mode)
     - [Handling Transaction Conflicts](#handling-transaction-conflicts)
+  - [Gem Server Control](#gem-server-control)
+    - [Gem Server start/stop bash scripts]()
+    - [Gem Server start/stip Smalltalk API]()
 - [Basic Gem Server Structure](#basic-gem-server-structure)
 - [Seaside Gem Servers](#seaside-gem-servers)
 - [ServiceVM Gem Servers](#servicevm-gem-servers)
@@ -18,9 +25,21 @@
 ##What is a Gem Server
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
+The *gem server* is started and stopped by using a [standard Shell script]() or a [Smalltalk api]().
+The **GemServer** class provides a framework for standardized:
+  - [exception handling services](#gem-server-exception-handlers)
+  - [transaction management](#gem-server-transaction-management)
+
+*Gem servers* have been defined for:
+  - [Seaside][4] web servers
+  - [Zinc][11] web servers
+  - [Zinc][11] WebSocket servers]()
+  - [Zinc][11] REST servers
+  - [GsDevKit ServiceVm][10] servers
 
 ###Gem Server Service Loop
 The *service loop* is defined by subclassing the **GemServer** class and implementing a `basicServerOn:` method. 
+
 Here is the `basicServerOn:` method for a [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
@@ -74,7 +93,7 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
 
 The exception handling block in the `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` has been structured to allow for a number of customizations:
   1. The `exceptionSet` argument allows you to specify the set of [exceptions to be handled](#gem-server-default-exception-set).
-  2. The `GemServer>>handleGemServerException:` method invokes [a custom exception handling method](#gem-server-default-exception-handling).
+  2. The `GemServer>>handleGemServerException:` method invokes [a custom exception handling method](#gem-server-default-exception-handlers).
   3. If the `GemServer>>handleGemServerException:` method returns, the [`beforeUnwindBlock`](#gem-server-beforunwindblock) is invoked.
   4. If the `beforeUnwindBlock` returns...
   5. `GemServer>>doInteractiveModePass:`
@@ -93,7 +112,7 @@ Default exception handling has been defined for the following exceptions (the li
   - **AlmostOutOfMemory**
   - **AlmostOutOfStack** 
 
-####Gem Server Default Exception Handling
+####Gem Server Default Exception Handlers
 The *gem server* uses [double dispatching][9] to invoke exception-specific handling behavior.
 The primary method `exceptionHandlingForGemServer:` is sent by the `GemServer>>handleGemServerException:` method:
 
@@ -231,7 +250,7 @@ There are two options for handling exceptions in these methods:
 - *return* from the method, in which case the stack is unwound to point of the **gemServer:** method call. 
   The **beforeUnwind:** block can be used to perform any additional actions that might need to be performed before unwinding the stack.
 
-###Gem Server Transaction Model
+###Gem Server Transaction Management
 In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
 The [view of the repository](#gemstone-transaction) is shared by all of the threads in the vm.
 Consequently, one must take great care in managing transaction boundaries when running a multi-threaded application in a *gem server*.
@@ -398,6 +417,8 @@ By default, the *transaction conflict dictionary* is written to the [object log]
 For a web server, in addition to logging the *transaction conflict dictionary*, it may make sense to simply retry the request again, as is done for *Seaside*.
 
 ###Gem Server Control
+####Gem Server start/stop bash scripts
+####Gem Server start/stip Smalltalk API
 To define a GemServer you specify a name and a list of ports:
 
 ```Smalltalk
@@ -757,3 +778,5 @@ problem.*
 [7]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-SysAdminGuide-3.2.pdf
 [8]: http://gemtalksystems.com/products/gs64/versions24x/
 [9]: http://c2.com/cgi/wiki?DoubleDispatch
+[10]: https://github.com/GsDevKit/ServiceVM#servicevm
+[11]: https://github.com/GsDevKit/zinc
