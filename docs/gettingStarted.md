@@ -13,8 +13,8 @@
     - [Serial Processing Mode](#serial-processing-mode)
     - [Handling Transaction Conflicts](#handling-transaction-conflicts)
   - [Gem Server Control](#gem-server-control)
-    - [Gem Server start/stop bash scripts]()
-    - [Gem Server start/stip Smalltalk API]()
+    - [Gem Server start/stop bash scripts](#gem-server-startstop-bash-scripts)
+    - [Gem Server start/stip Smalltalk API](#gem-server-startstoprestart-smalltalk-api)
 - [Basic Gem Server Structure](#basic-gem-server-structure)
 - [Seaside Gem Servers](#seaside-gem-servers)
 - [ServiceVM Gem Servers](#servicevm-gem-servers)
@@ -420,7 +420,7 @@ For a web server, in addition to logging the *transaction conflict dictionary*, 
 
 ####Gem Server start/stop bash scripts
 
-####Gem Server start/stip Smalltalk API
+####Gem Server start/stop/restart Smalltalk API
 
 To define a GemServer you specify a name and a list of ports:
 
