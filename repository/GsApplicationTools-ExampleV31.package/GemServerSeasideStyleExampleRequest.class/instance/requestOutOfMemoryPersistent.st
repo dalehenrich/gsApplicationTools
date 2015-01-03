@@ -14,4 +14,5 @@ requestOutOfMemoryPersistent
         do: [ :ex | 
           "we'll burn TOC twice to prove that we survived the fist fillup"
           aom := aom + 1.
-          ex pass ] ]
+          ex pass ] ].
+  ^ true

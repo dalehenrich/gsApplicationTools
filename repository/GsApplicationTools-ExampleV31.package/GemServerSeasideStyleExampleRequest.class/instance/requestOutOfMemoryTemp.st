@@ -11,4 +11,5 @@ requestOutOfMemoryTemp
     on: AlmostOutOfMemory
     do: [ :ex | 
       aom := true.	"avoid infinite loop"
-      ex pass ]
+      ex pass ].
+  ^ true

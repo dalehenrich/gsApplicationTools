@@ -1,3 +1,4 @@
 requests
 requestHalt
-  ^ self halt: 'example halt'
+  self halt: 'example halt'.
+  ^ true

@@ -12,4 +12,7 @@ testSeasideStyleError
         expectedStatus: #'error';
         yourself)}.
   gemServer doCommitTransaction.
-  self runTest: gemServer
+  self runTest: gemServer.
+  gemServer errorLog
+    detect: [ :entry | entry object isKindOf: Error ]
+    ifNone: [ self assert: false description: 'no errorLog entry for Error' ]

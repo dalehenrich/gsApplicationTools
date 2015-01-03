@@ -43,9 +43,7 @@ waitForTasks: taskList gemServer: gemServer
               trace
                 ifTrue: [ 
                   self
-                    doTransaction: [ 
-                      (ObjectLogEntry trace: '---CRASHED' object: gemServer gemServer crashLog)
-                        addToLog ] ].
+                    doTransaction: [ (ObjectLogEntry trace: '---CRASHED' object: gemServer crashLog) addToLog ] ].
               ^ {false.
               tasks.
               completed.

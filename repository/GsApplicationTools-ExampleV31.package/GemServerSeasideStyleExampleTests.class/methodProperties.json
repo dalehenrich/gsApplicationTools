@@ -8,6 +8,11 @@
 		"startGems:" : "dkh 01/02/2015 11:11",
 		"stopGems:" : "dkh 01/02/2015 11:11",
 		"tearDown" : "dkh 01/02/2015 14:50",
-		"testSeasideStyleError" : "dkh 01/02/2015 14:35",
+		"testSeasideStyleError" : "dkh 01/02/2015 16:05",
+		"testSeasideStyleHalt" : "dkh 01/02/2015 16:04",
+		"testSeasideStyleOutOfMemoryPersistent" : "dkh 01/02/2015 16:34",
+		"testSeasideStyleOutOfMemoryTemp" : "dkh 01/02/2015 16:38",
 		"testSeasideStyleSimple" : "dkh 01/02/2015 12:33",
+		"testSeasideStyleStackOverflow" : "dkh 01/02/2015 16:30",
+		"testSeasideStyleWarning" : "dkh 01/02/2015 16:06",
 		"waitAndValidateResponse:" : "dkh 01/02/2015 12:05" } }

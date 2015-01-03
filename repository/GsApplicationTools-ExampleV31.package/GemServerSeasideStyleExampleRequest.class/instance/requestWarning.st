@@ -1,3 +1,4 @@
 requests
 requestWarning
-  Warning signal: 'example warning'
+  Warning signal: 'example warning'.
+  ^ true
