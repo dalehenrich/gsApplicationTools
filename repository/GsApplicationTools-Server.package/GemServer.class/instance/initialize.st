@@ -7,4 +7,5 @@ initialize
   interactiveMode := false.
   transactionMode := #'manualBegin'.
   enableCreateContinuations := true.
+  basicServerProcess := TransientValue value: nil.
   self initCrashLog

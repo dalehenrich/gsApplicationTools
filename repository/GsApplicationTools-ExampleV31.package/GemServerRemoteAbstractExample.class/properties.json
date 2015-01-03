@@ -6,7 +6,6 @@
 		 ],
 	"commentStamp" : "",
 	"instvars" : [
-		"serverProcess",
 		"errorLog" ],
 	"name" : "GemServerRemoteAbstractExample",
 	"pools" : [

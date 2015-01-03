@@ -3,7 +3,7 @@ startBasicServerOn: ignored
   "start server in current vm. expected to return."
 
   self
-    serverProcess:
+    basicServerProcess:
       [ 
       | loopCount |
       loopCount := 0.
