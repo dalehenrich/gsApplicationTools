@@ -20,26 +20,27 @@
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
 
 ###Gem Server Service Loop
-The *service loop* is defined by subclassing the **GemServer** class and implementing a **startBasicServerOn:** method. 
-Here is the **startBasicServerOn:** method for a [maintenance vm](#maintenance-vm):
+The *service loop* is defined by subclassing the **GemServer** class and implementing a **basicServerOn:** method. 
+Here is the **basicServerOn:** method for a [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
-startBasicServerOn: ignored
-  self
-    maintenanceProcess:
-      [ 
-      | count |
-      count := 0.
-      [ true ]
-        whileTrue: [ 
-          self gemServer: [ self taskClass performTasks: count ].
-          (Delay forMilliseconds: self delayTimeMs) wait.
-          count := count + 1 ] ]
-        fork.
+basicServerOn: port
+  "forked by caller"
+
+  | count |
+  count := 0.
+  [ true ]
+    whileTrue: [ 
+      self
+        gemServer: [ 
+          "run maintenance tasks"
+          self taskClass performTasks: count ].
+      (Delay forMilliseconds: self delayTimeMs) wait.	"Sleep for a minute"
+      count := count + 1 ]
 ```
 
 This is a classic *forever* loop that performs a task every *delayTimeMs*.
-The task is performed in a block that is passed into the **gemServer:** method. 
+The task itself is performed in a block that is passed into the **gemServer:** method. 
 
 The **gemServer:** method is but one method in a family of methods that provide a standardardized set of *gem server* services.
 The services can be divided into two broad categories: [exception handling](#gem-server-exception-handling) and [transaction management](#gem-server-transaction-model).
@@ -54,32 +55,80 @@ These methods provide the standard set of *exception handling* services and oper
   - gemServer:exceptionSet:beforeUnwind:ensure:
   - gemServer:exceptionSet:ensure:
 
-These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode):
-  - gemServerTransaction:
-  - gemServerTransaction:beforeUnwind:
-  - gemServerTransaction:beforeUnwind:ensure:
-  - gemServerTransaction:beforeUnwind:onConflict:
-  - gemServerTransaction:beforeUnwind:onConflict:ensure:
-  - gemServerTransaction:ensure:
-  - gemServerTransaction:exceptionSet:
-  - gemServerTransaction:exceptionSet:beforeUnwind:
-  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:
-  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:
-  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:ensure:
-  - gemServerTransaction:exceptionSet:ensure:
-  - gemServerTransaction:onConflict:
-  - gemServerTransaction:onConflict:ensure:
-
 With the **exceptionSet:** argument, you may specify a custom list of exceptions to be handled.
 
 With the **beforeUnwind:** block, you may specify custom exception processing that is invoked after the exception-specific exception handling has run and before the stack is unwound.
 For an HTTP server, this is the point in the stack where you would return a 5xx response.
 
+With the **ensure:** block, you may specify an processing to be performed when the **gemServer:** call returns.
+Typically the **ensure:** block is used to clean up any resources that may have been alocated for processing, such as sockets or files.
+
+The __gemServer:*__ methods should be used at the very top of  each *forked* block in your *gem server*:
+
+```Smalltalk
+gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock
+  [ 
+  ^ aBlock
+    on: exceptionSet
+    do: [ :ex | 
+      | exception |
+      [ 
+      "only returns if an error was logged"
+      exception := ex.
+      self handleGemServerException: ex.
+      beforeUnwindBlock value: exception ]
+        on: Error
+        do: [ :unexpectedError | 
+          "error while handling the exception"
+          self
+            serverError: unexpectedError
+            titled: self name , ' Internal Server error handling exception: '.
+          beforeUnwindBlock value: unexpectedError.
+          self doInteractiveModePass: unexpectedError.
+          unexpectedError return: nil	"unwind error stack" ].
+      self doInteractiveModePass: exception.
+      self	"unwind stack" ] ]
+    ensure: ensureBlock
+```
+
+These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode):
+  - gemServerTransaction:
+  - gemServerTransaction:beforeUnwind:
+  - gemServerTransaction:beforeUnwind:ensure:
+  - gemServerTransaction:beforeUnwind:ensure:onConflict:
+  - gemServerTransaction:beforeUnwind:onConflict:
+  - gemServerTransaction:ensure:
+  - gemServerTransaction:ensure:onConflict:
+  - gemServerTransaction:exceptionSet:
+  - gemServerTransaction:exceptionSet:beforeUnwind:
+  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:
+  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:
+  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:
+  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:ensure:
+  - gemServerTransaction:exceptionSet:ensure:
+  - gemServerTransaction:onConflict:
+
 With the **onConflict:** block you may specify custom processing in the event of a [commit conflict](#transaction-conflict). 
 By default, the [transaction conflict dictionary](#transaction-conflict-dictionary) is written to the [object log](#object-log).
 
-With the **ensure:** block, you may specify an processing to be performed when the **gemServer:** call returns.
-Typically the **ensure:** block is used to clean up any resources that may have been alocated for processing, such as sockets or files.
+The __gemServerTransaction:*__ methods should be used to wrap the code that does the work in your *gem server*:
+ 
+```Smalltalk
+gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock onConflict: conflictBlock
+  (System inTransaction and: [ self transactionMode ~~ #'autoBegin' ])
+    ifTrue: [ 
+      self
+        error:
+          'Expected to be outside of transaction. Use doAbortTransaction or doCommitTransaction before calling.' ].
+  self
+    doTransaction: [ 
+      ^ self
+        gemServer: aBlock
+        exceptionSet: exceptionSet
+        beforeUnwind: beforeUnwindBlock
+        ensure: ensureBlock ]
+    onConflict: conflictBlock
+```
 
 ###Gem Server Exception Handling
 The **gemServer:** method has default exception handlers for the following exceptions (the list of default exceptions is slightly different for [GemStone 2.4.x][8]):
@@ -223,11 +272,62 @@ In [Seaside][4] applications, for example, transaction boundaries are defined to
   3. on conflict, abort transaction and retry HTTP request.
 The transaction boundaries are managed by the Seaside framework and it is not necessary to complicate the application code with transaction management.
 
+For concurrent processing, one may run multiple gems in parallel.
+
+
 #####Seaside-style structure...
+
 ```Smalltalk
+basicServerOn: ignored
+  "forked by caller"
+
+  self
+    gemServer: [ 
+      | requests |
+      requests := self requests.
+      [ requests notEmpty ]
+        whileTrue: [ 
+          | request |
+          request := requests first.
+          requests remove: request.
+          [ self handleRequestFrom: request ] fork ] ]
 ```
 
-For concurrent processing, one may run multiple gems in parallel.
+```Smalltalk
+handleRequestFrom: request
+  "forked by caller"
+
+  self
+    gemServer: [ 
+      | retryCount |
+      retryCount := 0.
+      [ retryCount < 11 ]
+        whileTrue: [ 
+          self
+            processRequest: request
+            onSuccess: [ :response | ^ self writeResponse: response to: request ]
+            onError: [ :ex | ^ self writeApplicationError: ex to: request ].
+          retryCount := retryCount + 1 ] ]
+    beforeUnwind: [ :ex | ^ self writeServerError: ex to: request ]
+```
+
+```Smalltalk
+processRequest: request onSuccess: successBlock onError: errorBlock
+  "Both <successBlock> and errorBlock are expected to do a non-local return.
+   If this method returns normally, the request should be retried. "
+
+  | requestResult |
+  requestResult := self
+    gemServerTransaction: [ self processRequest: request ]
+    beforeUnwind: errorBlock
+    onConflict: [ :conflicts | 
+      "log conflict and retry"
+      self
+        doTransaction: [ ObjectLogEntry error: 'Commit failure ' object: conflicts ].
+      ^ self	"retry" ].
+  successBlock value: requestResult
+```
+
 
 ####Handling Transaction Conflicts
 The default behavior for the **onConflict:** block is as follows:
