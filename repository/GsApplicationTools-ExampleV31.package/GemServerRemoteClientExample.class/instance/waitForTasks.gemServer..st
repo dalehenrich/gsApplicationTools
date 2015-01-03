@@ -66,7 +66,7 @@ waitForTasks: taskList gemServer: gemServer
           Transcript
             cr;
             show:
-                'Server timed out: (' , (expectedDelay * 2) printString , ' tasks: '
+                'Server timed out (' , (expectedDelay * 2) printString , ' secs): '
                     , tasks size printString , ' completed: '
                     , completed size printString , ' valid: '
                     , valid size printString , ' queue: '
