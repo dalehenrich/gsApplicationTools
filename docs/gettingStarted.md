@@ -24,6 +24,36 @@
 ##What is a Gem Server
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
+
+The [Topaz][2] process is initiated by launching a [bash script](#gem-server-startstop-bash-scripts) that looks roughly like the following: 
+
+```Shell
+#!/bin/bash
+
+GemServer=$1
+Port=$2
+
+topaz -l << EOF
+set user DataCurator pass swordfish
+login
+run
+(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
+%
+EOF
+```
+
+When you execute a Smalltalk expression in [Topaz][2], control does not return until the expression returns or an unhandled error occurs.
+For example, the following statements will cause [Topaz][2] process exit almost immediately:
+
+```
+run
+[true] whileTrue: [ (Delay forSeconds: 1) wait].
+%
+```
+
+The loop will run until interrupted in the [Topaz][2] process is terminated, or 
+
+
 The *service loop* is defined by subclassing the **GemServer** class and implementing a `basicServerOn:` method. 
 Here is the `basicServerOn:` method for a [maintenance vm](#maintenance-vm):
 
@@ -43,7 +73,10 @@ basicServerOn: port
       count := count + 1 ]
 ```
 
-The *gem server* process is [started and stopped](#gem-server-control) by using a [standard Shell script]() or a [Smalltalk API]().
+
+The *gem server* process is [started and stopped](#gem-server-control) by using a [standard Shell script](#gem-server-startstop-bash-scripts) or a [Smalltalk API](#gem-server-startstoprestart-smalltalk-api). 
+
+
 The **GemServer** class provides a framework for standardized:
   - [exception handling services](#gem-server-exception-handlers)
   - [transaction management](#gem-server-transaction-management)
