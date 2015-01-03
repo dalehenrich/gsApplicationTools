@@ -66,9 +66,9 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
             titled: self name , ' Internal Server error handling exception: '.
           beforeUnwindBlock value: unexpectedError.
           self doInteractiveModePass: unexpectedError.
-          unexpectedError return: nil	"unwind error stack" ].
+          exception return: nil	"unwind stack" ].
       self doInteractiveModePass: exception.
-      self	"unwind stack" ] ]
+      exception return: nil	"unwind stack" ] ]
     ensure: ensureBlock
 ```
 
@@ -128,7 +128,7 @@ gemServerHandleErrorException: exception
       self name , ' ' , exception class name asString , ' exception encountered: '.
 ```
 
-Note that the `GemServer>>gemServerHandleErrorException:` returns, implying that the stack will be unwound after the exception has been looged.
+where the [exception is logged](#gem-server-exception-logging) and the method returns.
 
 For a resumable **Exception**, the `GemServer>>gemServerHandleResumableException:` method is invoked:
 
@@ -145,12 +145,12 @@ gemServerHandleResumableException: exception
   exception resume
 ```
 
-Note that the since `GemServer>>gemServerHandleResumableException:` ends with the exception being resumed, processing will continue uninterrupted, after [exception logging](#gem-server-exception-logging) has taken place.
+As in the case of handling an **Error** the [exception is logged](#gem-server-exception-logging), but instead of returning, the exception is resumed and processing continues uninterrupted.
 
 ####Gem Server `beforeUnwindBlock`
 The `beforeUnwindBlock` gives you a chance to 
 
-####Gem Server Exception Logging
+####Gem Server Default Exception Logging
 
 The __gemServer:*__ methods should be used at the very top of  each *forked* block in your *gem server*:
 
