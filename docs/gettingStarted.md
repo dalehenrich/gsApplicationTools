@@ -1,7 +1,7 @@
 # Getting started with Gem Servers
 
 ##Table of Contents
-- [What is a Gem Server](#what-is-a-gemserver)
+- [What is a Gem Server](#what-is-a-gem-server)
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
   - [Gem Server Transaction Model](#gem-server-transaction-model)
@@ -20,8 +20,8 @@
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
 
 ###Gem Server Service Loop
-The *service loop* is defined by subclassing the **GemServer** class and implementing a **basicServerOn:** method. 
-Here is the **basicServerOn:** method for a [maintenance vm](#maintenance-vm):
+The *service loop* is defined by subclassing the **GemServer** class and implementing a `basicServerOn:` method. 
+Here is the `basicServerOn:` method for a [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
 basicServerOn: port
@@ -40,30 +40,11 @@ basicServerOn: port
 ```
 
 This is a classic *forever* loop that performs a task every *delayTimeMs*.
-The task itself is performed in a block that is passed into the **gemServer:** method. 
+The task itself is performed in a block that is passed into the `gemServer:` method. 
 
-The **gemServer:** method is but one method in a family of methods that provide a standardardized set of *gem server* services.
-The services can be divided into two broad categories: [exception handling](#gem-server-exception-handling) and [transaction management](#gem-server-transaction-model).
+###Gem Server Exception Handling
 
-These methods provide the standard set of *exception handling* services and operate in [parallel processing mode](#parallel-processing-mode):  
-  - gemServer:
-  - gemServer:beforeUnwind:
-  - gemServer:beforeUnwind:ensure:
-  - gemServer:ensure:
-  - gemServer:exceptionSet:
-  - gemServer:exceptionSet:beforeUnwind:
-  - gemServer:exceptionSet:beforeUnwind:ensure:
-  - gemServer:exceptionSet:ensure:
-
-With the **exceptionSet:** argument, you may specify a custom list of exceptions to be handled.
-
-With the **beforeUnwind:** block, you may specify custom exception processing that is invoked after the exception-specific exception handling has run and before the stack is unwound.
-For an HTTP server, this is the point in the stack where you would return a 5xx response.
-
-With the **ensure:** block, you may specify an processing to be performed when the **gemServer:** call returns.
-Typically the **ensure:** block is used to clean up any resources that may have been alocated for processing, such as sockets or files.
-
-The __gemServer:*__ methods should be used at the very top of  each *forked* block in your *gem server*:
+Here's the implementation of the fully qualified `gemServer:exceptionSet:beforeUnwind:ensure:` method:
 
 ```Smalltalk
 gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock
@@ -91,47 +72,20 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
     ensure: ensureBlock
 ```
 
-These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode):
-  - gemServerTransaction:
-  - gemServerTransaction:beforeUnwind:
-  - gemServerTransaction:beforeUnwind:ensure:
-  - gemServerTransaction:beforeUnwind:ensure:onConflict:
-  - gemServerTransaction:beforeUnwind:onConflict:
-  - gemServerTransaction:ensure:
-  - gemServerTransaction:ensure:onConflict:
-  - gemServerTransaction:exceptionSet:
-  - gemServerTransaction:exceptionSet:beforeUnwind:
-  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:
-  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:
-  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:
-  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:ensure:
-  - gemServerTransaction:exceptionSet:ensure:
-  - gemServerTransaction:onConflict:
+The exception handling block in the `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` has been structured to allow for a number of customizations:
+  1. The `exceptionSet` argument allows you to specify the set of [exceptions to be handled](#gem-server-default-exception-set).
+  2. The `GemServer>>handleGemServerException:` method invokes [a custom exception handling method](#gem-server-default-exception-handling).
+  3. If the `GemServer>>handleGemServerException:` method returns, the [`beforeUnwindBlock`](#gem-server-beforunwindblock) is invoked.
+  4. If the `beforeUnwindBlock` returns...
+  5. `GemServer>>doInteractiveModePass:`
+  6. Handler blocks falls off end and the stack is unwound.
+  7. If an error occures while processing steps 3 and 4, ...
+  8. `ensureBlock`.... 
+     Typically the `ensure:` block is used to clean up any resources that may have been alocated for processing, such as sockets or files.
 
-With the **onConflict:** block you may specify custom processing in the event of a [commit conflict](#transaction-conflict). 
-By default, the [transaction conflict dictionary](#transaction-conflict-dictionary) is written to the [object log](#object-log).
 
-The __gemServerTransaction:*__ methods should be used to wrap the code that does the work in your *gem server*:
- 
-```Smalltalk
-gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock onConflict: conflictBlock
-  (System inTransaction and: [ self transactionMode ~~ #'autoBegin' ])
-    ifTrue: [ 
-      self
-        error:
-          'Expected to be outside of transaction. Use doAbortTransaction or doCommitTransaction before calling.' ].
-  self
-    doTransaction: [ 
-      ^ self
-        gemServer: aBlock
-        exceptionSet: exceptionSet
-        beforeUnwind: beforeUnwindBlock
-        ensure: ensureBlock ]
-    onConflict: conflictBlock
-```
-
-###Gem Server Exception Handling
-The **gemServer:** method has default exception handlers for the following exceptions (the list of default exceptions is slightly different for [GemStone 2.4.x][8]):
+####Gem Server Default Exception Set
+Default exception handling has been defined for the following exceptions (the list of default exceptions is slightly different for [GemStone 2.4.x][8]):
   - **Error**
   - **Break**
   - **Breakpoint**
@@ -139,7 +93,30 @@ The **gemServer:** method has default exception handlers for the following excep
   - **AlmostOutOfMemory**
   - **AlmostOutOfStack** 
 
-For example, when an **Error** exception is handled, the following method is invoked:
+####Gem Server Default Exception Handling
+The *gem server* uses [double dispatching][9] to invoke exception-specific handling behavior.
+The primary method `exceptionHandlingForGemServer:` is sent by the `GemServer>>handleGemServerException:` method:
+
+```Smalltalk
+handleGemServerException: exception
+  "if control is returned to receiver, then exception is treated like an error, i.e., 
+   the beforeUnwindBlock is invoked and stack is unwound."
+
+  ^ exception exceptionHandlingForGemServer: self
+```
+
+Secondary methods have been defined for each of the [default exceptions](#gem-server-default-exception-set):
+  - gemServerHandleAlmostOutOfMemoryException:
+  - gemServerHandleAlmostOutOfStackException:
+  - gemServerHandleBreakException:
+  - gemServerHandleBreakpointException:
+  - gemServerHandleErrorException:
+  - gemServerHandleHaltException:
+  - gemServerHandleNonResumableException:
+  - gemServerHandleNotificationException:
+  - gemServerHandleResumableException:
+
+For an **Error** exception, the `GemServer>>gemServerHandleErrorException:` method is invoked:
 
 ```Smalltalk
 gemServerHandleErrorException: exception
@@ -150,6 +127,48 @@ gemServerHandleErrorException: exception
     titled:
       self name , ' ' , exception class name asString , ' exception encountered: '.
 ```
+
+Note that the `GemServer>>gemServerHandleErrorException:` returns, implying that the stack will be unwound after the exception has been looged.
+
+For a resumable **Exception**, the `GemServer>>gemServerHandleResumableException:` method is invoked:
+
+```Smalltalk
+gemServerHandleResumableException: exception
+  "in interactive mode pass exception without logging.
+   Otherwise, log the stack trace and then resume the exception."
+
+  self doInteractiveModePass: exception.
+  self
+    logStack: exception
+    titled:
+      self name , ' ' , exception class name asString , ' exception encountered: '.
+  exception resume
+```
+
+Note that the since `GemServer>>gemServerHandleResumableException:` ends with the exception being resumed, processing will continue uninterrupted, after [exception logging](#gem-server-exception-logging) has taken place.
+
+####Gem Server `beforeUnwindBlock`
+The `beforeUnwindBlock` gives you a chance to 
+
+####Gem Server Exception Logging
+
+The __gemServer:*__ methods should be used at the very top of  each *forked* block in your *gem server*:
+
+
+The __gemServer:*__ family of methods:  
+  - gemServer:
+  - gemServer:beforeUnwind:
+  - gemServer:beforeUnwind:ensure:
+  - gemServer:ensure:
+  - gemServer:exceptionSet:
+  - gemServer:exceptionSet:beforeUnwind:
+  - gemServer:exceptionSet:beforeUnwind:ensure:
+  - gemServer:exceptionSet:ensure:
+
+
+
+The **gemServer:** method has
+
 
 The **logStack:titled:** method:
 
@@ -196,16 +215,6 @@ writeGemLogEntryFor: exception titled: title
   GsFile gciLogServer: stream contents
 ```
 
-Custom exception handlers are defined for each of the exceptions:
-  - gemServerHandleAlmostOutOfMemoryException:
-  - gemServerHandleAlmostOutOfStackException:
-  - gemServerHandleBreakException:
-  - gemServerHandleBreakpointException:
-  - gemServerHandleErrorException:
-  - gemServerHandleHaltException:
-  - gemServerHandleNonResumableException:
-  - gemServerHandleNotificationException:
-  - gemServerHandleResumableException:
 
 These messages are *double dispatched* via the `GemServer>>handleGemServerException:` method:
 
@@ -226,6 +235,45 @@ There are two options for handling exceptions in these methods:
 In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
 The [view of the repository](#gemstone-transaction) is shared by all of the threads in the vm.
 Consequently, one must take great care in managing transaction boundaries when running a multi-threaded application in a *gem server*.
+
+These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode):
+  - gemServerTransaction:
+  - gemServerTransaction:beforeUnwind:
+  - gemServerTransaction:beforeUnwind:ensure:
+  - gemServerTransaction:beforeUnwind:ensure:onConflict:
+  - gemServerTransaction:beforeUnwind:onConflict:
+  - gemServerTransaction:ensure:
+  - gemServerTransaction:ensure:onConflict:
+  - gemServerTransaction:exceptionSet:
+  - gemServerTransaction:exceptionSet:beforeUnwind:
+  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:
+  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:
+  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:
+  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:ensure:
+  - gemServerTransaction:exceptionSet:ensure:
+  - gemServerTransaction:onConflict:
+
+With the **onConflict:** block you may specify custom processing in the event of a [commit conflict](#transaction-conflict). 
+By default, the [transaction conflict dictionary](#transaction-conflict-dictionary) is written to the [object log](#object-log).
+
+The __gemServerTransaction:*__ methods should be used to wrap the code that does the work in your *gem server*:
+ 
+```Smalltalk
+gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock onConflict: conflictBlock
+  (System inTransaction and: [ self transactionMode ~~ #'autoBegin' ])
+    ifTrue: [ 
+      self
+        error:
+          'Expected to be outside of transaction. Use doAbortTransaction or doCommitTransaction before calling.' ].
+  self
+    doTransaction: [ 
+      ^ self
+        gemServer: aBlock
+        exceptionSet: exceptionSet
+        beforeUnwind: beforeUnwindBlock
+        ensure: ensureBlock ]
+    onConflict: conflictBlock
+```
 
 ####Parallel Processing Mode
 In *parallel processing mode* multiple threads may be employed in a *gem server* where 
@@ -708,3 +756,4 @@ problem.*
 [6]: http://mmonit.com/monit/
 [7]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-SysAdminGuide-3.2.pdf
 [8]: http://gemtalksystems.com/products/gs64/versions24x/
+[9]: http://c2.com/cgi/wiki?DoubleDispatch
