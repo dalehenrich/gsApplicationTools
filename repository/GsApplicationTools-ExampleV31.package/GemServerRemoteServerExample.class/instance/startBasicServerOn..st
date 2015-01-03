@@ -6,7 +6,4 @@ startBasicServerOn: ignored
     doTransaction: [ 
       "prime the pump"
       currentQueueCounter := 0 ].
-  self
-    basicServerProcess:
-      [ [ true ] whileTrue: [ self gemServer: [ self serviceLoop ] ] ] fork.
-  self serverInstance: self	"the serverProcess is session-specific"
+  super startBasicServerOn: ignored

@@ -1,5 +1,6 @@
 service instance-server
 startBasicServerOn: port
-  "start server in current vm. expected to return."
+  "start basic server process in current vm. fork and record forked process instance. expected to return."
 
-  self subclassResponsibility
+  self basicServerProcess: [ self basicServerOn: port ] fork.
+  self serverInstance: self	"the serverProcess is session-specific"
