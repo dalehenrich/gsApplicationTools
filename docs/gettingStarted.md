@@ -2,7 +2,6 @@
 
 ##Table of Contents
 - [What is a Gem Server](#what-is-a-gem-server)
-  - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
     - [Gem Server Default Exception Set](#gem-server-default-exception-set)
     - [Gem Server Default Exception Handlers](#gem-server-default-exception-handlers)
@@ -25,21 +24,7 @@
 ##What is a Gem Server
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
-The *gem server* is started and stopped by using a [standard Shell script]() or a [Smalltalk api]().
-The **GemServer** class provides a framework for standardized:
-  - [exception handling services](#gem-server-exception-handlers)
-  - [transaction management](#gem-server-transaction-management)
-
-*Gem servers* have been defined for:
-  - [Seaside][4] web servers
-  - [Zinc][11] web servers
-  - [Zinc][11] WebSocket servers
-  - [Zinc][11] REST servers
-  - [GsDevKit ServiceVm][10] servers
-
-###Gem Server Service Loop
 The *service loop* is defined by subclassing the **GemServer** class and implementing a `basicServerOn:` method. 
-
 Here is the `basicServerOn:` method for a [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
@@ -58,8 +43,17 @@ basicServerOn: port
       count := count + 1 ]
 ```
 
-This is a classic *forever* loop that performs a task every *delayTimeMs*.
-The task itself is performed in a block that is passed into the `gemServer:` method. 
+The *gem server* process is [started and stopped](#gem-server-control) by using a [standard Shell script]() or a [Smalltalk API]().
+The **GemServer** class provides a framework for standardized:
+  - [exception handling services](#gem-server-exception-handlers)
+  - [transaction management](#gem-server-transaction-management)
+
+*Gem servers* have been defined for:
+  - [Seaside][4] web servers
+  - [Zinc][11] web servers
+  - [Zinc][11] WebSocket servers
+  - [Zinc][11] REST servers
+  - [GsDevKit ServiceVm][10] servers
 
 ###Gem Server Exception Handling
 
