@@ -417,8 +417,11 @@ By default, the *transaction conflict dictionary* is written to the [object log]
 For a web server, in addition to logging the *transaction conflict dictionary*, it may make sense to simply retry the request again, as is done for *Seaside*.
 
 ###Gem Server Control
+
 ####Gem Server start/stop bash scripts
+
 ####Gem Server start/stip Smalltalk API
+
 To define a GemServer you specify a name and a list of ports:
 
 ```Smalltalk
