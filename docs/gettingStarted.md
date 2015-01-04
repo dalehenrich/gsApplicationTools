@@ -4,6 +4,8 @@
 - [What is a Gem Server](#what-is-a-gem-server)
   - [Topaz](#topaz)
     - [Topaz Execution Environment](#topaz-execution-environment)
+      - [Block Main Process](#block-main-process)
+      - [Exception Handler protecting forked blocks](#exception-handler-protecting-forked-blocks)
       - [Exceptions to Handle in Topaz](#exceptions-to-handle-in-topaz)
     - [Topaz Transaction Modes](#topaz-transaction-modes)
 - [GemServer class](#gemserver-class)
@@ -21,6 +23,8 @@
       - [`doTransaction:onConflict:`](#dotransactiononconflict)
       - [`doTransaction:`](#dotransaction)
     - [Practical Gem Server Transaction Support](#practical-gem-server-transaction-support)
+      - [Request/Response Gem Server Tasks](#requestresponse-gem-server-tasks)
+      - [I/O Gem Server Tasks](#io-gem-server-tasks)
       - [Parallel Processing Mode](#parallel-processing-mode)
       - [Serial Processing Mode](#serial-processing-mode)
         - [Seaside-style Transaction Model](#seaside-style-transaction-model)
@@ -63,6 +67,7 @@ For *gem server* code to be run in [Topaz][2] you need to do two things:
   1. Ensure that the main Smalltalk process blocks and does not return.
   2. Ensure that all exceptions are handled, including exceptions signalled in processes that have been forked from the main Smalltalk process.
 
+#####Block Main Process
 In essence this entails structuring your *application-specific service loop* to look something like the following:
 
 ```
@@ -78,6 +83,7 @@ run
 The main Smalltalk process is blocked by the infinite `whileTrue:` loop.
 The exception handler is protecting the `"application service loop code"`, so we shouldn't have an *unhandled exception*, as long as the *exceptionSet* is covering the [proper set of exceptions](#exceptions-to-handle-in-topaz).
 
+#####Exception Handler protecting forked blocks
 If we are forking blocks, each of the forked processes must have an exception handler near the top of the stack to guard against *unhandled exceptions* that looks like the following:
 
 ```Smalltalk
@@ -492,7 +498,7 @@ doTransaction: aBlock
 This method dumps the  [conflict dictionary](#transaction-conflict-dictionary) to the [object log](#object-log) and signals an error.
 
 ####Practical Gem Server Transaction Support
-The `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` wraps a transaction around the [``gemServer:exceptionSet:beforeUnwind:ensure:`](#gem-server-exception-handling) method and exports the [`conflictBlock`](#dotransactiononconflict):
+The `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` wraps a transaction around the [`gemServer:exceptionSet:beforeUnwind:ensure:`](#gem-server-exception-handling) method and exports the [`conflictBlock`](#dotransactiononconflict):
 
 ```Smalltalk
 gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock onConflict: conflictBlock
@@ -510,6 +516,28 @@ gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwi
         ensure: ensureBlock ]
     onConflict: conflictBlock
 ```
+
+With only one Smalltalk process in the *transaction critical section* at any one time, you must run separate *gem server* to handle concurrent tasks.
+The shorter you can make the task response time, the fewer *gem servers* that you'll need.
+Long running transactions combined with a large number of *gem servers* can lead to large a [commit record backlogs](#commit-record-backlog), so it is a good idea to make your transactions as short as possible.
+
+In general there are two broad categories of tasks performed by a *gem server*:
+  - Quick hitting, compute intensive [request/response tasks](#requestresponse-gem-server-tasks).
+  - Long running, wait intensive [I/O tasks](#io-gem-server-tasks).
+
+#####Request/Response Gem Server Tasks
+In a quick hitting, request/response *gem server* you should run the request handling logic in a forked process and wrap it with a `gemServerTransaction:*` call like the following:
+
+```Smalltalk
+handleRequest: request for: socket
+  [ 
+  self
+    gemServerTransaction: [ ^self processRequest: request for: socket ]
+    beforeUnwind: [ :ex | ^ self writeServerError: ex to: socket ]
+    ensure: [ socket close ] ] fork
+```
+
+#####I/O Gem Server Tasks
 
 There are several variants of the  `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` available:
   - gemServerTransaction:
