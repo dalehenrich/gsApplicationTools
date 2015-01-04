@@ -25,6 +25,8 @@
   - [Gem Server Debugging](#gem-server-debugging)
 - [Glossary](#glossary)
 
+---
+
 ##What is a Gem Server
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an *application-specific service loop*.
@@ -102,6 +104,8 @@ An [abort transaction](#abort-transaction) updates the transaction view, but doe
 
 The choice of *transaction mode* depends upon the characteristics of your application.
 
+---
+
 ##GemServer class
 As the preceding sections have highlighted there are several issues in the area of *server exception handling* and *server transaction management* that are unique to the GemStone Smalltalk environment.
 The **GemServer** class provides a concise framework for standardized:
@@ -111,6 +115,8 @@ The **GemServer** class provides a concise framework for standardized:
   - [gem server control](#gem-server-control)
   - [gem server logging](#gem-server-default-exception-logging)
   - [gem server debugging](#gem-server-debugging)
+
+---
 
 ###GemServerRegistry class
 The **GemServerRegistry** class provides a registry of named *gem servers*.
@@ -125,6 +131,8 @@ Once an instance has been registered, it may be accessed from the **GemServerReg
 ```Smalltalk
 (GemServerRegistry gemServerNamed: gemName)
 ```
+
+---
 
 ###Gem Server Service Loop
 A *gem server* is associated with one or more ports (a port may be nil).
@@ -210,6 +218,8 @@ basicServerOn: port
       (Delay forMilliseconds: self delayTimeMs) wait.	"Sleep for a minute"
       count := count + 1 ]
 ```
+
+---
 
 ###Gem Server Exception Handling
 The `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` method implements the basic exception handling logic for the **GemServer** class:
@@ -416,6 +426,8 @@ There are two options for handling exceptions in these methods:
 - *return* from the method, in which case the stack is unwound to point of the **gemServer:** method call. 
   The **beforeUnwind:** block can be used to perform any additional actions that might need to be performed before unwinding the stack.
 
+---
+
 ###Gem Server Transaction Management
 ####Which transaction mode for Topaz servers?
 At first blush, [automatic transaction mode](#automatic-transaction-mode) seems to be the most convenient transaction mode for [Topaz][2] servers.
@@ -593,6 +605,8 @@ By default, the *transaction conflict dictionary* is written to the [object log]
 
 For a web server, in addition to logging the *transaction conflict dictionary*, it may make sense to simply retry the request again, as is done for *Seaside*.
 
+---
+
 ###Gem Server Control
 
 ####Gem Server start/stop bash scripts
@@ -631,9 +645,13 @@ This makes it possible to use scripts to start individual gem servers from a pro
 
 The Smalltalk GemServer api uses `System class>>performOnServer:` to launch a bash script for each of the ports associated with the gem server.
 
+---
+
 ###Gem Server Debugging
 ####Interactive Debugging
 ####Remote Debugging
+
+---
 
 ##Glossary
 
