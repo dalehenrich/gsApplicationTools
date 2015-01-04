@@ -103,7 +103,7 @@ The transactional view is only updated when a [begin transaction](#begin-transac
 It is an error to perform a [commit transaction](#commit-transaction) unless preceded by a [begin transaction](#begin-transaction).
 An [abort transaction](#abort-transaction) updates the transaction view, but does not start a transaction.
 
-The choice of *transaction mode* depends upon the characteristics of your application.
+See the [Gem Server Transaction Management](#gem-server-transaction-management) for a description of the *gem server* transaction options.
 
 ---
 
