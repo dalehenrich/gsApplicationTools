@@ -104,77 +104,31 @@ An [abort transaction](#abort-transaction) updates the transaction view, but doe
 
 ##GemServer class
 As the preceding sections have highlighted there are several issues in the area of *server exception handling* and *server transaction management* that are unique to the GemStone Smalltalk environment.
-
-
-The **GemServer** class provides a framework for standardized:
+The **GemServer** class provides a concise framework for standardized:
+  - [service loop definition](#gem-server-service-loop)
   - [exception handling services](#gem-server-exception-handlers)
   - [transaction management](#gem-server-transaction-management)
 
-*Gem servers* have been defined for:
-  - [Seaside][4] web servers
-  - [Zinc][11] web servers
-  - [Zinc][11] WebSocket servers
-  - [Zinc][11] REST servers
-  - [GsDevKit ServiceVm][10] servers
-
-
-
-The [Topaz][2] process that runs the *application-specific service loop* is initiated by launching a [bash script](#gem-server-startstop-bash-scripts).
-
-
-When you execute a Smalltalk expression in [Topaz][2] like the following:
-
-```
-run
-(GemServerRegistry gemServerNamed: 'example') scriptStartServiceOn: 8383.
-%
-```
-
-control does not return until the Smalltalk expression itself returns or an *unhandled exception* is signalled.
-For *gem servers*, we insert the method `GemServer>>startServerOn:` in the call stack and it is blocked by an infinite **Delay** loop:
+The **GemServerRegistry** class provides a registry of named *gem servers*.
+A *gem server* named instance is created by using the `register:` method:
 
 ```Smalltalk
-startServerOn: portOrNil
-  "start server in current vm. Not expected to return."
-
-  self startBasicServerOn: portOrNil.
-  [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
+GemServerTestServer register: 'testServer'.
 ```
 
-While the infinite loop  guarantees that the main process will not return normally, we must still take *unhandled exceptions* into consideration.
-It is important to note that *unhandled exceptions* in processes forked from the main process must also be taken into consideration.
-For example the following [Topaz][2] will return control with an **Error** after 10 seconds:
+Once an instance has been registered, it may be accessed from the **GemServerRegistry** using the `gemServerNamed:` method:
 
+```Smalltalk
+(GemServerRegistry gemServerNamed: gemName)
 ```
-run
-[ (Delay forSeconds: 10) wait. 1 foo] fork.
-[true] whileTrue: [ (Delay forSeconds: 1) wait ].
-%
-```
+
+A *gem server* instance is associated with one or more ports (a port may be nil).
+If there is more than one port, then multiple [Topaz sessions](#gemstone-session) (one for each port)will be launched when the *gem server* is [started](#gem-server-control).
+It is important to note that the single *gem server* instance is shared by all [Topaz sessions](#gemstone-session) and that the *basicServerProcess* and *serverInstance* instance variables are the only two instance variables that are be used to store session-specific (non-persistent) state.
+
 
 ###Gem Server Service Loop
-The `basicServerOn:` method implements the application-specific service loop and is expected to be defined by **GemServer** subclasses.
-
-Here is the `basicServerOn:` method for a [maintenance vm](#maintenance-vm):
-
-```Smalltalk
-basicServerOn: portOrNil
-  "forked by caller"
-
-  | count |
-  count := 0.
-  [ true ]
-    whileTrue: [ 
-      self
-        gemServer: [ 
-          "run maintenance tasks"
-          self taskClass performTasks: count ].
-      (Delay forMilliseconds: self delayTimeMs) wait.	"Sleep for a minute"
-      count := count + 1 ]
-```
-
-The *service loop* is defined by subclassing the **GemServer** class and implementing a `basicServerOn:` method. 
-
+A *gem server* [Topaz session](#gemstone-session) is initiated by calling the [gem server start script](#gem-server-startstop-bash-scripts).
 
 
 ###Gem Server Exception Handling
