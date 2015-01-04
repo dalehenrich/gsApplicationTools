@@ -2,6 +2,8 @@
 
 ##Table of Contents
 - [What is a Gem Server](#what-is-a-gem-server)
+  - [Topaz Execution Environment](#topaz-execution-environment)
+  - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
     - [Gem Server Default Exception Set](#gem-server-default-exception-set)
     - [Gem Server Default Exception Handlers](#gem-server-default-exception-handlers)
@@ -25,36 +27,82 @@
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an *application-specific service loop*.
 
-The [Topaz][2] process that runs the *application-specific service loop* is initiated by launching a [bash script](#gem-server-startstop-bash-scripts) that looks roughly like the following: 
+###Topaz Execution Environment
+
+The [Topaz][2] execution model is very different from the typical Smalltalk execution model:
+
+>> Topaz is a GemStone programming environment that provides keyboard command access
+>> to the GemStone system. Topaz does not require a windowing system and so is a useful,
+>> interface for batch work and for many system administration functions.
+
+Smalltalk code is executed in [Topaz][2] using the `run` command:
 
 ```
-#!/bin/bash
-
-GemServer=$1
-Port=$2
-
-topaz -l << EOF
-
-set user DataCurator pass swordfish
-login
-
 run
-(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
+  3+4
 %
-
-EOF
 ```
+
+Control returns to the [Topaz][2] console when the Smalltalk code itself returns, or an *unhandled exceptions* is encountered.
+When control returns to the console, Smalltalk execution is halted until another [Topaz][2] command is executed.
+For server-style code to be run in [Topaz][2] you need to do two things:
+  1. ensure that the main Smalltalk process blocks
+  2. ensure that all exceptions are handled, including exceptions signalled in processes that have been forked from the main Smalltalk process.
+
+In essence this entails structuring your *application-specific service loop* to look something like the following:
+
+```
+run
+  [ true ]
+    whileTrue: [
+      [ "service code" ]
+        on: exceptionSet
+        do: [:ex | "handle the exception and continue processing" ] ].
+%
+```
+
+The main Smalltalk process is blocked because we have an infinite `whileTrue:` loop.
+The exception handler is protecting the `"service code"`, so we shouldn't have an *unhandled exception*, as long as the *exceptionSet* is covering the proper set of exceptions.
+Of course, if we are forking any processes, each of the forked process must have an exception handler near the top of the stack to gurad against *unhandled exceptions*. 
+
+In GemStone, the top-level exception handler should be defined to handle the following exceptions:
+  - **AlmostOutOfMemory** - Notication signalled when a percent [temporary object space](#temporary-object-space) threshold is exceeded. The [Topaz][2] process will be terminated if [temporary object space](#temporary-object-space) is completely consumed.
+  - **AlmostOutOfStack** - Notification signaled when the 
+  - **Error**
+  - **TransactionBacklog**
+
+When running Smalltalk code in a [Topaz][2] process, one must account for *unhandled exceptions*.
+In a client Smalltalk like [Pharo][12], *unhandled exceptions* result in a debugger window being opened in the [GUI][13].
+In [Topaz][2], *unhandled exceptions* 
+
+
+
+The **GemServer** class provides a framework for standardized:
+  - [exception handling services](#gem-server-exception-handlers)
+  - [transaction management](#gem-server-transaction-management)
+
+*Gem servers* have been defined for:
+  - [Seaside][4] web servers
+  - [Zinc][11] web servers
+  - [Zinc][11] WebSocket servers
+  - [Zinc][11] REST servers
+  - [GsDevKit ServiceVm][10] servers
+
+
+
+The [Topaz][2] process that runs the *application-specific service loop* is initiated by launching a [bash script](#gem-server-startstop-bash-scripts).
+
 
 When you execute a Smalltalk expression in [Topaz][2] like the following:
 
 ```
 run
-(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
+(GemServerRegistry gemServerNamed: 'example') scriptStartServiceOn: 8383.
 %
 ```
 
-control does not return until the Smalltalk expression itself returns or an unhandled exception is signalled.
-For *gem servers*, we insert a method (`GemServer>>startServerOn:`) in the call stack that blocks on an infinite **Delay** loop:
+control does not return until the Smalltalk expression itself returns or an *unhandled exception* is signalled.
+For *gem servers*, we insert the method `GemServer>>startServerOn:` in the call stack and it is blocked by an infinite **Delay** loop:
 
 ```Smalltalk
 startServerOn: portOrNil
@@ -64,72 +112,20 @@ startServerOn: portOrNil
   [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
 ```
 
-This guarantees that the main process will not return normally.
-
-and that the [Topaz][2] process will 
-
-
-
-For example, the following statements will cause [Topaz][2] process exit almost immediately:
+While the infinite loop  guarantees that the main process will not return normally, we must still take *unhandled exceptions* into consideration.
+It is important to note that *unhandled exceptions* in processes forked from the main process must also be taken into consideration.
+For example the following [Topaz][2] will return control with an **Error** after 10 seconds:
 
 ```
 run
-(Delay forSeconds: 1) wait
+[ (Delay forSeconds: 10) wait. 1 foo] fork.
+[true] whileTrue: [ (Delay forSeconds: 1) wait ].
 %
 ```
 
 
-```
-run
-[true] whileTrue: [ (Delay forSeconds: 1) wait].
-%
-```
 
-The loop will run until interrupted in the [Topaz][2] process is terminated, or 
-
-
-
-The `run` command is used to execute Smalltalk expressions in topaz:
-
-```
-run
-(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
-%
-
-```
-
-The `scriptStartServiceOn:` method:
-
-```Smaltalk
-scriptStartServiceOn: portOrNil
-  "called from shell script"
-
-  self
-    scriptServicePrologOn: portOrNil;
-    startServerOn: portOrNil	"does not return"
-
-```
-
-invokes `GemServer>>scriptServicePrologOn:` to set up the [Topaz][2] process for batch processing and calls `GemServer>>startServerOn:`:
-
-```Smalltalk
-startServerOn: portOrNil
-  "start server in current vm. Not expected to return."
-
-  self startBasicServerOn: portOrNil.
-  [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
-```
-
-The `startBasicServerOn:` method:
-
-```Smalltalk
-startBasicServerOn: portOrNil
-  "start basic server process in current vm. fork and record forked process instance. expected to return."
-
-  self basicServerProcess: [ self basicServerOn: portOrNil ] fork.
-  self serverInstance: self	"the serverProcess is session-specific"
-```
-
+###Gem Server Service Loop
 The `basicServerOn:` method implements the application-specific service loop and is expected to be defined by **GemServer** subclasses.
 
 Here is the `basicServerOn:` method for a [maintenance vm](#maintenance-vm):
@@ -150,27 +146,9 @@ basicServerOn: portOrNil
       count := count + 1 ]
 ```
 
-
-
-
 The *service loop* is defined by subclassing the **GemServer** class and implementing a `basicServerOn:` method. 
 
 
-
-
-The *gem server* process is [started and stopped](#gem-server-control) by using a [standard Shell script](#gem-server-startstop-bash-scripts) or a [Smalltalk API](#gem-server-startstoprestart-smalltalk-api). 
-
-
-The **GemServer** class provides a framework for standardized:
-  - [exception handling services](#gem-server-exception-handlers)
-  - [transaction management](#gem-server-transaction-management)
-
-*Gem servers* have been defined for:
-  - [Seaside][4] web servers
-  - [Zinc][11] web servers
-  - [Zinc][11] WebSocket servers
-  - [Zinc][11] REST servers
-  - [GsDevKit ServiceVm][10] servers
 
 ###Gem Server Exception Handling
 
@@ -795,6 +773,24 @@ committed by other users become visible to you...*
 
 ---
 
+###GEM\_MAX\_SMALLTALK\_STACK_DEPTH
+
+---
+
+*GEM_MAX_SMALLTALK_STACK_DEPTH determines the size of the GemStone Smalltalk
+execution stack space that is allocated when the Gem logs in. The unit is the approximate
+number of method activations in the stack. This setting causes heap memory allocation of
+approximately 64 bytes per activation. Exceeding the stack depth results in generation of
+the error RT_ERR_STACK_LIMIT.*
+
+*Min: 100*
+
+*Max: 1000000*
+
+*Default: 1000*
+
+---
+
 ###Manual Transaction Mode
 **Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.1**
 
@@ -825,6 +821,31 @@ An **ObjectLogEntry** records the following information:
   - user-defined tag
 
 One can add arbitrary labeled  objects to the *object log*, so it can function as a very sophisticated form of *print statement debugging*.
+
+
+###Temporary Object Space
+**Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 14.3**
+
+---
+
+*The temporary object space cache is used to store temporary objects created by your
+application. Each Gem session has a temporary object memory that is private to the Gem
+process and its corresponding session. When you fault persistent (committed) objects into
+your application, they are copied to temporary object memory.*
+
+*Some of these objects may ultimately become permanent and reside on the disk, but
+probably not all of them. Temporary objects that your application creates merely in order
+to do its work reside in temporary object space until they are no longer needed, when the
+Gem’s garbage collector reclaims the storage they use.*
+
+*It is important to provide sufficient temporary object space. At the same time, you must
+design your application so that it does not create an infinite amount of reachable
+temporary objects. Temporary object memory must be large enough to accommodate the
+sum of live temporary objects and modified persistent objects. It that sum exceeds the
+allocated temporary object memory, the Gem can encounter an OutOfMemory condition
+and terminate.*
+
+---
 
 ###Transaction Conflict
 **Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.2**
@@ -895,3 +916,5 @@ problem.*
 [9]: http://c2.com/cgi/wiki?DoubleDispatch
 [10]: https://github.com/GsDevKit/ServiceVM#servicevm
 [11]: https://github.com/GsDevKit/zinc
+[12]: http://pharo.org/
+[13]: http://pharo.org/web/files/screenshots/debugger.png
