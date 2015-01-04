@@ -4,6 +4,7 @@
 - [What is a Gem Server](#what-is-a-gem-server)
   - [Topaz](#topaz)
     - [Topaz Execution Environment](#topaz-execution-environment)
+      - [Exceptions to Handle in Topaz](#exceptions-to-handle-in-topaz)
     - [Topaz Transaction Modes](#topaz-transaction-modes)
 - [GemServer](#gemserver)
   - [Gem Server Service Loop](#gem-server-service-loop)
@@ -67,8 +68,8 @@ run
 %
 ```
 
-The main Smalltalk process is blocked because we have an infinite `whileTrue:` loop.
-The exception handler is protecting the `"application service loop code"`, so we shouldn't have an *unhandled exception*, as long as the *exceptionSet* is covering the proper set of exceptions.
+The main Smalltalk process is blocked by the infinite `whileTrue:` loop.
+The exception handler is protecting the `"application service loop code"`, so we shouldn't have an *unhandled exception*, as long as the *exceptionSet* is covering the [proper set of exceptions](#exceptions-to-handle-in-topaz).
 If we are forking blocks, each of the forked processes must have an exception handler near the top of the stack to guard against *unhandled exceptions* that looks like the following:
 
 ```Smalltalk
@@ -78,6 +79,7 @@ If we are forking blocks, each of the forked processes must have an exception ha
     do: [:ex | "handle the exception and continue processing" ] ] fork
 ```
 
+#####Exceptions to Handle in Topaz
 In GemStone, the exception handlers should be defined to handle the following exceptions:
   - **AlmostOutOfMemory** - Notication signalled when a percent [temporary object space](#temporary-object-space) threshold is exceeded. The [Topaz][2] process will be terminated if [temporary object space](#temporary-object-space) is completely consumed. A typical handler will do a commit to cause persistent objects to be flushed from [temporary object space](#temporary-object-space) to disk. If a significant amount of [temporary object space](#temporary-object-space) is being consumed on the stack, then logging a stack trace and unwinding the stack may be called for. 
   - **AlmostOutOfStack** - Notification signaled when the size of the current execution stack is about to exceed the [max execution stack depth](#gem_max_smalltalk_stack_depth). Again, the [Topaz][2] process will be terminated if the notification is not heeded. A typical handler will log a stack trace and unwind the stack.
