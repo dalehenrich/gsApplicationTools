@@ -41,8 +41,53 @@ login
 run
 (GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
 %
+
 EOF
 ```
+
+When you execute a Smalltalk expression in [Topaz][2] like the following:
+
+```
+run
+(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
+%
+```
+
+control does not return until the Smalltalk expression itself returns or an unhandled exception is signalled.
+For *gem servers*, we insert a method (`GemServer>>startServerOn:`) in the call stack that blocks on an infinite **Delay** loop:
+
+```Smalltalk
+startServerOn: portOrNil
+  "start server in current vm. Not expected to return."
+
+  self startBasicServerOn: portOrNil.
+  [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
+```
+
+This guarantees that the main process will not return normally.
+
+and that the [Topaz][2] process will 
+
+
+
+For example, the following statements will cause [Topaz][2] process exit almost immediately:
+
+```
+run
+(Delay forSeconds: 1) wait
+%
+```
+
+
+```
+run
+[true] whileTrue: [ (Delay forSeconds: 1) wait].
+%
+```
+
+The loop will run until interrupted in the [Topaz][2] process is terminated, or 
+
+
 
 The `run` command is used to execute Smalltalk expressions in topaz:
 
@@ -106,24 +151,6 @@ basicServerOn: portOrNil
 ```
 
 
-
-When you execute a Smalltalk expression in [Topaz][2], control does not return until the expression returns or an unhandled error occurs.
-For example, the following statements will cause [Topaz][2] process exit almost immediately:
-
-```
-run
-(Delay forSeconds: 1) wait
-%
-```
-
-
-```
-run
-[true] whileTrue: [ (Delay forSeconds: 1) wait].
-%
-```
-
-The loop will run until interrupted in the [Topaz][2] process is terminated, or 
 
 
 The *service loop* is defined by subclassing the **GemServer** class and implementing a `basicServerOn:` method. 
