@@ -6,8 +6,7 @@
     - [Topaz Execution Environment](#topaz-execution-environment)
       - [Exceptions to Handle in Topaz](#exceptions-to-handle-in-topaz)
     - [Topaz Transaction Modes](#topaz-transaction-modes)
-    - [Which transaction mode for Topaz servers?](#which-transaction-mode-for-topaz-servers)
-- [GemServer](#gemserver)
+- [GemServer class](#gemserver-class)
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
     - [Gem Server Default Exception Set](#gem-server-default-exception-set)
@@ -15,6 +14,7 @@
     - [Gem Server `beforeUnwindBlock`](#gem-server-beforeunwindblock)
     - [Gem Server Default Exception Logging](#gem-server-default-exception-logging)
   - [Gem Server Transaction Management](#gem-server-transaction-management)
+    - [Which transaction mode for Topaz servers?](#which-transaction-mode-for-topaz-servers)
     - [Parallel Processing Mode](#parallel-processing-mode)
     - [Serial Processing Mode](#serial-processing-mode)
     - [Handling Transaction Conflicts](#handling-transaction-conflicts)
@@ -102,18 +102,9 @@ The transactional view is only updated when a [begin transaction](#begin-transac
 It is an error to perform a [commit transaction](#commit-transaction) unless preceded by a [begin transaction](#begin-transaction).
 An [abort transaction](#abort-transaction) updates the transaction view, but does not start a transaction.
 
-####Which transaction mode for Topaz servers?
-At first blush, [automatic transaction mode](#automatic-transaction-mode) seems to be the most convenient transaction mode for [Topaz][2] servers.
-With the system always in transaction one should never get an error doing a [commit transaction](#commit-transaction) weithout a preceding [begin transaction](#begin-transaction).
-However, if you are making use of multiple concurrent processes, there are advantages to using [manual transaction mode](#manual-transaction-mode).
+##GemServer class
+As the preceding sections have highlighted there are several issues in the area of *server exception handling* and *server transaction management* that are unique to the GemStone Smalltalk environment.
 
-[manual transaction mode](#manual-transaction-mode) means that you have a bit more protection from incorrect [abort](#abort-transaction) or [commit transactions](#commit-transaction): 
-  1. an incorrect [abort transaction](#abort-transaction) will result in a commit error before any logical corruption can be written to the repository.
-  2. an inadvertant [commit transaction](#commit-transaction) will commit a partial result from another process to the repository, thus introducing logical corruption, but the subsequent commit will result in a commit error, so at least you will be alerted to the existence of the incorrect transaction semantics.
-
-Using [automatic transaction mode](#automatic-transaction-mode) means that detecting logical corruption would be harder to isolate and identify.
-
-###GemServer
 
 The **GemServer** class provides a framework for standardized:
   - [exception handling services](#gem-server-exception-handlers)
@@ -377,6 +368,17 @@ There are two options for handling exceptions in these methods:
   The **beforeUnwind:** block can be used to perform any additional actions that might need to be performed before unwinding the stack.
 
 ###Gem Server Transaction Management
+####Which transaction mode for Topaz servers?
+At first blush, [automatic transaction mode](#automatic-transaction-mode) seems to be the most convenient transaction mode for [Topaz][2] servers.
+With the system always in transaction one should never get an error doing a [commit transaction](#commit-transaction) without a preceding [begin transaction](#begin-transaction).
+However, if you are making use of multiple concurrent processes, there are advantages to using [manual transaction mode](#manual-transaction-mode).
+
+[Manual transaction mode](#manual-transaction-mode) means that you have a bit more protection from incorrect [aborts](#abort-transaction) or [commits](#commit-transaction): 
+  1. an incorrect [abort transaction](#abort-transaction) will result in a **commit error** before any logical corruption can be written to the repository.
+  2. an inadvertant [commit transaction](#commit-transaction) will commit a partial result from another process to the repository, thus introducing potential logical corruption, but any subsequent commit will result in a **commit error**, so at least you will be alerted to the existence of the incorrect transaction semantics.
+
+Using [automatic transaction mode](#automatic-transaction-mode) means that detecting logical corruption would be a bit harder to isolate and identify.
+
 In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
 The [view of the repository](#gemstone-transaction) is shared by all of the threads in the vm.
 Consequently, one must take great care in managing transaction boundaries when running a multi-threaded application in a *gem server*.
