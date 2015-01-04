@@ -54,10 +54,11 @@ run
 
 Control returns to the [Topaz][2] console when the Smalltalk code itself returns, or an *unhandled exceptions* is encountered.
 When control returns to the console, Smalltalk execution is halted until another [Topaz][2] command is executed.
+If the last `run` section has been encountered the [Topaz][2] process exits.
 
 ####Topaz Execution Environment
 
-For server-style code to be run in [Topaz][2] you need to do two things:
+For *gem server* code to be run in [Topaz][2] you need to do two things:
   1. Ensure that the main Smalltalk process blocks and does not return.
   2. Ensure that all exceptions are handled, including exceptions signalled in processes that have been forked from the main Smalltalk process.
 
@@ -106,6 +107,8 @@ The transactional view is only updated when a [begin transaction](#begin-transac
 It is an error to perform a [commit transaction](#commit-transaction) unless preceded by a [begin transaction](#begin-transaction).
 An [abort transaction](#abort-transaction) updates the transaction view, but does not start a transaction.
 
+The choice of *transaction mode* depends upon the characteristics of your application.
+
 ##GemServer class
 As the preceding sections have highlighted there are several issues in the area of *server exception handling* and *server transaction management* that are unique to the GemStone Smalltalk environment.
 The **GemServer** class provides a concise framework for standardized:
@@ -133,7 +136,7 @@ Once an instance has been registered, it may be accessed from the **GemServerReg
 ###Gem Server Service Loop
 A *gem server* is associated with one or more ports (a port may be nil).
 
-One [Topaz sessions](#gemstone-session) is launched for each of the *ports* associated with the *gem server*.
+One [Topaz sessions](#gemstone-session) is launched for each of the *ports* associated with a *gem server*.
 
 The *gem server* instance is shared by each of the *gems*.
 
@@ -175,8 +178,9 @@ scriptServicePrologOn: portOrNil
 
 which, records the gem pid in a file, sets the statmonitor cache name, enables remote breakpoint handling, puts the gem in [manual transaction mode](#manual-transaction-mode), starts a **TransactionBacklog** handler, and enables **AlmostOutOrMemory** handling.
 
-The `startServerOn:` is called by both the `scriptStartServiceOn:` method and `interactiveStartServiceOn:transactionMode:` method.
-This method is expected to block the main process:
+The `startServerOn:` method is called by both the `scriptStartServiceOn:` method and the `interactiveStartServiceOn:transactionMode:` method.
+
+This method is expected to block the main Smalltalk process in the *gem*:
 
 ```Smalltalk
 startServerOn: portOrNil
@@ -215,9 +219,7 @@ basicServerOn: port
 ```
 
 ###Gem Server Exception Handling
-
-
-Here's the implementation of the `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` method:
+The `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` method implements the basic exception handling lgic for the **GemServer** class:
 
 ```Smalltalk
 gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock
@@ -256,6 +258,15 @@ The exception handling block in this method has been structured to allow for a n
   8. `ensureBlock`.... 
      Typically the `ensure:` block is used to clean up any resources that may have been alocated for processing, such as sockets or files.
 
+There are several variants of the `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` method that allow you to specify only the attributes that you need:
+  - gemServer:
+  - gemServer:beforeUnwind:
+  - gemServer:beforeUnwind:ensure:
+  - gemServer:ensure:
+  - gemServer:exceptionSet:
+  - gemServer:exceptionSet:beforeUnwind:
+  - gemServer:exceptionSet:beforeUnwind:ensure:
+  - gemServer:exceptionSet:ensure:
 
 ####Gem Server Default Exception Set
 Default exception handling has been defined for the following exceptions (the list of default exceptions is slightly different for [GemStone 2.4.x][8]):
