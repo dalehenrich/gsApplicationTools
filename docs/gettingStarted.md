@@ -7,6 +7,7 @@
       - [Exceptions to Handle in Topaz](#exceptions-to-handle-in-topaz)
     - [Topaz Transaction Modes](#topaz-transaction-modes)
 - [GemServer class](#gemserver-class)
+  - [GemServerRegistry class](#gemserverregistry-class)
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
     - [Gem Server Default Exception Set](#gem-server-default-exception-set)
@@ -109,6 +110,7 @@ The **GemServer** class provides a concise framework for standardized:
   - [exception handling services](#gem-server-exception-handlers)
   - [transaction management](#gem-server-transaction-management)
 
+###GemServerRegistry class
 The **GemServerRegistry** class provides a registry of named *gem servers*.
 A *gem server* named instance is created by using the `register:` method:
 
@@ -122,13 +124,17 @@ Once an instance has been registered, it may be accessed from the **GemServerReg
 (GemServerRegistry gemServerNamed: gemName)
 ```
 
-A *gem server* instance is associated with one or more ports (a port may be nil).
-If there is more than one port, then multiple [Topaz sessions](#gemstone-session) (one for each port)will be launched when the *gem server* is [started](#gem-server-control).
-It is important to note that the single *gem server* instance is shared by all [Topaz sessions](#gemstone-session) and that the *basicServerProcess* and *serverInstance* instance variables are the only two instance variables that are be used to store session-specific (non-persistent) state.
-
-
 ###Gem Server Service Loop
-A *gem server* [Topaz session](#gemstone-session) is initiated by calling the [gem server start script](#gem-server-startstop-bash-scripts).
+A *gem server* is associated with one or more ports (a port may be nil).
+One [Topaz sessions](#gemstone-session) is launched for each of* ports*  associated with the *gem server*.
+The *gem server* instance is shared by each of the *gems*.
+The *gem server* is launched by calling the [gem server start script](#gem-server-startstop-bash-scripts).
+The [script](#gem-server-startstop-bash-scripts) executes the following Smalltalk code to start the *gem server*:
+
+```Smalltalk
+(GemServerRegistry gemServerNamed: '<gem-server-name') scriptStartServiceOn: <port-number-or-nil>.
+```
+
 
 
 ###Gem Server Exception Handling
