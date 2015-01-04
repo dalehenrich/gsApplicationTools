@@ -405,8 +405,8 @@ handleRequest: request for: socket
 ###Gem Server Transaction Management
 
 ####Basic Gem Server Transaction Support
-For the current **GemServer** implementation I have chosen to support [manual transaction mode](#manual-transaction-mode) when running a *gem server* in [Topaz][2] using the `scriptStartServiceOn:` method.
-For [interactive debugging](#interactive-debugging) you can use either *transaction mode* with the `interactiveStartServiceOn:transactionMode:` method: 
+The current implementation supports [manual transaction mode](#manual-transaction-mode) when running a *gem server* from a script (`scriptStartServiceOn:` method).
+For [interactive debugging](#interactive-debugging) using the `interactiveStartServiceOn:transactionMode:` method: 
   - use [automatic transaction mode](#automatic-transaction-mode) (**#autoBegin**) when doing in-place development on your *gem server* application.
   - use [manual transaction mode](#manual-transaction-mode) (**#manualBegin**) when debugging or testing transaction sensitive code.
 
