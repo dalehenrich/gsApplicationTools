@@ -135,7 +135,65 @@ The [script](#gem-server-startstop-bash-scripts) executes the following Smalltal
 (GemServerRegistry gemServerNamed: '<gem-server-name') scriptStartServiceOn: <port-number-or-nil>.
 ```
 
+```Smalltalk
+scriptStartServiceOn: portOrNil
+  "called from shell script"
 
+  self
+    scriptServicePrologOn: portOrNil;
+    startServerOn: portOrNil	"does not return"
+```
+
+```Smalltalk
+scriptServicePrologOn: portOrNil
+  self
+    scriptLogEvent:
+      '-->>Script Start ' , self name , ' on ' , portOrNil printString
+    object: self.
+  self
+    recordGemPid: portOrNil;
+    setStatmonCacheName;
+    enableRemoteBreakpointHandling.
+  self transactionMode: #'manualBegin'.
+  self
+    startSigAbortHandling;
+    enableAlmostOutOfMemoryHandling
+```
+
+```Smalltalk
+startServerOn: portOrNil
+  "start server in current vm. Not expected to return."
+
+  self startBasicServerOn: portOrNil.
+  [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
+```
+
+```Smalltalk
+startBasicServerOn: portOrNil
+  "start basic server process in current vm. fork and record forked process instance. expected to return."
+
+  self basicServerProcess: [ self basicServerOn: portOrNil ] fork.
+  self serverInstance: self	"the serverProcess is session-specific"
+```
+
+The `basicServerOn:` is expected to be implemented by a concrete subclass of *GemServer*.
+For example, here's the `basicServerOn:` method for the [maintenance vm](#maintenance-vm):
+
+```Smalltalk
+basicServerOn: port
+  "forked by caller"
+
+  | count |
+  count := 0.
+  [ true ]
+    whileTrue: [ 
+      self
+        gemServer: [ 
+          "run maintenance tasks"
+          self taskClass performTasks: count ].
+      (Delay forMilliseconds: self delayTimeMs) wait.	"Sleep for a minute"
+      count := count + 1 ]
+```
 
 ###Gem Server Exception Handling
 
