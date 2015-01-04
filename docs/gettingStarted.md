@@ -16,7 +16,6 @@
     - [Gem Server Exception Logging](#gem-server-exception-logging)
     - [Gem Server `ensureBlock`](#gem-server-ensureblock)
   - [Gem Server Transaction Management](#gem-server-transaction-management)
-    - [Which transaction mode for Topaz servers?](#which-transaction-mode-for-topaz-servers)
     - [Parallel Processing Mode](#parallel-processing-mode)
     - [Serial Processing Mode](#serial-processing-mode)
     - [Handling Transaction Conflicts](#handling-transaction-conflicts)
@@ -398,6 +397,16 @@ handleRequest: request for: socket
 ---
 
 ###Gem Server Transaction Management
+For the current **GemServer** implementation I have chosen to support [manual transaction mode](#manual-transaction-mode) when running a *gem server* in [Topaz][2] using the `scriptStartServiceOn:` method.
+For [interactive debugging](#interactive-debugging) you can use either *transaction mode* with the `interactiveStartServiceOn:transactionMode:` method: 
+  - use [automatic transaction mode](#automatic-transaction-mode) (**#autoBegin**) when doing in-place development on your *gem server* application.
+  - use [manual transaction mode](#manual-transaction-mode) (**#manualBegin**) when debugging or testing transaction sensitive code.
+
+No matter which *transaction mode* is used, it is important to remember that one must manage transaction boundaries carefully:
+
+>> when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes*.
+
+
 ####Which transaction mode for Topaz servers?
 At first blush, [automatic transaction mode](#automatic-transaction-mode) seems to be the most convenient transaction mode for [Topaz][2] servers.
 With the system always in transaction one should never get an error doing a [commit transaction](#commit-transaction) without a preceding [begin transaction](#begin-transaction).
