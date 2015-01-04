@@ -22,14 +22,7 @@
   - [Gem Server Control](#gem-server-control)
     - [Gem Server start/stop bash scripts](#gem-server-startstop-bash-scripts)
     - [Gem Server start/stip Smalltalk API](#gem-server-startstoprestart-smalltalk-api)
-  - [Gem Server Logging](#gem-server-logging)
   - [Gem Server Debugging](#gem-server-debugging)
-
-- [Basic Gem Server Structure](#basic-gem-server-structure)
-- [Seaside Gem Servers](#seaside-gem-servers)
-- [ServiceVM Gem Servers](#servicevm-gem-servers)
-- [Non-Seaside Gem Servers](#non-seaside-gem-servers)
-- [Background Articles](#background-articles)
 - [Glossary](#glossary)
 
 ##What is a Gem Server
@@ -116,7 +109,7 @@ The **GemServer** class provides a concise framework for standardized:
   - [exception handling services](#gem-server-exception-handlers)
   - [transaction management](#gem-server-transaction-management)
   - [gem server control](#gem-server-control)
-  - [gem server logging](#gem-server-logging)
+  - [gem server logging](#gem-server-default-exception-logging)
   - [gem server debugging](#gem-server-debugging)
 
 ###GemServerRegistry class
@@ -219,7 +212,7 @@ basicServerOn: port
 ```
 
 ###Gem Server Exception Handling
-The `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` method implements the basic exception handling lgic for the **GemServer** class:
+The `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` method implements the basic exception handling logic for the **GemServer** class:
 
 ```Smalltalk
 gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock
@@ -250,11 +243,10 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
 The exception handling block in this method has been structured to allow for a number of customizations:
   1. The `exceptionSet` argument allows you to specify the set of [exceptions to be handled](#gem-server-default-exception-set).
   2. The `GemServer>>handleGemServerException:` method invokes [a custom exception handling method](#gem-server-default-exception-handlers).
-  3. If the `GemServer>>handleGemServerException:` method returns, the [`beforeUnwindBlock`](#gem-server-beforunwindblock) is invoked.
-  4. If the [`beforeUnwindBlock`](#gem-server-beforunwindblock) returns...
-  5. `GemServer>>doInteractiveModePass:`
-  6. Handler blocks falls off end and the stack is unwound.
-  7. If an error occures while processing steps 3 and 4, ...
+  3. If the `GemServer>>handleGemServerException:` method returns, the [`beforeUnwindBlock`](#gem-server-beforeunwindblock) is invoked.
+  4. If the [`beforeUnwindBlock`](#gem-server-beforunwindblock) returns and the *gem server* was started during an [interactive debugging session](#interactive-debugging) the `GemServer>>doInteractiveModePass:` method sends `pass` to the exception so that a debugger will be opened.
+  6. In a non-interactive session, the `return:` message send causes the stack to unwind.
+  7. If an error occures while processing steps 3 and 4, the [error is logged](#gem-server-default-exception-logging), the exception is passed if in an [interactive debugging session](#interactive-debugging) and the stack is unwound.
   8. `ensureBlock`.... 
      Typically the `ensure:` block is used to clean up any resources that may have been alocated for processing, such as sockets or files.
 
@@ -333,7 +325,15 @@ gemServerHandleResumableException: exception
 As in the case of handling an **Error** the [exception is logged](#gem-server-exception-logging), but instead of returning, the exception is resumed and processing continues uninterrupted.
 
 ####Gem Server `beforeUnwindBlock`
-The `beforeUnwindBlock` gives you a chance to 
+The `beforeUnwindBlock` gives you a chance to perform application specific operations before the stack is unwound.
+For example, a web server may want to return a 4xx or 5xx HTTP response in the event of an error:
+
+```Smalltalk
+handleRequest: request for: socket
+  self
+    gemServer: [ ^self processRequest: request for: socket ]
+    beforeUnwind: [ :ex | ^ self writeServerError: ex to: socket ]
+```
 
 ####Gem Server Default Exception Logging
 
@@ -631,141 +631,9 @@ This makes it possible to use scripts to start individual gem servers from a pro
 
 The Smalltalk GemServer api uses `System class>>performOnServer:` to launch a bash script for each of the ports associated with the gem server.
 
-###Gem Server Logging
-The exact logging options are a function of the application running in the service loop.
-For example, Zinc-based gem servers offer a choice of Transcript logging (**logToTranscript**) or Object Log logging (**logToObjectLog**) with control over which events are logged (**#debug**, **#error**, **#info**, **#object**, and **#transaction**):
-
-```Smalltalk
-(ZnSeasideGemServer register: 'Seaside')
-  logToObjectLog;
-  logFilter: [:category | #( #error #debug ) includes: category ];
-  yourself
-```
-
 ###Gem Server Debugging
-####Remote Debugging
 ####Interactive Debugging
-##Gem Server Reference
-###Seaside Gem Servers (including ServiceVM)
-###Zinc Gem Servers
-
-**Eventually delete remainder of doc ... 
-
-
-A **GemServer** class is used to define the application-specific service loop and any attributes that may be needed. 
-For example, a web server must have a service loop that starts listening for http connections on a particular port, so the gem server attributes typically include a list of port numbers to launch servers on.
-Other attributes may include the logging method and level to use.
-
-##Basic Gem Server Structure
-
-```Smalltalk
-ZnGemServer register: 'RESTServer'.
-FastCGISeasideGemServer register: 'FastCGISeasideServer' on: #( 9001 9002 9003 )
-```
-
-###Service Loop
-####startServerOn:
-
-```Smalltalk
-startServerOn: port
-  "start server in current vm. for gemstone, not expected to return."
-
-  self startBasicServerOn: port.
-  [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
-```
-
-####startBasicServerOn:
-
-```Smalltalk
-startBasicServerOn: port
-  "start server in current vm. expected to return."
-
-  [ "start listening on socket or running application specific service loop" ] fork.
-```
-
-```Smalltalk
-startBasicServerOn: port
-  "start instance of seaside adaptor. expected to return."
-
-  | adaptor |
-  GRPlatform current seasideLogServerStart: self class name port: port.
-  adaptor := self serverClass port: port.
-  self serverInstance: adaptor.
-  adaptor gemServerStart
-```
-
-
-###Start/Restart/Stop/Status Gem Server
-
-```Smalltalk
-gemServer := FastCGISeasideGemServer register: 'FastCGISeasideServer' on: #( 9001 9002 9003 ).
-gemServer startGems.
-gemServer restartGems.
-gemServer statusGems.
-gemServer stopGems.
-```
-
-###Launching GemServer
-
-```Smalltalk
-scriptStartServiceOn: port
-  "called from shell script"
-
-  self
-    scriptLogEvent: '-->>Start ' , self name , ' on ' , port printString
-    object: self.
-  self
-    recordGemPid: port;
-    setStatmonCacheName;
-    enableRemoteBreakpointHandling.
-  System transactionMode: #'manualBegin'.
-  self
-    startSigAbortHandling;
-    startServiceOn: port	"does not return"
-```
-
-####Launching from bash shell
-
-```Shell
-startGemServerGem <gemServer-name> <port> <exe-conf-path>
-```
-
-```
-#
-# standard gem.conf file for dev kit gems
-# 
-
-GEM_TEMPOBJ_CACHE_SIZE = 50000;
-GEM_TEMPOBJ_POMGEN_PRUNE_ON_VOTE = 90;
-```
-
-####Launching from development environment
-
-```Smalltalk
-gemServer startServerOn: 8383. "will not return"
-```
-
-## Seaside Gem Servers
-In [Seaside][4] applications a *simple persistence model* is used where the [transaction](#gemstone-transaction) boundaries are aligned along HTTP request boundaries: 
-
-1. An [abort](#abort-transaction) is performed before the HTTP request is passed to Seaside for processing.
-2. A [commit](#commit-transaction) is performed before the HTTP request is returned to the HTTP client). 
-3. [Transaction conflicts](#transaction-conflicts) are handled by doing an *abort* and then the HTTP request is retried.
-
-###Seaside Adaptor Gem Server
-###MaintenanceVM Gem Server
-## ServiceVM Gem Servers
-## Non-Seaside Gem Servers
-###Zinc HTTP Gem Server
-###Zinc REST Gem Server
-###Zinc Web Socket Gem Server
-##Background Articles
-1. https://gemstonesoup.wordpress.com/2007/05/07/transparent-persistence-for-seaside/
-2. https://gemstonesoup.wordpress.com/2008/03/08/glass-101-disposable-gems-durable-data/
-3. https://gemstonesoup.wordpress.com/2008/03/09/glass-101-simple-persistence/
-4. https://gemstonesoup.wordpress.com/2007/05/10/porting-application-specific-seaside-threads-to-gemstone/
-5. https://gemstonesoup.wordpress.com/2007/06/29/unlimited-gemstone-vms-in-every-garage-and-a-stone-in-every-pot/
-6. http://smalltalkinspect1.rssing.com/browser.php?indx=6463396&item=10
+####Remote Debugging
 
 ##Glossary
 
