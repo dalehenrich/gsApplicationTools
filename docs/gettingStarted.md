@@ -406,11 +406,12 @@ handleRequest: request for: socket
 
 ####Basic Gem Server Transaction Support
 The current implementation supports [manual transaction mode](#manual-transaction-mode) when running a *gem server* from a script using the `scriptStartServiceOn:` method.
-For [interactive debugging](#interactive-debugging) using the `interactiveStartServiceOn:transactionMode:` method: 
-  - use [automatic transaction mode](#automatic-transaction-mode) (**#autoBegin**) when doing in-place development on your *gem server* application.
-  - use [manual transaction mode](#manual-transaction-mode) (**#manualBegin**) when debugging or testing transaction sensitive code.
 
-No matter which *transaction mode* is used, it is important to remember that one must manage transaction boundaries carefully:
+For [interactive debugging](#interactive-debugging) using the `interactiveStartServiceOn:transactionMode:` method: 
+  - [automatic transaction mode](#automatic-transaction-mode) (**#autoBegin**) can be used when doing *normal* development.
+  - [manual transaction mode](#manual-transaction-mode) (**#manualBegin**) should be used when debugging or testing transaction sensitive code.
+
+Regardless of which *transaction mode* is used, it is important to manage transaction boundaries very carefully:
 
 >> When an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
 
