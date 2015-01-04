@@ -27,7 +27,7 @@ A *gem server* is a [Topaz session](#gemstone-session) that executes an applicat
 
 The [Topaz][2] process is initiated by launching a [bash script](#gem-server-startstop-bash-scripts) that looks roughly like the following: 
 
-```Shell
+```
 #!/bin/bash
 
 GemServer=$1
@@ -42,23 +42,44 @@ run
 EOF
 ```
 
-When you execute a Smalltalk expression in [Topaz][2], control does not return until the expression returns or an unhandled error occurs.
-For example, the following statements will cause [Topaz][2] process exit almost immediately:
+The `scriptStartServiceOn:` method:
+
+```Smaltalk
+scriptStartServiceOn: portOrNil
+  "called from shell script"
+
+  self
+    scriptServicePrologOn: portOrNil;
+    startServerOn: portOrNil	"does not return"
 
 ```
-run
-[true] whileTrue: [ (Delay forSeconds: 1) wait].
-%
+
+invokes `GemServer>>scriptServicePrologOn:` to set up the [Topaz][2] process for batch processing and calls `GemServer>>startServerOn:`:
+
+```Smalltalk
+startServerOn: portOrNil
+  "start server in current vm. Not expected to return."
+
+  self startBasicServerOn: portOrNil.
+  [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
 ```
 
-The loop will run until interrupted in the [Topaz][2] process is terminated, or 
+The `startBasicServerOn:` method:
 
+```Smalltalk
+startBasicServerOn: portOrNil
+  "start basic server process in current vm. fork and record forked process instance. expected to return."
 
-The *service loop* is defined by subclassing the **GemServer** class and implementing a `basicServerOn:` method. 
+  self basicServerProcess: [ self basicServerOn: portOrNil ] fork.
+  self serverInstance: self	"the serverProcess is session-specific"
+```
+
+The `basicServerOn:` method implements the application-specific service loop and is expected to be defined by **GemServer** subclasses.
+
 Here is the `basicServerOn:` method for a [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
-basicServerOn: port
+basicServerOn: portOrNil
   "forked by caller"
 
   | count |
@@ -72,6 +93,31 @@ basicServerOn: port
       (Delay forMilliseconds: self delayTimeMs) wait.	"Sleep for a minute"
       count := count + 1 ]
 ```
+
+
+
+When you execute a Smalltalk expression in [Topaz][2], control does not return until the expression returns or an unhandled error occurs.
+For example, the following statements will cause [Topaz][2] process exit almost immediately:
+
+```
+run
+(Delay forSeconds: 1) wait
+%
+```
+
+
+```
+run
+[true] whileTrue: [ (Delay forSeconds: 1) wait].
+%
+```
+
+The loop will run until interrupted in the [Topaz][2] process is terminated, or 
+
+
+The *service loop* is defined by subclassing the **GemServer** class and implementing a `basicServerOn:` method. 
+
+
 
 
 The *gem server* process is [started and stopped](#gem-server-control) by using a [standard Shell script](#gem-server-startstop-bash-scripts) or a [Smalltalk API](#gem-server-startstoprestart-smalltalk-api). 
