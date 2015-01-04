@@ -70,6 +70,7 @@ run
 
 The main Smalltalk process is blocked by the infinite `whileTrue:` loop.
 The exception handler is protecting the `"application service loop code"`, so we shouldn't have an *unhandled exception*, as long as the *exceptionSet* is covering the [proper set of exceptions](#exceptions-to-handle-in-topaz).
+
 If we are forking blocks, each of the forked processes must have an exception handler near the top of the stack to guard against *unhandled exceptions* that looks like the following:
 
 ```Smalltalk
@@ -80,7 +81,7 @@ If we are forking blocks, each of the forked processes must have an exception ha
 ```
 
 #####Exceptions to Handle in Topaz
-In GemStone, the exception handlers should be defined to handle the following exceptions:
+In a [Topaz][2] process, exception handlers should be defined to handle the following exceptions:
   - **AlmostOutOfMemory** - Notication signalled when a percent [temporary object space](#temporary-object-space) threshold is exceeded. The [Topaz][2] process will be terminated if [temporary object space](#temporary-object-space) is completely consumed. A typical handler will do a commit to cause persistent objects to be flushed from [temporary object space](#temporary-object-space) to disk. If a significant amount of [temporary object space](#temporary-object-space) is being consumed on the stack, then logging a stack trace and unwinding the stack may be called for. 
   - **AlmostOutOfStack** - Notification signaled when the size of the current execution stack is about to exceed the [max execution stack depth](#gem_max_smalltalk_stack_depth). Again, the [Topaz][2] process will be terminated if the notification is not heeded. A typical handler will log a stack trace and unwind the stack.
   - **Error** - Most **Error** exceptions are going to be handled by error handlers in the application code itself, but it is prudent to provide a backstop exception handler for unanticipated error conditions. The typical error handler should log the stack trace and unwind the stack.
@@ -106,12 +107,10 @@ On the other hand, if you are making use of multiple concurrent processes, using
   1. an incorrect [abort transaction](#abort-transaction) will result in a commit error before any logical corruption can be written to the repository.
   2. an inadvertant [commit transaction](#commit-transaction) will commit a partial result from another process to the repository, thus introducing logical corruption, but the subsequent commit will result in a commit error, so at least you will be alerted to the existence of the incorrect transaction semantics.
 
-If one were using [automatic transaction mode](#automatic-transaction-mode) in this case, the source of the logical corruption will be harder to identify.
-
-
-However, in a [Topaz session](#gemstone-session) that is making use of multiple concurrent processes, one must be very careful to make sure that a [commit transaction](#commit-transaction) in one process will commit partial results in another process 
+If one were using [automatic transaction mode](#automatic-transaction-mode) in this case, the source of the logical corruption would be harder to isolate and identify.
 
 ###GemServer
+
 The **GemServer** class provides a framework for standardized:
   - [exception handling services](#gem-server-exception-handlers)
   - [transaction management](#gem-server-transaction-management)
