@@ -132,7 +132,7 @@ The *gem server* is launched by calling the [gem server start script](#gem-serve
 The [script](#gem-server-startstop-bash-scripts) executes the following Smalltalk code to start the *gem server*:
 
 ```Smalltalk
-(GemServerRegistry gemServerNamed: '<gem-server-name') scriptStartServiceOn: <port-number-or-nil>.
+(GemServerRegistry gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
 ```
 
 ```Smalltalk
