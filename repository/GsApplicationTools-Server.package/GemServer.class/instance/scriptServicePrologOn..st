@@ -10,5 +10,5 @@ scriptServicePrologOn: portOrNil
     enableRemoteBreakpointHandling.
   self transactionMode: #'manualBegin'.
   self
-    startSigAbortHandling;
+    startTransactionBacklogHandling;
     enableAlmostOutOfMemoryHandling

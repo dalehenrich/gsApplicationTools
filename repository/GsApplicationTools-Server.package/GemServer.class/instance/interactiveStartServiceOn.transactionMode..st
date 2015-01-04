@@ -10,7 +10,7 @@ interactiveStartServiceOn: portOrNil transactionMode: mode
     object: self.
   self transactionMode: mode.
   mode == #'manualBegin'
-    ifTrue: [ self startSigAbortHandling ].
+    ifTrue: [ self startTransactionBacklogHandling ].
   self
     enableAlmostOutOfMemoryHandling;
     startServerOn: portOrNil	"does not return"
