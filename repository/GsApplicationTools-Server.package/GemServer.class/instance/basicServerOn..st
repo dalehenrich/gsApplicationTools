@@ -1,5 +1,5 @@
 service instance-server
-basicServerOn: port
+basicServerOn: portOrNil
   "forked by caller"
 
   self subclassResponsibility

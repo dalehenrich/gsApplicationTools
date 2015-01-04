@@ -9,4 +9,4 @@ unitTestStartServiceOn: portOrNil
   self
     transactionMode: #'autoBegin';
     interactiveMode: false.
-  self startServiceOn: portOrNil	"does not return"
+  self startServerOn: portOrNil	"does not return"

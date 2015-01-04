@@ -13,4 +13,4 @@ interactiveStartServiceOn: portOrNil transactionMode: mode
     ifTrue: [ self startSigAbortHandling ].
   self
     enableAlmostOutOfMemoryHandling;
-    startServiceOn: portOrNil	"does not return"
+    startServerOn: portOrNil	"does not return"

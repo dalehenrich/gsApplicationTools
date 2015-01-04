@@ -3,15 +3,5 @@ scriptStartServiceOn: portOrNil
   "called from shell script"
 
   self
-    scriptLogEvent:
-      '-->>Script Start ' , self name , ' on ' , portOrNil printString
-    object: self.
-  self
-    recordGemPid: portOrNil;
-    setStatmonCacheName;
-    enableRemoteBreakpointHandling.
-  self transactionMode: #'manualBegin'.
-  self
-    startSigAbortHandling;
-    enableAlmostOutOfMemoryHandling;
-    startServiceOn: portOrNil	"does not return"
+    scriptServicePrologOn: portOrNil;
+    startServerOn: portOrNil	"does not return"
