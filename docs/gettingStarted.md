@@ -10,10 +10,10 @@
   - [GemServerRegistry class](#gemserverregistry-class)
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
-    - [Gem Server Default Exception Set](#gem-server-default-exception-set)
-    - [Gem Server Default Exception Handlers](#gem-server-default-exception-handlers)
+    - [Gem Server Exception Set](#gem-server-exception-set)
+    - [Gem Server Exception Handlers](#gem-server-exception-handlers)
     - [Gem Server `beforeUnwindBlock`](#gem-server-beforeunwindblock)
-    - [Gem Server Default Exception Logging](#gem-server-default-exception-logging)
+    - [Gem Server Exception Logging](#gem-server-exception-logging)
     - [Gem Server `ensureBlock`](#gem-server-ensureblock)
   - [Gem Server Transaction Management](#gem-server-transaction-management)
     - [Which transaction mode for Topaz servers?](#which-transaction-mode-for-topaz-servers)
@@ -114,7 +114,7 @@ The **GemServer** class provides a concise framework for standardized:
   - [exception handling services](#gem-server-exception-handling)
   - [transaction management](#gem-server-transaction-management)
   - [gem server control](#gem-server-control)
-  - [gem server logging](#gem-server-default-exception-logging)
+  - [gem server logging](#gem-server-exception-logging)
   - [gem server debugging](#gem-server-debugging)
 
 ---
@@ -179,7 +179,7 @@ startBasicServerOn: portOrNil
   self serverInstance: self	"the serverProcess is session-specific"
 ```
 
-The `basicServerOn:` method is expected to be implemented by a concrete subclass of *GemServer*.
+The `basicServerOn:` method is expected to be implemented by a concrete subclass of **GemServer**.
 For example, here's the `basicServerOn:` method for the [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
@@ -230,14 +230,13 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
 ```
 
 The exception handling block in this method has been structured to allow for a number of customizations:
-  1. The `exceptionSet` argument allows you to specify the set of [exceptions to be handled](#gem-server-default-exception-set).
-  2. The `GemServer>>handleGemServerException:` method invokes [a custom exception handling method](#gem-server-default-exception-handlers).
+  1. The `exceptionSet` argument allows you to specify the set of [exceptions to be handled](#gem-server-exception-set).
+  2. The `GemServer>>handleGemServerException:` method invokes [a custom exception handling method](#gem-server-exception-handlers).
   3. If the `GemServer>>handleGemServerException:` method returns, the [`beforeUnwindBlock`](#gem-server-beforeunwindblock) is invoked.
   4. If the [`beforeUnwindBlock`](#gem-server-beforunwindblock) returns and the *gem server* was started during an [interactive debugging session](#interactive-debugging) the `GemServer>>doInteractiveModePass:` method sends `pass` to the exception so that a debugger will be opened.
   6. In a non-interactive session, the `return:` message send causes the stack to unwind.
-  7. If an error occures while processing steps 3 and 4, the [error is logged](#gem-server-default-exception-logging), the exception is passed if in an [interactive debugging session](#interactive-debugging) and the stack is unwound.
-  8. `ensureBlock`.... 
-     Typically the `ensure:` block is used to clean up any resources that may have been alocated for processing, such as sockets or files.
+  7. If an error occures while processing steps 3 and 4, the [error is logged](#gem-server-exception-logging), the exception is passed if in an [interactive debugging session](#interactive-debugging) and the stack is unwound.
+  8. Lastly the [`ensureBlock`](#gem-server-ensureBlock) is invoked upon return from the method.
 
 There are several variants of the `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` method that allow you to specify only the attributes that you need:
   - gemServer:
@@ -249,7 +248,7 @@ There are several variants of the `GemServer>>gemServer:exceptionSet:beforeUnwin
   - gemServer:exceptionSet:beforeUnwind:ensure:
   - gemServer:exceptionSet:ensure:
 
-####Gem Server Default Exception Set
+####Gem Server Exception Set
 Default exception handling has been defined for the following exceptions (the list of default exceptions is slightly different for [GemStone 2.4.x][8]):
   - **Error**
   - **Break**
@@ -258,7 +257,7 @@ Default exception handling has been defined for the following exceptions (the li
   - **AlmostOutOfMemory**
   - **AlmostOutOfStack** 
 
-####Gem Server Default Exception Handlers
+####Gem Server Exception Handlers
 The *gem server* uses [double dispatching][9] to invoke exception-specific handling behavior.
 The primary method `exceptionHandlingForGemServer:` is sent by the `GemServer>>handleGemServerException:` method:
 
@@ -270,7 +269,7 @@ handleGemServerException: exception
   ^ exception exceptionHandlingForGemServer: self
 ```
 
-The `exceptionHandlingForGemServer:` has been implemented in the [default exception classes](#gem-server-default-exception-set).
+The `exceptionHandlingForGemServer:` has been implemented in the [default exception classes](#gem-server-exception-set).
 The following secondary methods have been defined in the **GemServer** class:
   - gemServerHandleAlmostOutOfMemoryException:
   - gemServerHandleAlmostOutOfStackException:
@@ -294,7 +293,7 @@ gemServerHandleErrorException: exception
       self name , ' ' , exception class name asString , ' exception encountered: '.
 ```
 
-where the [exception is logged](#gem-server-default-exception-logging) and the method returns.
+where the [exception is logged](#gem-server-exception-logging) and the method returns.
 
 For a resumable **Exception**, the `GemServer>>gemServerHandleResumableException:` method is invoked:
 
@@ -326,7 +325,7 @@ handleRequest: request for: socket
 
 If your *gem server* needs custom handling for an exception, you can add new `gemServerHandle*` methods or override existing `gemServerHandle*` methods.
 
-####Gem Server Default Exception Logging
+####Gem Server Exception Logging
 When an exception is handled, the stack is written to the gem log and a continuation for the stack is saved to the [object log](#object-log) by the `logStack:titled:inTransactionDo:` method:
 
 ```Smalltalk
