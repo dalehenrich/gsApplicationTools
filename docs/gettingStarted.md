@@ -6,6 +6,7 @@
     - [Topaz Execution Environment](#topaz-execution-environment)
       - [Exceptions to Handle in Topaz](#exceptions-to-handle-in-topaz)
     - [Topaz Transaction Modes](#topaz-transaction-modes)
+    - [Which transaction mode for Topaz servers?](#which-transaction-mode-for-topaz-servers)
 - [GemServer](#gemserver)
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
@@ -53,8 +54,8 @@ When control returns to the console, Smalltalk execution is halted until another
 ####Topaz Execution Environment
 
 For server-style code to be run in [Topaz][2] you need to do two things:
-  1. ensure that the main Smalltalk process blocks, i.e., does not return
-  2. ensure that all exceptions are handled, including exceptions signalled in processes that have been forked from the main Smalltalk process.
+  1. Ensure that the main Smalltalk process blocks and does not return.
+  2. Ensure that all exceptions are handled, including exceptions signalled in processes that have been forked from the main Smalltalk process.
 
 In essence this entails structuring your *application-specific service loop* to look something like the following:
 
@@ -93,7 +94,7 @@ A [Topaz session](#gemstone-session) may run in one of two transaction modes:
   - [automatic transaction mode](#automatic-transaction-mode)
   - [manual transaction mode](#manual-transaction-mode)
 
-In [automatic transaction mode](#automatic-transaction-mode), the system is always *in transaction*. When either a [commit transaction](#commit-transaction) or an [abort transaction](#abort-transaction), the system automatically updates the transactional view of the system and leaves the system *in transaction*.
+In [automatic transaction mode](#automatic-transaction-mode), the system is always *in transaction*. When either a [commit transaction](#commit-transaction) or an [abort transaction](#abort-transaction) is performed, the system automatically updates the transactional view of the system and leaves the system *in transaction*.
 An explicit [begin transaction](#begin-transaction) is not needed.
 
 In [manual transaction mode](#manual-transaction-mode) it is necessary to explicitly to start each transaction with a [begin transaction](#begin-transaction) and terminate each transaction with either a [commit transaction](#commit-transaction) or an [abort transaction](#abort-transaction). 
@@ -101,13 +102,16 @@ The transactional view is only updated when a [begin transaction](#begin-transac
 It is an error to perform a [commit transaction](#commit-transaction) unless preceded by a [begin transaction](#begin-transaction).
 An [abort transaction](#abort-transaction) updates the transaction view, but does not start a transaction.
 
-Clearly, [automatic transaction mode](#automatic-transaction-mode) is the most convenient transaction mode, since the system is always in transaction and one should never get an error for missing a [begin transaction](#begin-transaction).
+####Which transaction mode for Topaz servers?
+At first blush, [automatic transaction mode](#automatic-transaction-mode) seems to be the most convenient transaction mode for [Topaz][2] servers.
+With the system always in transaction one should never get an error doing a [commit transaction](#commit-transaction) weithout a preceding [begin transaction](#begin-transaction).
+However, if you are making use of multiple concurrent processes, there are advantages to using [manual transaction mode](#manual-transaction-mode).
 
-On the other hand, if you are making use of multiple concurrent processes, using [manual transaction mode](#manual-transaction-mode) means that you have a bit more protection from incorrect [abort](#abort-transaction) or [commit transactions](#commit-transaction): 
+[manual transaction mode](#manual-transaction-mode) means that you have a bit more protection from incorrect [abort](#abort-transaction) or [commit transactions](#commit-transaction): 
   1. an incorrect [abort transaction](#abort-transaction) will result in a commit error before any logical corruption can be written to the repository.
   2. an inadvertant [commit transaction](#commit-transaction) will commit a partial result from another process to the repository, thus introducing logical corruption, but the subsequent commit will result in a commit error, so at least you will be alerted to the existence of the incorrect transaction semantics.
 
-If one were using [automatic transaction mode](#automatic-transaction-mode) in this case, the source of the logical corruption would be harder to isolate and identify.
+Using [automatic transaction mode](#automatic-transaction-mode) means that detecting logical corruption would be harder to isolate and identify.
 
 ###GemServer
 
