@@ -46,7 +46,7 @@ run
 Control returns to the [Topaz][2] console when the Smalltalk code itself returns, or an *unhandled exceptions* is encountered.
 When control returns to the console, Smalltalk execution is halted until another [Topaz][2] command is executed.
 For server-style code to be run in [Topaz][2] you need to do two things:
-  1. ensure that the main Smalltalk process blocks
+  1. ensure that the main Smalltalk process blocks, i.e., does not return
   2. ensure that all exceptions are handled, including exceptions signalled in processes that have been forked from the main Smalltalk process.
 
 In essence this entails structuring your *application-specific service loop* to look something like the following:
@@ -63,9 +63,16 @@ run
 
 The main Smalltalk process is blocked because we have an infinite `whileTrue:` loop.
 The exception handler is protecting the `"service code"`, so we shouldn't have an *unhandled exception*, as long as the *exceptionSet* is covering the proper set of exceptions.
-Of course, if we are forking any processes, each of the forked process must have an exception handler near the top of the stack to guard against *unhandled exceptions*. 
+Of course, if we are forking any processes, each of the forked process must have an exception handler near the top of the stack to guard against *unhandled exceptions* that looks like the following:
 
-In GemStone, the top-level exception handler should be defined to handle the following exceptions:
+```Smalltalk
+[ 
+[ "forked code" ]
+    on: exceptionSet
+    do: [:ex | "handle the exception and continue processing" ] ] fork
+```
+
+In GemStone, the exception handlers should be defined to handle the following exceptions:
   - **AlmostOutOfMemory** - Notication signalled when a percent [temporary object space](#temporary-object-space) threshold is exceeded. The [Topaz][2] process will be terminated if [temporary object space](#temporary-object-space) is completely consumed. A typical handler will do a commit to cause persistent objects to be flushed from [temporary object space](#temporary-object-space) to disk. If a significant amount of [temporary object space](#temporary-object-space) is being consumed on the stack, then logging a stack trace and unwinding the stack may be called for. 
   - **AlmostOutOfStack** - Notification signaled when the size of the current execution stack is about to exceed the [max execution stack depth](#gem_max_smalltalk_stack_depth). Again, the [Topaz][2] process will be terminated if the notification is not heeded. A typical handler will log a stack trace and unwind the stack.
   - **Error** - The typical error handler should log the stack trace and unwind the stack.
