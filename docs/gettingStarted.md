@@ -86,6 +86,29 @@ In GemStone, the exception handlers should be defined to handle the following ex
 
 ####Topaz Transaction Modes
 
+A [Topaz session](#gemstone-session) may run in one of two transaction modes:
+  - [automatic transaction mode](#automatic-transaction-mode)
+  - [manual transaction mode](#manual-transaction-mode)
+
+In [automatic transaction mode](#automatic-transaction-mode), the system is always *in transaction*. When either a [commit transaction](#commit-transaction) or an [abort transaction](#abort-transaction), the system automatically updates the transactional view of the system and leaves the system *in transaction*.
+An explicit [begin transaction](#begin-transaction) is not needed.
+
+In [manual transaction mode](#manual-transaction-mode) it is necessary to explicitly to start each transaction with a [begin transaction](#begin-transaction) and terminate each transaction with either a [commit transaction](#commit-transaction) or an [abort transaction](#abort-transaction). 
+The transactional view is only updated when a [begin transaction](#begin-transaction) is performed and the system is put *in transaction*. 
+It is an error to perform a [commit transaction](#commit-transaction) unless preceded by a [begin transaction](#begin-transaction).
+An [abort transaction](#abort-transaction) updates the transaction view, but does not start a transaction.
+
+Clearly, [automatic transaction mode](#automatic-transaction-mode) is the most convenient transaction mode, since the system is always in transaction and one should never get an error for missing a [begin transaction](#begin-transaction).
+
+On the other hand, if you are making use of multiple concurrent processes, using [manual transaction mode](#manual-transaction-mode) means that you have a bit more protection from incorrect [abort](#abort-transaction) or [commit transactions](#commit-transaction): 
+  1. an incorrect [abort transaction](#abort-transaction) will result in a commit error before any logical corruption can be written to the repository.
+  2. an inadvertant [commit transaction](#commit-transaction) will commit a partial result from another process to the repository, thus introducing logical corruption, but the subsequent commit will result in a commit error, so at least you will be alerted to the existence of the incorrect transaction semantics.
+
+If one were using [automatic transaction mode](#automatic-transaction-mode) in this case, the source of the logical corruption will be harder to identify.
+
+
+However, in a [Topaz session](#gemstone-session) that is making use of multiple concurrent processes, one must be very careful to make sure that a [commit transaction](#commit-transaction) in one process will commit partial results in another process 
+
 ###GemServer
 The **GemServer** class provides a framework for standardized:
   - [exception handling services](#gem-server-exception-handlers)
@@ -707,6 +730,41 @@ session.*
 
 ---
 
+###Automatic transaction mode
+**Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.1**
+
+---
+
+*In this mode, GemStone begins a transaction when you log in, and starts a new one after
+each commit or abort message. In this default mode, you are in a transaction the entire
+time you are logged into a GemStone session. Use caution with this mode in busy
+production systems, since your session will not receive the signals that your view is
+causing a strain on system resources.*
+
+*This is the default transaction mode on login.*
+
+*To change to transactionless transaction mode, send the message:*
+
+*`System transactionMode: #autoBegin`*
+
+*This aborts the current transaction and starts a new transaction.*
+
+---
+
+###Begin Transaction
+**Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.2**
+
+---
+*To begin a transaction, execute*
+
+*System beginTransaction*
+
+*This message gives you a fresh view of the repository and starts a transaction. When you
+commit or abort this new transaction, you will again be outside of a transaction until you
+either explicitly begin a new one or change transaction modes.*
+
+---
+
 ###Commit Record Backlog
 **Excerpted from [System Administration Guide for GemStone/S 64 Bit][7], Section 4.9**
 
@@ -805,11 +863,23 @@ the error RT_ERR_STACK_LIMIT.*
 
 ---
 
-####*Manual transaction mode*
-
 *In this mode, you can be logged in and outside of a transaction. You explicitly control whether your session starts a transaction, makes changes, and commits. Although a transaction is started for you when you log in, you can set the transaction mode to manual, which aborts the current transaction and leaves you outside a transaction. You can subsequently start a transaction when you are ready to commit. Manual transaction mode provides a method of minimizing the transactions, while still managing the repository for concurrent access.*
 
 *In manual transaction mode, you can view the repository, browse objects, and make computations based upon object values. You cannot, however, make your changes permanent, nor can you add any new objects you may have created while outside a transaction. You can start a transaction at any time during a session; you can carry temporary results that you may have computed while outside a transaction into your new transaction, where they can be committed, subject to the usual constraints of conflict-checking.*
+
+*To change to manual transaction mode, send the message:*
+
+*System transactionMode: #manualBegin*
+
+*This aborts the current transaction and leaves the session not in transaction.*
+
+*To begin a transaction, execute*
+
+*System beginTransaction*
+
+*This message gives you a fresh view of the repository and starts a transaction. When you
+commit or abort this new transaction, you will again be outside of a transaction until you
+either explicitly begin a new one or change transaction modes.*
 
 ---
 
