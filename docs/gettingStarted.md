@@ -63,13 +63,13 @@ run
 
 The main Smalltalk process is blocked because we have an infinite `whileTrue:` loop.
 The exception handler is protecting the `"service code"`, so we shouldn't have an *unhandled exception*, as long as the *exceptionSet* is covering the proper set of exceptions.
-Of course, if we are forking any processes, each of the forked process must have an exception handler near the top of the stack to gurad against *unhandled exceptions*. 
+Of course, if we are forking any processes, each of the forked process must have an exception handler near the top of the stack to guard against *unhandled exceptions*. 
 
 In GemStone, the top-level exception handler should be defined to handle the following exceptions:
-  - **AlmostOutOfMemory** - Notication signalled when a percent [temporary object space](#temporary-object-space) threshold is exceeded. The [Topaz][2] process will be terminated if [temporary object space](#temporary-object-space) is completely consumed.
-  - **AlmostOutOfStack** - Notification signaled when the 
-  - **Error**
-  - **TransactionBacklog**
+  - **AlmostOutOfMemory** - Notication signalled when a percent [temporary object space](#temporary-object-space) threshold is exceeded. The [Topaz][2] process will be terminated if [temporary object space](#temporary-object-space) is completely consumed. A typical handler will do a commit to cause persistent objects to be flushed from [temporary object space](#temporary-object-space) to disk. If a significant amount of [temporary object space](#temporary-object-space) is being consumed on the stack, then logging a stack trace and unwinding the stack may be called for. 
+  - **AlmostOutOfStack** - Notification signaled when the size of the current execution stack is about to exceed the [max execution stack depth](#gem_max_smalltalk_stack_depth). Again, the [Topaz][2] process will be terminated if the notification is not heeded. A typical handler will log a stack trace and unwind the stack.
+  - **Error** - The typical error handler should log the stack trace and unwind the stack.
+  - **TransactionBacklog** - If signalling is enabled, a typical handler will do an abort. If signalling is not enabled and/or an abort is not performed in a timely manner, then the session will be forcibly terminated.
 
 When running Smalltalk code in a [Topaz][2] process, one must account for *unhandled exceptions*.
 In a client Smalltalk like [Pharo][12], *unhandled exceptions* result in a debugger window being opened in the [GUI][13].
@@ -773,7 +773,8 @@ committed by other users become visible to you...*
 
 ---
 
-###GEM\_MAX\_SMALLTALK\_STACK_DEPTH
+###GEM_MAX_SMALLTALK_STACK_DEPTH
+**Excerpted from [System Administration Guide for GemStone/S 64 Bit][7], Appendix A.3**
 
 ---
 
