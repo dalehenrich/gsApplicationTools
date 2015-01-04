@@ -492,7 +492,7 @@ doTransaction: aBlock
 This method dumps the  [conflict dictionary](#transaction-conflict-dictionary) to the [object log](#object-log) and signals an error.
 
 ####Practical Gem Server Transaction Support
-The `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` wraps a transaction around the [``gemServer:exceptionSet:beforeUnwind:ensure:`](#gem-server-exception-handling) method and exports the `conflictBlock`:
+The `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` wraps a transaction around the [``gemServer:exceptionSet:beforeUnwind:ensure:`](#gem-server-exception-handling) method and exports the [`conflictBlock`](#dotransactiononconflict):
 
 ```Smalltalk
 gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock onConflict: conflictBlock
@@ -511,7 +511,7 @@ gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwi
     onConflict: conflictBlock
 ```
 
-These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode):
+There are several variants of the  `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` available:
   - gemServerTransaction:
   - gemServerTransaction:beforeUnwind:
   - gemServerTransaction:beforeUnwind:ensure:
@@ -532,29 +532,6 @@ These methods provide for *exception handling* and operate in [serial processing
 
 
 
-In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
-The [view of the repository](#gemstone-transaction) is shared by all of the threads in the vm.
-Consequently, one must take great care in managing transaction boundaries when running a multi-threaded application in a *gem server*.
-
-These methods provide for *exception handling* and operate in [serial processing mode](#serial-processing-mode):
-  - gemServerTransaction:
-  - gemServerTransaction:beforeUnwind:
-  - gemServerTransaction:beforeUnwind:ensure:
-  - gemServerTransaction:beforeUnwind:ensure:onConflict:
-  - gemServerTransaction:beforeUnwind:onConflict:
-  - gemServerTransaction:ensure:
-  - gemServerTransaction:ensure:onConflict:
-  - gemServerTransaction:exceptionSet:
-  - gemServerTransaction:exceptionSet:beforeUnwind:
-  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:
-  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:
-  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:
-  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:ensure:
-  - gemServerTransaction:exceptionSet:ensure:
-  - gemServerTransaction:onConflict:
-
-With the **onConflict:** block you may specify custom processing in the event of a [commit conflict](#transaction-conflict). 
-By default, the [transaction conflict dictionary](#transaction-conflict-dictionary) is written to the [object log](#object-log).
 
 
 #####Parallel Processing Mode
