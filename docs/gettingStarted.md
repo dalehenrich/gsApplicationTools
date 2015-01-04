@@ -530,8 +530,9 @@ There are several variants of the  `gemServerTransaction:exceptionSet:beforeUnwi
   - gemServerTransaction:exceptionSet:ensure:
   - gemServerTransaction:onConflict:
 
-With only one Smalltalk process in the *transaction critical section* at any one time, you must run separate **N** *gem server* to handle **N** concurrent tasks.
+With only one Smalltalk process in the *transaction critical section* at any one time, you must run **N** separate *gem server* to handle **N** concurrent tasks.
 The shorter you can make the task response time, the fewer *gem servers* that you'll need.
+
 Long running transactions combined with a large number of *gem servers* can lead to large a [commit record backlogs](#commit-record-backlog), so it is a good idea to make your transactions as short as possible.
 
 In general there are two broad categories of tasks performed by a *gem server*:
@@ -550,12 +551,14 @@ handleRequest: request for: socket
     ensure: [ socket close ] ] fork
 ```
 
+In this example I assume that the `processRequest:for:` is pure business logic and will execute relatively quickly.
+
 By following this pattern, you will be able to write the `processRequest:for:` logic without ever having to worry about transaction boundaries.
 
 This is basically the transaction model used by [GsDevKit/Seaside31][4].
 
 #####I/O Gem Server Tasks
-In a long running, wait intensive *gem server*, you will run the task handling logic in a forked process, as before, but you will want to exclude the wait time, from the *transaction critical block*, like the following:
+In a long running, wait intensive *gem server*, you will run the task handling logic in a forked process, as before, but you will want to exclude the wait intensive tasks, from the *transaction critical block*, like the following:
 
 ```Smalltalk
 performTask:
