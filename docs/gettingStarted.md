@@ -160,28 +160,7 @@ scriptStartServiceOn: portOrNil
     startServerOn: portOrNil	"does not return"
 ```
 
-calls the `scriptServicePrologOn:` method:
-
-```Smalltalk
-scriptServicePrologOn: portOrNil
-  self
-    scriptLogEvent:
-      '-->>Script Start ' , self name , ' on ' , portOrNil printString
-    object: self.
-  self
-    recordGemPid: portOrNil;
-    setStatmonCacheName;
-    enableRemoteBreakpointHandling.
-  self transactionMode: #'manualBegin'.
-  self
-    startTransactionBacklogHandling;
-    enableAlmostOutOfMemoryHandling
-```
-
-which, records the gem pid in a file, sets the statmonitor cache name, enables remote breakpoint handling, puts the gem in [manual transaction mode](#manual-transaction-mode), starts a **TransactionBacklog** handler, and enables **AlmostOutOrMemory** handling.
-
-The `startServerOn:` method is called by both the `scriptStartServiceOn:` method and the `interactiveStartServiceOn:transactionMode:` method.
-This method is expected to block the main Smalltalk process in the *gem*:
+The `startServerOn:` method is expected to block the main Smalltalk process in the *gem*:
 
 ```Smalltalk
 startServerOn: portOrNil
@@ -345,6 +324,8 @@ handleRequest: request for: socket
     beforeUnwind: [ :ex | ^ self writeServerError: ex to: socket ]
 ```
 
+If your *gem server* needs custom handling for an exception, you can add new `gemServerHandle*` methods or override existing `gemServerHandle*` methods.
+
 ####Gem Server Default Exception Logging
 When an exception is handled, the stack is written to the gem log and a continuation for the stack is saved to the [object log](#object-log) by the `logStack:titled:inTransactionDo:` method:
 
@@ -392,8 +373,7 @@ saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
           inTransactionBlock value ] ]
 ```
 
-The `logStack:titled:inTransactionDo:` method is called by both `logStack:titled:` method and the `serverError:titled:inTransactionDo:` method.
-The `serverError:titled:` method also calls the `serverError:titled:inTransactionDo:` method:
+The `serverError:titled:` method calls `logStack:titled:inTransactionDo:` and allows for [interactive debugging](#interactive-debugging) of the exception:
 
 ```Smalltalk
 serverError: exception titled: title inTransactionDo: inTransactionBlock
@@ -403,8 +383,6 @@ serverError: exception titled: title inTransactionDo: inTransactionBlock
     inTransactionDo: inTransactionBlock.
   self doInteractiveModePass: exception
 ```
-
-The `serverError:*` variants end up sending `pass` to the exception if the *gem server* is in [interactive debugging mode](#interactive-debugging), whereas the `logStack:*` variants simply log the exceptions.
 
 ####Gem Server `ensureBlock`
 The `ensureBlock` gives you a chance to make sure that any resources used by the application within the scope of the `gemServer:*` call are cleaned up.
