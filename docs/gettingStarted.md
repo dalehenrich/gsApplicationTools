@@ -2,7 +2,10 @@
 
 ##Table of Contents
 - [What is a Gem Server](#what-is-a-gem-server)
-  - [Topaz Execution Environment](#topaz-execution-environment)
+  - [Topaz](#topaz)
+    - [Topaz Execution Environment](#topaz-execution-environment)
+    - [Topaz Transaction Modes](#topaz-transaction-modes)
+- [GemServer](#gemserver)
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
     - [Gem Server Default Exception Set](#gem-server-default-exception-set)
@@ -27,7 +30,7 @@
 
 A *gem server* is a [Topaz session](#gemstone-session) that executes an *application-specific service loop*.
 
-###Topaz Execution Environment
+###Topaz
 
 The [Topaz][2] execution model is very different from the typical Smalltalk execution model:
 
@@ -45,6 +48,9 @@ run
 
 Control returns to the [Topaz][2] console when the Smalltalk code itself returns, or an *unhandled exceptions* is encountered.
 When control returns to the console, Smalltalk execution is halted until another [Topaz][2] command is executed.
+
+####Topaz Execution Environment
+
 For server-style code to be run in [Topaz][2] you need to do two things:
   1. ensure that the main Smalltalk process blocks, i.e., does not return
   2. ensure that all exceptions are handled, including exceptions signalled in processes that have been forked from the main Smalltalk process.
@@ -62,8 +68,8 @@ run
 ```
 
 The main Smalltalk process is blocked because we have an infinite `whileTrue:` loop.
-The exception handler is protecting the `"service code"`, so we shouldn't have an *unhandled exception*, as long as the *exceptionSet* is covering the proper set of exceptions.
-Of course, if we are forking any processes, each of the forked process must have an exception handler near the top of the stack to guard against *unhandled exceptions* that looks like the following:
+The exception handler is protecting the `"application service loop code"`, so we shouldn't have an *unhandled exception*, as long as the *exceptionSet* is covering the proper set of exceptions.
+If we are forking blocks, each of the forked processes must have an exception handler near the top of the stack to guard against *unhandled exceptions* that looks like the following:
 
 ```Smalltalk
 [ 
@@ -78,7 +84,9 @@ In GemStone, the exception handlers should be defined to handle the following ex
   - **Error** - Most **Error** exceptions are going to be handled by error handlers in the application code itself, but it is prudent to provide a backstop exception handler for unanticipated error conditions. The typical error handler should log the stack trace and unwind the stack.
   - **TransactionBacklog** - If signalling is enabled, a typical handler will do an abort. If signalling is not enabled and/or an abort is not performed in a timely manner, then the session will be forcibly terminated.
 
+####Topaz Transaction Modes
 
+###GemServer
 The **GemServer** class provides a framework for standardized:
   - [exception handling services](#gem-server-exception-handlers)
   - [transaction management](#gem-server-transaction-management)
@@ -124,8 +132,6 @@ run
 [true] whileTrue: [ (Delay forSeconds: 1) wait ].
 %
 ```
-
-
 
 ###Gem Server Service Loop
 The `basicServerOn:` method implements the application-specific service loop and is expected to be defined by **GemServer** subclasses.
