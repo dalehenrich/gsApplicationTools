@@ -25,10 +25,6 @@
     - [Practical Gem Server Transaction Support](#practical-gem-server-transaction-support)
       - [Request/Response Gem Server Tasks](#requestresponse-gem-server-tasks)
       - [I/O Gem Server Tasks](#io-gem-server-tasks)
-      - [Parallel Processing Mode](#parallel-processing-mode)
-      - [Serial Processing Mode](#serial-processing-mode)
-        - [Seaside-style Transaction Model](#seaside-style-transaction-model)
-      - [Handling Transaction Conflicts](#handling-transaction-conflicts)
   - [Gem Server Control](#gem-server-control)
     - [Gem Server start/stop bash scripts](#gem-server-startstop-bash-scripts)
     - [Gem Server start/stip Smalltalk API](#gem-server-startstoprestart-smalltalk-api)
@@ -517,7 +513,24 @@ gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwi
     onConflict: conflictBlock
 ```
 
-With only one Smalltalk process in the *transaction critical section* at any one time, you must run separate *gem server* to handle concurrent tasks.
+There are several variants of the  `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` available:
+  - gemServerTransaction:
+  - gemServerTransaction:beforeUnwind:
+  - gemServerTransaction:beforeUnwind:ensure:
+  - gemServerTransaction:beforeUnwind:ensure:onConflict:
+  - gemServerTransaction:beforeUnwind:onConflict:
+  - gemServerTransaction:ensure:
+  - gemServerTransaction:ensure:onConflict:
+  - gemServerTransaction:exceptionSet:
+  - gemServerTransaction:exceptionSet:beforeUnwind:
+  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:
+  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:
+  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:
+  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:ensure:
+  - gemServerTransaction:exceptionSet:ensure:
+  - gemServerTransaction:onConflict:
+
+With only one Smalltalk process in the *transaction critical section* at any one time, you must run separate **N** *gem server* to handle **N** concurrent tasks.
 The shorter you can make the task response time, the fewer *gem servers* that you'll need.
 Long running transactions combined with a large number of *gem servers* can lead to large a [commit record backlogs](#commit-record-backlog), so it is a good idea to make your transactions as short as possible.
 
@@ -537,152 +550,27 @@ handleRequest: request for: socket
     ensure: [ socket close ] ] fork
 ```
 
+By following this pattern, you will be able to write the `processRequest:for:` logic without ever having to worry about transaction boundaries.
+
+This is basically the transaction model used by [GsDevKit/Seaside31][4].
+
 #####I/O Gem Server Tasks
-
-There are several variants of the  `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` available:
-  - gemServerTransaction:
-  - gemServerTransaction:beforeUnwind:
-  - gemServerTransaction:beforeUnwind:ensure:
-  - gemServerTransaction:beforeUnwind:ensure:onConflict:
-  - gemServerTransaction:beforeUnwind:onConflict:
-  - gemServerTransaction:ensure:
-  - gemServerTransaction:ensure:onConflict:
-  - gemServerTransaction:exceptionSet:
-  - gemServerTransaction:exceptionSet:beforeUnwind:
-  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:
-  - gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:
-  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:
-  - gemServerTransaction:exceptionSet:beforeUnwind:onConflict:ensure:
-  - gemServerTransaction:exceptionSet:ensure:
-  - gemServerTransaction:onConflict:
-
-
-
-
-
-
-
-#####Parallel Processing Mode
-In *parallel processing mode* multiple threads may be employed in a *gem server* where 
-updates to persistent objects must be made within a critical section that:
-  - acquires the *transaction mutex* (see `GemServer>>transactionMutex`)
-  - performs an abort or begin transaction
-  - updates the persistent objects
-  - performs a commit
-
-For convenience, the methods `GemServer>>doTransaction:` and `GemServer>>doTransaction:onConflict:` provide a safe way to update persistent objects in *parallel processing mode*:
+In a long running, wait intensive *gem server*, you will run the task handling logic in a forked process, as before, but you will want to exclude the wait time, from the *transaction critical block*, like the following:
 
 ```Smalltalk
-doTransaction: aBlock onConflict: conflictBlock
-  "Perform a transaction. If the transaction fails, evaluate <conflictBlock> with transaction 
-   conflicts dictionary."
-
-  (self doBasicTransaction: aBlock)
-    ifFalse: [ 
-      self doAbortTransaction.
-      conflictBlock value: System transactionConflicts ]
-```
-
-```Smalltalk
-doTransaction: aBlock
-  "Perform a transaction. If the transaction fails, signal an Error."
-
+performTask:
+  [ 
   self
-    doTransaction: aBlock
-    onConflict: [ :conflicts | 
-      (self
-        doBasicTransaction: [ ObjectLogEntry warn: 'Commit failure ' object: conflicts ])
-        ifTrue: [ self error: 'commit conflicts' ]
-        ifFalse: [ 
-          self doAbortTransaction.
-          self error: 'commit conflicts - could not log conflict dictionary' ] ]
+    gemServer: [ | response |
+      response := (HTTPSocket httpGet: 'http://example.com') contents.
+      self gemServerTransaction: [ self processResponse: response ] ] ] fork
 ```
 
+In this example we do the http get *outside of transaction*, which means that a large number of tasks can be waiting for an http response, concurrently.
+Only when a response becomes available, does the *transaction mutex* and then the processing required while *in transaction* should be very short.
 
-#####Serial Processing Mode
-It may not always be practical or necessary to employ *parallel processing mode* in a *gem server*.
-In [Seaside][4] applications, for example, transaction boundaries are defined to correspond to the HTTP request boundaries:
-  1. begin transaction before handling the HTTP request
-  2. commit transaction before returning HTTP response to the clent
-  3. on conflict, abort transaction and retry HTTP request.
-The transaction boundaries are managed by the Seaside framework and it is not necessary to complicate the application code with transaction management.
-
-For concurrent processing, one may run multiple gems in parallel.
-
-
-######Seaside-style Transaction Model
-
-```Smalltalk
-basicServerOn: ignored
-  "forked by caller"
-
-  self
-    gemServer: [ 
-      | requests |
-      requests := self requests.
-      [ requests notEmpty ]
-        whileTrue: [ 
-          | request |
-          request := requests first.
-          requests remove: request.
-          [ self handleRequestFrom: request ] fork ] ]
-```
-
-```Smalltalk
-handleRequestFrom: request
-  "forked by caller"
-
-  self
-    gemServer: [ 
-      | retryCount |
-      retryCount := 0.
-      [ retryCount < 11 ]
-        whileTrue: [ 
-          self
-            processRequest: request
-            onSuccess: [ :response | ^ self writeResponse: response to: request ]
-            onError: [ :ex | ^ self writeApplicationError: ex to: request ].
-          retryCount := retryCount + 1 ] ]
-    beforeUnwind: [ :ex | ^ self writeServerError: ex to: request ]
-```
-
-```Smalltalk
-processRequest: request onSuccess: successBlock onError: errorBlock
-  "Both <successBlock> and errorBlock are expected to do a non-local return.
-   If this method returns normally, the request should be retried. "
-
-  | requestResult |
-  requestResult := self
-    gemServerTransaction: [ self processRequest: request ]
-    beforeUnwind: errorBlock
-    onConflict: [ :conflicts | 
-      "log conflict and retry"
-      self
-        doTransaction: [ ObjectLogEntry error: 'Commit failure ' object: conflicts ].
-      ^ self	"retry" ].
-  successBlock value: requestResult
-```
-
-
-#####Handling Transaction Conflicts
-The default behavior for the **onConflict:** block is as follows:
-
-```Smalltalk
-gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock
-  self
-    gemServerTransaction: aBlock
-    exceptionSet: exceptionSet
-    beforeUnwind: beforeUnwindBlock
-    onConflict: [ :conflicts | 
-      self doAbortTransaction.
-      self
-        doSimpleTransaction: [ ObjectLogEntry warn: 'Commit failure ' object: conflicts ] ]
-```
-
-The *conflicts* argument to the block is a [transaction conflict dictionary](#transaction-conflict-dictionary).
-By default, the *transaction conflict dictionary* is written to the [object log](#object-log) for analysis.
-
-For a web server, in addition to logging the *transaction conflict dictionary*, it may make sense to simply retry the request again, as is done for *Seaside*.
+It is important that one avoids modifying persistent objects while *outside of transaction*.
+It is permissable to read persistent objects but any modifications to persistent objects made while outside of transaction will be lost when the [abort](#abort-transaction) or [begin](#begin-transaction) transaction is called by the `gemServerTransaction:` method.
 
 ---
 
