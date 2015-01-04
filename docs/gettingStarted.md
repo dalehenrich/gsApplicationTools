@@ -23,9 +23,9 @@
 
 ##What is a Gem Server
 
-A *gem server* is a [Topaz session](#gemstone-session) that executes an application-specific service loop.
+A *gem server* is a [Topaz session](#gemstone-session) that executes an *application-specific service loop*.
 
-The [Topaz][2] process is initiated by launching a [bash script](#gem-server-startstop-bash-scripts) that looks roughly like the following: 
+The [Topaz][2] process that runs the *application-specific service loop* is initiated by launching a [bash script](#gem-server-startstop-bash-scripts) that looks roughly like the following: 
 
 ```
 #!/bin/bash
@@ -34,12 +34,23 @@ GemServer=$1
 Port=$2
 
 topaz -l << EOF
+
 set user DataCurator pass swordfish
 login
+
 run
 (GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
 %
 EOF
+```
+
+The `run` command is used to execute Smalltalk expressions in topaz:
+
+```
+run
+(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
+%
+
 ```
 
 The `scriptStartServiceOn:` method:
