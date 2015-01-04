@@ -111,7 +111,7 @@ See the [Gem Server Transaction Management](#gem-server-transaction-management) 
 As the preceding sections have highlighted, there are several issues in the area of *server exception handling* and *server transaction management* that are unique to the GemStone Smalltalk environment.
 The **GemServer** class provides a concise framework for standardized:
   - [service loop definition](#gem-server-service-loop)
-  - [exception handling services](#gem-server-exception-handlers)
+  - [exception handling services](#gem-server-exception-handling)
   - [transaction management](#gem-server-transaction-management)
   - [gem server control](#gem-server-control)
   - [gem server logging](#gem-server-default-exception-logging)
