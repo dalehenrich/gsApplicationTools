@@ -14,6 +14,7 @@
     - [Gem Server Default Exception Handlers](#gem-server-default-exception-handlers)
     - [Gem Server `beforeUnwindBlock`](#gem-server-beforeunwindblock)
     - [Gem Server Default Exception Logging](#gem-server-default-exception-logging)
+    - [Gem Server `ensureBlock`](#gem-server-ensureblock)
   - [Gem Server Transaction Management](#gem-server-transaction-management)
     - [Which transaction mode for Topaz servers?](#which-transaction-mode-for-topaz-servers)
     - [Parallel Processing Mode](#parallel-processing-mode)
@@ -107,7 +108,7 @@ The choice of *transaction mode* depends upon the characteristics of your applic
 ---
 
 ##GemServer class
-As the preceding sections have highlighted there are several issues in the area of *server exception handling* and *server transaction management* that are unique to the GemStone Smalltalk environment.
+As the preceding sections have highlighted, there are several issues in the area of *server exception handling* and *server transaction management* that are unique to the GemStone Smalltalk environment.
 The **GemServer** class provides a concise framework for standardized:
   - [service loop definition](#gem-server-service-loop)
   - [exception handling services](#gem-server-exception-handlers)
@@ -137,7 +138,7 @@ Once an instance has been registered, it may be accessed from the **GemServerReg
 ###Gem Server Service Loop
 A *gem server* is associated with one or more ports (a port may be nil).
 
-One [Topaz sessions](#gemstone-session) is launched for each of the *ports* associated with a *gem server*.
+One [Topaz session](#gemstone-session) is launched for each of the *ports* associated with a *gem server*.
 
 The *gem server* instance is shared by each of the *gems*.
 
@@ -180,7 +181,6 @@ scriptServicePrologOn: portOrNil
 which, records the gem pid in a file, sets the statmonitor cache name, enables remote breakpoint handling, puts the gem in [manual transaction mode](#manual-transaction-mode), starts a **TransactionBacklog** handler, and enables **AlmostOutOrMemory** handling.
 
 The `startServerOn:` method is called by both the `scriptStartServiceOn:` method and the `interactiveStartServiceOn:transactionMode:` method.
-
 This method is expected to block the main Smalltalk process in the *gem*:
 
 ```Smalltalk
@@ -315,7 +315,7 @@ gemServerHandleErrorException: exception
       self name , ' ' , exception class name asString , ' exception encountered: '.
 ```
 
-where the [exception is logged](#gem-server-exception-logging) and the method returns.
+where the [exception is logged](#gem-server-default-exception-logging) and the method returns.
 
 For a resumable **Exception**, the `GemServer>>gemServerHandleResumableException:` method is invoked:
 
@@ -346,54 +346,19 @@ handleRequest: request for: socket
 ```
 
 ####Gem Server Default Exception Logging
-
-The __gemServer:*__ methods should be used at the very top of  each *forked* block in your *gem server*:
-
-
-The __gemServer:*__ family of methods:  
-  - gemServer:
-  - gemServer:beforeUnwind:
-  - gemServer:beforeUnwind:ensure:
-  - gemServer:ensure:
-  - gemServer:exceptionSet:
-  - gemServer:exceptionSet:beforeUnwind:
-  - gemServer:exceptionSet:beforeUnwind:ensure:
-  - gemServer:exceptionSet:ensure:
-
-
-
-The **gemServer:** method has
-
-
-The **logStack:titled:** method:
+When an exception is handled, the stack is written to the gem log and a continuation for the stack is saved to the [object log](#object-log) by the `logStack:titled:inTransactionDo:` method:
 
 ```Smalltalk
 logStack: exception titled: title inTransactionDo: inTransactionBlock
+  self writeGemLogEntryFor: exception titled: title.
   self
     saveContinuationFor: exception
     titled: title
-    inTransactionDo: inTransactionBlock.
-  self writeGemLogEntryFor: exception titled: title
+    inTransactionDo: inTransactionBlock
 ```
 
-snaps off a continuation and saves it to the [object log](#object-log):
-
-```Smalltalk
-saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
-  | label |
-  label := title , ': ' , exception description.
-  System inTransaction
-    ifTrue: [ 
-      self createContinuation: label.
-      inTransactionBlock value ]
-    ifFalse: [ 
-      self
-        doTransaction: [ 
-          self createContinuation: label.
-          inTransactionBlock value ] ]
-```
-
-then dumps a stack trace to the gem log:
+The `writeGemLogEnryFor:titled:` dumps a stack to the gem log.
+This method is called first to ensure that a record of the error has been written to disk in the event the continuation fails to be committed:
 
 ```Smalltalk
 writeGemLogEntryFor: exception titled: title
@@ -410,21 +375,47 @@ writeGemLogEntryFor: exception titled: title
   GsFile gciLogServer: stream contents
 ```
 
-
-These messages are *double dispatched* via the `GemServer>>handleGemServerException:` method:
+The `saveContinuationFor:titled:inTransactionDo:` method arranges to create the continuation within it's own transaction or within an existing transaction:
 
 ```Smalltalk
-handleGemServerException: exception
-  "if control is returned to receiver, then exception is treated like an error, i.e., 
-   the beforeUnwindBlock is invoked and stack is unwound."
-
-  ^ exception exceptionHandlingForGemServer: self
+saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
+  | label |
+  label := title , ': ' , exception description.
+  System inTransaction
+    ifTrue: [ 
+      self createContinuation: label.
+      inTransactionBlock value ]
+    ifFalse: [ 
+      self
+        doTransaction: [ 
+          self createContinuation: label.
+          inTransactionBlock value ] ]
 ```
 
-There are two options for handling exceptions in these methods: 
-- *resume* the exception, in which case processing continues uninterrupted
-- *return* from the method, in which case the stack is unwound to point of the **gemServer:** method call. 
-  The **beforeUnwind:** block can be used to perform any additional actions that might need to be performed before unwinding the stack.
+The `logStack:titled:inTransactionDo:` method is called by both `logStack:titled:` method and the `serverError:titled:inTransactionDo:` method and the `serverError:titled:` method calls the `serverError:titled:inTransactionDo:` method:
+
+```Smalltalk
+serverError: exception titled: title inTransactionDo: inTransactionBlock
+  self
+    logStack: exception
+    titled: title , ' Server error encountered: '
+    inTransactionDo: inTransactionBlock.
+  self doInteractiveModePass: exception
+```
+
+As you can see, the `serverError:*` variants end up sending `pass` to the exception if the *gem server* is in [interactive debugging mode](#interactive-debugging)
+
+####Gem Server `ensureBlock`
+The `ensureBlock` gives you a chance to make sure that any resources used by the application within the scope of the `gemServer:*` call are cleaned up.
+For example, a web server may want to close sockets when processing is finished:
+
+```Smalltalk
+handleRequest: request for: socket
+  self
+    gemServer: [ ^self processRequest: request for: socket ]
+    beforeUnwind: [ :ex | ^ self writeServerError: ex to: socket ]
+    ensure: [socket close]
+```
 
 ---
 
@@ -918,12 +909,6 @@ problem.*
 
 *The Write-Dependency conflict set contains objects modified (including DependencyMap operations) in the current transaction that were either added to, removed from,  or changed in the DependencyMap by another transaction. Objects in the  Write-Dependency conflict set may be in the Write-Write conflict set.*
 
----
-
-####Transaction State
-**Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.1**
-
----
 ---
 
 [1]: https://gemstonesoup.wordpress.com/2007/05/10/porting-application-specific-seaside-threads-to-gemstone/
