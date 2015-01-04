@@ -23,6 +23,7 @@
     - [Practical Gem Server Transaction Support](#practical-gem-server-transaction-support)
       - [Parallel Processing Mode](#parallel-processing-mode)
       - [Serial Processing Mode](#serial-processing-mode)
+        - [Seaside-style Transaction Model](#seaside-style-transaction-model)
       - [Handling Transaction Conflicts](#handling-transaction-conflicts)
   - [Gem Server Control](#gem-server-control)
     - [Gem Server start/stop bash scripts](#gem-server-startstop-bash-scripts)
@@ -451,7 +452,7 @@ Otherwise it is not possible to guarantee the integrity of your persistent data.
 The  `doBasicTransaction:` method does not handle commit failures, so for everyday transactions, you should use either [`doTransaction:onConflict:`](#dotransactiononconflict) or [`doTransaction:`](#dotransaction), depending upon whether or not you want to handle [commit conflicts](#transaction-conflict) explicitly or not.
 
 #####doTransaction:onConflict:
-The `doTransaction:onConflict:` method allows you to specify action to be taken in the event of a [commit conflicts](#transaction-conflict):
+The `doTransaction:onConflict:` method allows you to specify action to be taken in the event of a [commit conflict](#transaction-conflict):
 
 ```Smalltalk
 doTransaction: aBlock onConflict: conflictBlock
@@ -470,7 +471,7 @@ The `conflictBlock` is passed the [conflict dictionary](#transaction-conflict-di
 Typically the `conflictBlock` is used to stash the [conflict dictionary](#transaction-conflict-dictionary) in the [object log](#object-log).
 
 #####doTransaction:
-If an error is the appropriate response to a [commit conflicts](#transaction-conflict), the the `doTransaction` method should be used: 
+If an error is the appropriate response to a [commit conflict](#transaction-conflict), then the `doTransaction` method should be used: 
 
 ```Smalltalk
 doTransaction: aBlock
@@ -489,7 +490,7 @@ doTransaction: aBlock
 
 This method dumps the  [conflict dictionary](#transaction-conflict-dictionary) to the [object log](#object-log) and signals an error.
 
-
+####Practical Gem Server Transaction Support
 
 In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
 The [view of the repository](#gemstone-transaction) is shared by all of the threads in the vm.
@@ -534,7 +535,7 @@ gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwi
     onConflict: conflictBlock
 ```
 
-####Parallel Processing Mode
+#####Parallel Processing Mode
 In *parallel processing mode* multiple threads may be employed in a *gem server* where 
 updates to persistent objects must be made within a critical section that:
   - acquires the *transaction mutex* (see `GemServer>>transactionMutex`)
@@ -571,7 +572,7 @@ doTransaction: aBlock
 ```
 
 
-####Serial Processing Mode
+#####Serial Processing Mode
 It may not always be practical or necessary to employ *parallel processing mode* in a *gem server*.
 In [Seaside][4] applications, for example, transaction boundaries are defined to correspond to the HTTP request boundaries:
   1. begin transaction before handling the HTTP request
@@ -582,7 +583,7 @@ The transaction boundaries are managed by the Seaside framework and it is not ne
 For concurrent processing, one may run multiple gems in parallel.
 
 
-#####Seaside-style structure...
+######Seaside-style Transaction Model
 
 ```Smalltalk
 basicServerOn: ignored
@@ -636,7 +637,7 @@ processRequest: request onSuccess: successBlock onError: errorBlock
 ```
 
 
-####Handling Transaction Conflicts
+#####Handling Transaction Conflicts
 The default behavior for the **onConflict:** block is as follows:
 
 ```Smalltalk
