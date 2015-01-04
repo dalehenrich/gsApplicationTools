@@ -140,7 +140,7 @@ A *gem server* is associated with one or more ports (a port may be nil).
 
 One [Topaz session](#gemstone-session) is launched for each of the *ports* associated with a *gem server*.
 
-The *gem server* instance is shared by each of the *gems*.
+The *gem server* instance is shared by each of the *[Topaz][2] gems*.
 
 The *gem server* is launched by calling the [gem server start script](#gem-server-startstop-bash-scripts).
 The [script](#gem-server-startstop-bash-scripts) executes the following Smalltalk code to start the *gem server*:
@@ -392,7 +392,8 @@ saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
           inTransactionBlock value ] ]
 ```
 
-The `logStack:titled:inTransactionDo:` method is called by both `logStack:titled:` method and the `serverError:titled:inTransactionDo:` method and the `serverError:titled:` method calls the `serverError:titled:inTransactionDo:` method:
+The `logStack:titled:inTransactionDo:` method is called by both `logStack:titled:` method and the `serverError:titled:inTransactionDo:` method.
+The `serverError:titled:` method also calls the `serverError:titled:inTransactionDo:` method:
 
 ```Smalltalk
 serverError: exception titled: title inTransactionDo: inTransactionBlock
@@ -403,7 +404,7 @@ serverError: exception titled: title inTransactionDo: inTransactionBlock
   self doInteractiveModePass: exception
 ```
 
-As you can see, the `serverError:*` variants end up sending `pass` to the exception if the *gem server* is in [interactive debugging mode](#interactive-debugging)
+The `serverError:*` variants end up sending `pass` to the exception if the *gem server* is in [interactive debugging mode](#interactive-debugging), whereas the `logStack:*` variants simply log the exceptions.
 
 ####Gem Server `ensureBlock`
 The `ensureBlock` gives you a chance to make sure that any resources used by the application within the scope of the `gemServer:*` call are cleaned up.
@@ -414,7 +415,7 @@ handleRequest: request for: socket
   self
     gemServer: [ ^self processRequest: request for: socket ]
     beforeUnwind: [ :ex | ^ self writeServerError: ex to: socket ]
-    ensure: [socket close]
+    ensure: [ socket close ]
 ```
 
 ---
