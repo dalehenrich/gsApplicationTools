@@ -16,9 +16,14 @@
     - [Gem Server Exception Logging](#gem-server-exception-logging)
     - [Gem Server `ensureBlock`](#gem-server-ensureblock)
   - [Gem Server Transaction Management](#gem-server-transaction-management)
-    - [Parallel Processing Mode](#parallel-processing-mode)
-    - [Serial Processing Mode](#serial-processing-mode)
-    - [Handling Transaction Conflicts](#handling-transaction-conflicts)
+    - [Basic Gem Server Transaction Support](#basic-gem-server-transaction-support)
+      - [`doBasicTransaction:`](#dobasictransaction)
+      - [`doTransaction:onConflict:`](#dotransactiononconflict)
+      - [`doTransaction:`](#dotransaction)
+    - [Practical Gem Server Transaction Support](#practical-gem-server-transaction-support)
+      - [Parallel Processing Mode](#parallel-processing-mode)
+      - [Serial Processing Mode](#serial-processing-mode)
+      - [Handling Transaction Conflicts](#handling-transaction-conflicts)
   - [Gem Server Control](#gem-server-control)
     - [Gem Server start/stop bash scripts](#gem-server-startstop-bash-scripts)
     - [Gem Server start/stip Smalltalk API](#gem-server-startstoprestart-smalltalk-api)
@@ -397,6 +402,8 @@ handleRequest: request for: socket
 ---
 
 ###Gem Server Transaction Management
+
+####Basic Gem Server Transaction Support
 For the current **GemServer** implementation I have chosen to support [manual transaction mode](#manual-transaction-mode) when running a *gem server* in [Topaz][2] using the `scriptStartServiceOn:` method.
 For [interactive debugging](#interactive-debugging) you can use either *transaction mode* with the `interactiveStartServiceOn:transactionMode:` method: 
   - use [automatic transaction mode](#automatic-transaction-mode) (**#autoBegin**) when doing in-place development on your *gem server* application.
@@ -404,19 +411,85 @@ For [interactive debugging](#interactive-debugging) you can use either *transact
 
 No matter which *transaction mode* is used, it is important to remember that one must manage transaction boundaries carefully:
 
->> when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes*.
+>> When an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
+
+The **GemServer** class provides three methods for performing transactions: 
+  - [`doBasicTransaction:`](#dobasictransaction)
+  - [`doTransaction:onConflict:`](#dotransactiononconflict)
+  - [`doTransaction:`](#dotransaction)
+
+#####doBasicTransaction:
+The `doBasicTransaction:` method performs transactions under the protection of the `transactionMutex`:
+
+```Smalltalk
+doBasicTransaction: aBlock
+  "I do an unconditional commit. 
+   If running in manual transaction mode, the system will be outside of transaction upon 
+    returning.
+   Return true, if the transaction completed without conflicts.
+   If the transaction fails, return false and the caller is responsible for post commit failure
+   processing."
+
+  self transactionMutex
+    critical: [ 
+      | commitResult |
+      [ 
+      System inTransaction
+        ifTrue: [ aBlock value ]
+        ifFalse: [ 
+          self doBeginTransaction.
+          aBlock value ] ]
+        ensure: [ 
+          "workaround for Bug 42963: ensure: block executed twice (don't return from ensure: block)"
+          commitResult := self doCommitTransaction ].
+      ^ commitResult ]
+```
+
+It is **absolutely** imperative that all manipulation of persistent data in the *gem server* be performed while in the critical section of the `transactionMutex`.
+Otherwise it is not possible to guarantee the integrity of your persistent data.
+
+The  `doBasicTransaction:` method does not handle commit failures, so for everyday transactions, you should use either [`doTransaction:onConflict:`](#dotransactiononconflict) or [`doTransaction:`](#dotransaction), depending upon whether or not you want to handle [commit conflicts](#transaction-conflict) explicitly or not.
+
+#####doTransaction:onConflict:
+The `doTransaction:onConflict:` method allows you to specify action to be taken in the event of a [commit conflicts](#transaction-conflict):
+
+```Smalltalk
+doTransaction: aBlock onConflict: conflictBlock
+  "Perform a transaction. If the transaction fails, evaluate <conflictBlock> with transaction 
+   conflicts dictionary."
+
+  (self doBasicTransaction: aBlock)
+    ifFalse: [ 
+      | conflicts |
+      conflicts := System transactionConflicts.
+      self doAbortTransaction.
+      conflictBlock value: conflicts ]
+```
+
+The `conflictBlock` is passed the [conflict dictionary](#transaction-conflict-dictionary) as an argument.
+Typically the `conflictBlock` is used to stash the [conflict dictionary](#transaction-conflict-dictionary) in the [object log](#object-log).
+
+#####doTransaction:
+If an error is the appropriate response to a [commit conflicts](#transaction-conflict), the the `doTransaction` method should be used: 
+
+```Smalltalk
+doTransaction: aBlock
+  "Perform a transaction. If the transaction fails, signal an Error."
+
+  self
+    doTransaction: aBlock
+    onConflict: [ :conflicts | 
+      (self
+        doBasicTransaction: [ ObjectLogEntry warn: 'Commit failure ' object: conflicts ])
+        ifTrue: [ self error: 'commit conflicts' ]
+        ifFalse: [ 
+          self doAbortTransaction.
+          self error: 'commit conflicts - could not log conflict dictionary' ] ]
+```
+
+This method dumps the  [conflict dictionary](#transaction-conflict-dictionary) to the [object log](#object-log) and signals an error.
 
 
-####Which transaction mode for Topaz servers?
-At first blush, [automatic transaction mode](#automatic-transaction-mode) seems to be the most convenient transaction mode for [Topaz][2] servers.
-With the system always in transaction one should never get an error doing a [commit transaction](#commit-transaction) without a preceding [begin transaction](#begin-transaction).
-However, if you are making use of multiple concurrent processes, there are advantages to using [manual transaction mode](#manual-transaction-mode).
-
-[Manual transaction mode](#manual-transaction-mode) means that you have a bit more protection from incorrect [aborts](#abort-transaction) or [commits](#commit-transaction): 
-  1. an incorrect [abort transaction](#abort-transaction) will result in a **commit error** before any logical corruption can be written to the repository.
-  2. an inadvertant [commit transaction](#commit-transaction) will commit a partial result from another process to the repository, thus introducing potential logical corruption, but any subsequent commit will result in a **commit error**, so at least you will be alerted to the existence of the incorrect transaction semantics.
-
-Using [automatic transaction mode](#automatic-transaction-mode) means that detecting logical corruption would be a bit harder to isolate and identify.
 
 In a *gem server*, when an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
 The [view of the repository](#gemstone-transaction) is shared by all of the threads in the vm.
