@@ -293,7 +293,7 @@ gemServerHandleErrorException: exception
       self name , ' ' , exception class name asString , ' exception encountered: '.
 ```
 
-where the [exception is logged](#gem-server-exception-logging) and the method returns.
+the [exception is logged](#gem-server-exception-logging) and the method returns.
 
 For a resumable **Exception**, the `GemServer>>gemServerHandleResumableException:` method is invoked:
 
