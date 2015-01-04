@@ -22,6 +22,9 @@
   - [Gem Server Control](#gem-server-control)
     - [Gem Server start/stop bash scripts](#gem-server-startstop-bash-scripts)
     - [Gem Server start/stip Smalltalk API](#gem-server-startstoprestart-smalltalk-api)
+  - [Gem Server Logging](#gem-server-logging)
+  - [Gem Server Debugging](#gem-server-debugging)
+
 - [Basic Gem Server Structure](#basic-gem-server-structure)
 - [Seaside Gem Servers](#seaside-gem-servers)
 - [ServiceVM Gem Servers](#servicevm-gem-servers)
@@ -109,6 +112,9 @@ The **GemServer** class provides a concise framework for standardized:
   - [service loop definition](#gem-server-service-loop)
   - [exception handling services](#gem-server-exception-handlers)
   - [transaction management](#gem-server-transaction-management)
+  - [gem server control](#gem-server-control)
+  - [gem server logging](#gem-server-logging)
+  - [gem server debugging](#gem-server-debugging)
 
 ###GemServerRegistry class
 The **GemServerRegistry** class provides a registry of named *gem servers*.
@@ -126,14 +132,19 @@ Once an instance has been registered, it may be accessed from the **GemServerReg
 
 ###Gem Server Service Loop
 A *gem server* is associated with one or more ports (a port may be nil).
-One [Topaz sessions](#gemstone-session) is launched for each of* ports*  associated with the *gem server*.
+
+One [Topaz sessions](#gemstone-session) is launched for each of the *ports* associated with the *gem server*.
+
 The *gem server* instance is shared by each of the *gems*.
+
 The *gem server* is launched by calling the [gem server start script](#gem-server-startstop-bash-scripts).
 The [script](#gem-server-startstop-bash-scripts) executes the following Smalltalk code to start the *gem server*:
 
 ```Smalltalk
 (GemServerRegistry gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
 ```
+
+The `scriptStartServiceOn:` method:
 
 ```Smalltalk
 scriptStartServiceOn: portOrNil
@@ -143,6 +154,8 @@ scriptStartServiceOn: portOrNil
     scriptServicePrologOn: portOrNil;
     startServerOn: portOrNil	"does not return"
 ```
+
+calls the `scriptServicePrologOn:` method:
 
 ```Smalltalk
 scriptServicePrologOn: portOrNil
@@ -156,9 +169,14 @@ scriptServicePrologOn: portOrNil
     enableRemoteBreakpointHandling.
   self transactionMode: #'manualBegin'.
   self
-    startSigAbortHandling;
+    startTransactionBacklogHandling;
     enableAlmostOutOfMemoryHandling
 ```
+
+which, records the gem pid in a file, sets the statmonitor cache name, enables remote breakpoint handling, puts the gem in [manual transaction mode](#manual-transaction-mode), starts a **TransactionBacklog** handler, and enables **AlmostOutOrMemory** handling.
+
+The `startServerOn:` is called by both the `scriptStartServiceOn:` method and `interactiveStartServiceOn:transactionMode:` method.
+This method is expected to block the main process:
 
 ```Smalltalk
 startServerOn: portOrNil
@@ -168,6 +186,7 @@ startServerOn: portOrNil
   [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
 ```
 
+The `startBasicServerOn:` method forks a process to run the `basicServerOn:` method:
 ```Smalltalk
 startBasicServerOn: portOrNil
   "start basic server process in current vm. fork and record forked process instance. expected to return."
@@ -176,7 +195,7 @@ startBasicServerOn: portOrNil
   self serverInstance: self	"the serverProcess is session-specific"
 ```
 
-The `basicServerOn:` is expected to be implemented by a concrete subclass of *GemServer*.
+The `basicServerOn:` method is expected to be implemented by a concrete subclass of *GemServer*.
 For example, here's the `basicServerOn:` method for the [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
@@ -196,6 +215,7 @@ basicServerOn: port
 ```
 
 ###Gem Server Exception Handling
+
 
 Here's the implementation of the `GemServer>>gemServer:exceptionSet:beforeUnwind:ensure:` method:
 
@@ -611,7 +631,7 @@ For example, Zinc-based gem servers offer a choice of Transcript logging (**logT
   yourself
 ```
 
-###Debugging
+###Gem Server Debugging
 ####Remote Debugging
 ####Interactive Debugging
 ##Gem Server Reference
