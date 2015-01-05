@@ -612,8 +612,25 @@ startGems
       self executeStartGemCommand: port ]
 ```
 
+calls the `executeStartGemCommand:` method, which in turn constructs shell command line that calles the [*gem server* start script](#gem-server-startstop-bash-script):
+
+```Smalltalk
+executeStartGemCommand: port
+  | commandLine |
+  commandLine := self startScriptPath , ' ' , self name , ' ' , port asString
+    , ' "' , self exeConfPath , '"'.
+  self performOnServer: commandLine
+```
 
 ####Gem Server start/stop bash scripts
+The *gem server* start script takes three arguments:
+  1. gem server name
+  2. port number
+  3. exe conf file path
+
+```
+startGemServerGem Seaside 9001 $GEMSTONE_EXE_CONF
+```
 
 ####Gem Server start/stop/restart Smalltalk API
 
