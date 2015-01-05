@@ -578,6 +578,40 @@ It is permissable to read persistent objects but any modifications to persistent
 ---
 
 ###Gem Server Control
+When you register a *gem server*, you specify a list of ports associated with the *gem server*:
+
+```Smalltalk
+FastCGISeasideGemServer register: 'Seaside' on: #( 9001 9002 9003 )
+```
+
+When you subsequently ask the *gem server* to start:
+
+```Smalltalk
+(GemServerRegistry gemServerNamed: 'Seaside') startGems.
+```
+
+A [Topaz][2] process should be started for each port in the list.
+
+The `startGems` method:
+
+```Smalltalk
+startGems
+  self initCrashLog.
+  System commitTransaction
+    ifFalse: [ self error: 'Commit transaction failed before startGems' ].
+  self logControlEvent: 'Start Gems: ' , self name.
+  self ports
+    do: [ :port | 
+      | pidFilePath |
+      pidFilePath := self gemPidFileName: port.
+      (GsFile existsOnServer: pidFilePath)
+        ifTrue: [ 
+          self
+            error:
+              'Pid file exists for port: ' , port printString , '. Try restart command.' ].
+      self executeStartGemCommand: port ]
+```
+
 
 ####Gem Server start/stop bash scripts
 
