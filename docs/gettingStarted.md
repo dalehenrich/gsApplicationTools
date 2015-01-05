@@ -26,10 +26,13 @@
       - [Request/Response Gem Server Tasks](#requestresponse-gem-server-tasks)
       - [I/O Gem Server Tasks](#io-gem-server-tasks)
   - [Gem Server Control](#gem-server-control)
-    - [Gem Server start script](#gem-server-start-script)
-    - [Gem Server stop script](#gem-server-stop-script)
-    - [Gem Server start/stip Smalltalk API](#gem-server-startstoprestart-smalltalk-api)
+    - [Gem Server Control from Smalltalk](#gem-server-control-from-smalltalk)
+    - [Gem Server Bash scripts](#gem-server-bash-scripts)
+      - [Gem Server start script](#gem-server-start-script)
+      - [Gem Server stop script](#gem-server-stop-script)
   - [Gem Server Debugging](#gem-server-debugging)
+    - [Object Log Debugging](#object-log-debugging)
+    - [Interactive Debugging](#interactive-debugging)
 - [Glossary](#glossary)
 
 ---
@@ -579,6 +582,7 @@ It is permissable to read persistent objects but any modifications to persistent
 ---
 
 ###Gem Server Control
+
 When you register a *gem server*, you specify a list of ports associated with the *gem server*:
 
 ```Smalltalk
@@ -623,13 +627,26 @@ executeStartGemCommand: port
   self performOnServer: commandLine
 ```
 
-####Gem Server start script
-The *gem server* start script takes three arguments:
+####Gem Server Control from Smalltalk
+*Gem servers* can be started, stopped and restarted from Smalltalk:
+
+```Smalltalk
+(GemServerRegistry gemServerNamed: 'Seaside') startGems.
+(GemServerRegistry gemServerNamed: 'Seaside') stopGems.
+(GemServerRegistry gemServerNamed: 'Seaside') restartGems.
+```
+
+####Gem Server Bash scripts
+The *gem server* bash scripts are designed to control a single *gem server* operating system process, one process for each port in the port.
+The bash scripts are aimed at making it possible to start and stop individual gem servers from a process management tool like [DaemonTools][5] or [Monit][6].
+
+The scripts are also called from within Smalltalk using `System class>>performOnServer:`.
+
+#####Gem Server start script
+The [*gem server* start script][14] takes three arguments:
   1. gem server name
   2. port number
   3. exe conf file path
-
-like so:
 
 ```
 startGemServerGem Seaside 9001 $GEMSTONE_EXE_CONF
@@ -672,47 +689,22 @@ scriptServicePrologOn: portOrNil
 
 which among other things records the `gem process id` in a file, so that the [gem server stop script](#gem-server-stop-script) knows which operating system process to kill.
 
-####Gem Server stop script
+#####Gem Server stop script
+The [*gem server* stop script][15] takes two arguments:
+  1. gem server name
+  2. port number
 
-####Gem Server start/stop/restart Smalltalk API
-
-To define a GemServer you specify a name and a list of ports:
-
-```Smalltalk
-FastCGISeasideGemServer register: 'Seaside' on: #( 9001 9002 9003)
 ```
-
-Once registered you can refer to the GemServer by name:
-
-```Smalltalk
-GemServerRegistry gemServerNamed: 'Seaside'
-```
-
-Gem servers can be started and stopped from within a development image using the Smalltalk GemServer api:
-
-```Smalltalk
-(GemServerRegistry gemServerNamed: 'Seaside') start.
-(GemServerRegistry gemServerNamed: 'Seaside') restart.
-(GemServerRegistry gemServerNamed: 'Seaside') stop.
-```
-
-or started and stopped by using a bash script:
-
-```Shell
-startGemServerGem Seaside 9001
 stopGemServerGem Seaside 9001
 ```
 
-The bash scripts are designed to be called once for each port associated with the gem server. 
-This makes it possible to use scripts to start individual gem servers from a process management tool like [DaemonTools][5] or [Monit][6].
-
-The Smalltalk GemServer api uses `System class>>performOnServer:` to launch a bash script for each of the ports associated with the gem server.
+The script gets the `gem process id` from the `pid` file and kills.
 
 ---
 
 ###Gem Server Debugging
+####Object Log Debugging
 ####Interactive Debugging
-####Remote Debugging
 
 ---
 
@@ -996,3 +988,5 @@ problem.*
 [11]: https://github.com/GsDevKit/zinc
 [12]: http://pharo.org/
 [13]: http://pharo.org/web/files/screenshots/debugger.png
+[14]: https://github.com/GsDevKit/gsApplicationTools/blob/master/bin/startGemServerGem
+[15]: https://github.com/GsDevKit/gsApplicationTools/blob/master/bin/stopGemServerGem
