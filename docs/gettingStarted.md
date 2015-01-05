@@ -26,7 +26,8 @@
       - [Request/Response Gem Server Tasks](#requestresponse-gem-server-tasks)
       - [I/O Gem Server Tasks](#io-gem-server-tasks)
   - [Gem Server Control](#gem-server-control)
-    - [Gem Server start/stop bash scripts](#gem-server-startstop-bash-scripts)
+    - [Gem Server start script](#gem-server-start-script)
+    - [Gem Server stop script](#gem-server-stop-script)
     - [Gem Server start/stip Smalltalk API](#gem-server-startstoprestart-smalltalk-api)
   - [Gem Server Debugging](#gem-server-debugging)
 - [Glossary](#glossary)
@@ -149,8 +150,8 @@ One [Topaz session](#gemstone-session) is launched for each of the *ports* assoc
 
 The *gem server* instance is shared by each of the *[Topaz][2] gems*.
 
-The *gem server* is launched by calling the [gem server start script](#gem-server-startstop-bash-scripts).
-The [script](#gem-server-startstop-bash-scripts) executes the following Smalltalk code to start the *gem server*:
+The *gem server* is launched by calling the [gem server start script](#gem-server-start-script).
+The [script](#gem-server-start-script) executes the following Smalltalk code to start the *gem server*:
 
 ```Smalltalk
 (GemServerRegistry gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
@@ -612,7 +613,7 @@ startGems
       self executeStartGemCommand: port ]
 ```
 
-calls the `executeStartGemCommand:` method, which in turn constructs shell command line that calles the [*gem server* start script](#gem-server-startstop-bash-script):
+calls the `executeStartGemCommand:` method, which in turn constructs shell command line that calls the [*gem server* start script](#gem-server-start-script):
 
 ```Smalltalk
 executeStartGemCommand: port
@@ -622,15 +623,56 @@ executeStartGemCommand: port
   self performOnServer: commandLine
 ```
 
-####Gem Server start/stop bash scripts
+####Gem Server start script
 The *gem server* start script takes three arguments:
   1. gem server name
   2. port number
   3. exe conf file path
 
+like so:
+
 ```
 startGemServerGem Seaside 9001 $GEMSTONE_EXE_CONF
 ```
+
+The script itself invokes the following Smalltalk code:
+
+```Smalltalk
+(GemServerRegistry gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
+```
+
+The `scriptStartServiceOn:` method:
+
+```Smalltalk
+scriptStartServiceOn: portOrNil
+  "called from shell script"
+
+  self
+    scriptServicePrologOn: portOrNil;
+    startServerOn: portOrNil	"does not return"
+```
+
+initiates the [service loop](#gem-server-service-loop) and calls the `scriptServicePrologOn:` method: 
+
+```Smalltalk 
+scriptServicePrologOn: portOrNil
+  self
+    scriptLogEvent:
+      '-->>Script Start ' , self name , ' on ' , portOrNil printString
+    object: self.
+  self
+    recordGemPid: portOrNil;
+    setStatmonCacheName;
+    enableRemoteBreakpointHandling.
+  self transactionMode: #'manualBegin'.
+  self
+    startTransactionBacklogHandling;
+    enableAlmostOutOfMemoryHandling
+```
+
+which among other things records the `gem process id` in a file, so that the [gem server stop script](#gem-server-stop-script) knows which operating system process to kill.
+
+####Gem Server stop script
 
 ####Gem Server start/stop/restart Smalltalk API
 
