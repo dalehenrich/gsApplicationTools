@@ -707,6 +707,7 @@ The script gets the `gem process id` from the `pid` file and kills.
 ####Interactive Debugging
 
 ---
+---
 
 ##Glossary
 
