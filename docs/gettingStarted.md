@@ -831,13 +831,29 @@ The **GemServerRemoteServerSerialProcessingExample** instance takes tasks (**Gem
 If the task completes successfully the result is stored as the `value` for the task which marks the task as complete. 
 If an error occurs while executing the task, the resulting exception is stored as the `exception` for the task which marks the task as complete.
 
-The **GemServerRemoteClientSerialProcessingExample** instance adds requested tasks to the queue and then waits for the list of tasks to finish processing by the server.
+The **GemServerRemoteClientSerialProcessingExample** instance adds requested tasks to the queue and then waits for the list of tasks to finish processing by the server. 
+The **GemServerRemoteClientSerialProcessingExample** class provides a number of interesting tasks that can be scheduled to be run on the server:
+- scheduleBreakpointTask
+- scheduleErrorTask
+- scheduleExampleHttpTask
+- scheduleFastTask
+- scheduleHaltTask
+- scheduleInternalServerError
+- scheduleOutOfMemoryPersistent
+- scheduleOutOfMemoryTemp
+- scheduleSimpleTask
+- scheduleStackOverflow
+- scheduleStatusTask
+- scheduleTimeInLondonTask
+- scheduleWarning
 
 1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
-2. In the **client session** register the *gem server*:
+2. In the **client session** register the *gem server*, and reset the queue:
    ```Smalltalk
    (GemServerRemoteServerSerialProcessingExample register: 'example')
      interactiveMode: true.
+   GemServerRemoteTaskExample reset.
+   System commitTransaction.
    ```
 
 3. In the **server session**...
