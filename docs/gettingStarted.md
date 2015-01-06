@@ -704,8 +704,86 @@ The script gets the `gem process id` from the `pid` file and kills.
 
 ###Gem Server Debugging
 ####Object Log Debugging
+In normal operation, a *gem server* is running as a headless [Topaz][2] process.
+When an error occurs, [a continuation is saved to the object log](#gem-server-exception-logging):
+
+```
+info        Start Gems: Seaside_Style_Example_Server               20685  01/05/2015 15:28:19:991
+info        -->>Script Start Seaside_Style_Example_Server on 8...  21598  01/05/2015 15:28:20:084
+info        performOnServer: Seaside_Style_Example_Server :: /...  20685  01/05/2015 15:28:20:093
+info        recordGemPid: Seaside_Style_Example_Server on 8383     21598  01/05/2015 15:28:20:138
+info        setStatmonCacheName: Seaside_Style_Example_Server      21598  01/05/2015 15:28:20:235
+info        enableRemoteBreakpointHandling: Seaside_Style_Exam...  21598  01/05/2015 15:28:20:284
+info        startTransactionBacklogHandling: Seaside_Style_Exa...  21598  01/05/2015 15:28:20:435
+info        enable AlmostOutOfMemoryHandling: Seaside_Style_Ex...  21598  01/05/2015 15:28:20:485
+error       -- continuation -- (Seaside_Style_Example_Server U...  21598  01/05/2015 15:28:20:537
+```
+
+In an interactive client, you can open a debugger on the continuation:
+
+```
+1. DebuggerLogEntry class>>createContinuationFor: @2 line 5
+2. DebuggerLogEntry class>>createContinuationLabeled: @3 line 4
+3. GemServerSeasideStyleExample class(GemServer class)>>createContinuation: @2 line 2
+4. GemServerSeasideStyleExample(GemServer)>>createContinuation: @5 line 5
+5. GemServerSeasideStyleExample(GemServer)>>saveContinuationFor:titled:inTransactionDo: @8 line 6
+6. GemServerSeasideStyleExample(GemServer)>>logStack:titled:inTransactionDo: @3 line 4
+7. GemServerSeasideStyleExample(GemServerRemoteAbstractExample)>>logStack:titled:inTransactionDo: @2 line 3
+8. GemServerSeasideStyleExample(GemServer)>>logStack:titled: @2 line 2
+9. GemServerSeasideStyleExample(GemServer)>>gemServerHandleErrorException: @9 line 6
+10. UserDefinedError(Error)>>exceptionHandlingForGemServer: @2 line 2
+11. GemServerSeasideStyleExample(GemServer)>>handleGemServerException: @2 line 5
+12. [] in GemServerSeasideStyleExample(GemServer)>>gemServer:exceptionSet:beforeUnwind:ensure: @3 line 10
+13. GemServerSeasideStyleExample(ExecBlock)>>on:do: @3 line 42
+14. [] in GemServerSeasideStyleExample(GemServer)>>gemServer:exceptionSet:beforeUnwind:ensure: @2 line 12
+15. UserDefinedError(AbstractException)>>_executeHandler: @3 line 8
+16. UserDefinedError(AbstractException)>>_signalWith: @1 line 1
+17. UserDefinedError(AbstractException)>>signal @2 line 47
+18. GemServerSeasideStyleExampleRequest(Object)>>error: @6 line 7
+19. GemServerSeasideStyleExampleRequest>>requestError @2 line 2
+20. [] in ExecBlock(GemServerSeasideStyleExampleTests)>>testSeasideStyleError @2 line 9
+21. GemServerSeasideStyleExampleRequest>>processRequest @3 line 2
+22. GemServerSeasideStyleExample>>processRequest: @2 line 2
+23. [] in GemServerSeasideStyleExample>>processRequest:onSuccess:onError: @2 line 7
+24. GemServerSeasideStyleExample(ExecBlock)>>on:do: @3 line 42
+25. [] in GemServerSeasideStyleExample(GemServer)>>gemServer:exceptionSet:beforeUnwind:ensure: @2 line 4
+26. GemServerSeasideStyleExample(ExecBlock)>>ensure: @2 line 12
+27. GemServerSeasideStyleExample(GemServer)>>gemServer:exceptionSet:beforeUnwind:ensure: @2 line 23
+28. [] in GemServerSeasideStyleExample(GemServer)>>gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict: @2 line 10
+29. [] in GemServerSeasideStyleExample(GemServer)>>doBasicTransaction: @7 line 17
+30. GemServerSeasideStyleExample(ExecBlock)>>ensure: @2 line 12
+31. [] in GemServerSeasideStyleExample(GemServer)>>doBasicTransaction: @2 line 18
+32. GemServerSeasideStyleExample(ExecBlock)>>ensure: @2 line 12
+33. TransientRecursionLock>>critical: @11 line 12
+34. GemServerSeasideStyleExample(GemServer)>>doBasicTransaction: @3 line 10
+35. GemServerSeasideStyleExample(GemServer)>>doTransaction:onConflict: @2 line 5
+36. GemServerSeasideStyleExample(GemServer)>>gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict: @8 line 8
+37. GemServerSeasideStyleExample(GemServer)>>gemServerTransaction:beforeUnwind:onConflict: @3 line 3
+38. GemServerSeasideStyleExample>>processRequest:onSuccess:onError: @2 line 7
+39. [] in GemServerSeasideStyleExample>>handleRequestFrom: @5 line 11
+40. GemServerSeasideStyleExample(ExecBlock)>>on:do: @3 line 42
+41. [] in GemServerSeasideStyleExample(GemServer)>>gemServer:exceptionSet:beforeUnwind:ensure: @2 line 4
+42. GemServerSeasideStyleExample(ExecBlock)>>ensure: @2 line 12
+43. GemServerSeasideStyleExample(GemServer)>>gemServer:exceptionSet:beforeUnwind:ensure: @2 line 23
+44. GemServerSeasideStyleExample(GemServer)>>gemServer:beforeUnwind: @3 line 3
+45. GemServerSeasideStyleExample>>handleRequestFrom: @2 line 5
+46. [] in GemServerSeasideStyleExample>>basicServerOn: @2 line 13
+47. GsProcess>>_start @7 line 16
+48. UndefinedObject(GsNMethod class)>>_gsReturnToC @1 line 1
+```
+
+While you cannot resume execution of a stack from a *debugger continuation*, you can view the source of the methods on the stack and see the values of arguments and instance variables, which is often enough to characterize a problem.
+
+If you are experiencing problems in production and are having trouble characterizing the problem, you can insert `halt` statements into your code.
+By default the [*gem server* exception handlers](#gem-server-exception-set) will handle a **Halt** by saving a debug continuation to the [object log](#object-log) and then `resuming` the **Halt** exception, so execution continues.
+Naturally there is a cost to saving continuations, but it continuation-based debugging is superior to print statment debugging.
+
 ####Interactive Debugging
 
+If you have a reproducable test case or you need to do some hands on development of your server code, you would like to be able run a *gem server* in your favorite interactive development environment.
+However, there are several obstacles that need to be overcome when trying to do interactive development with a *gem server* that has been designed to run in a headless manner:
+  1. The GemStone [GCI](#gembuilder-for-c) (used by interactive development environments for GemStone) permits only one non-blocking function call per session.
+     This means that when a Smalltalk thread is active in a *gem server*, the interactive development environment may not make any other GemStone calls and in effect must block until the non-block call returns.
 ---
 ---
 
@@ -788,6 +866,30 @@ transaction enable receipt of the signal TransactionBacklog, and handle it appro
 the repository.*
 - *It makes visible to you any new or modified objects that have been committed by
 other users in an up-to-date view of the repository.*
+
+---
+
+###GemBuilder for C
+
+**Excerpted from [GemBuilder for C
+for GemStone/S 64 Bit][3], Section 1**
+
+---
+*GemBuilder for C is a set of C functions that
+provide your C application with complete
+access to a GemStone repository and its pr
+ogramming language, GemS
+tone Smalltalk. The
+GemStone object server contains your schema
+(class definitions) and
+objects (instances of
+those classes), while your C
+program provides the user in
+terface for your GemStone
+application. The GemBuilder functions allo
+w your C program to access the GemStone
+repository either through structural access (the C model) or by sending messages (the
+Smalltalk model).*
 
 ---
 
@@ -991,3 +1093,4 @@ problem.*
 [13]: http://pharo.org/web/files/screenshots/debugger.png
 [14]: https://github.com/GsDevKit/gsApplicationTools/blob/master/bin/startGemServerGem
 [15]: https://github.com/GsDevKit/gsApplicationTools/blob/master/bin/stopGemServerGem
+[16]: http://downloads.gemtalksystems.com/docs/GemStone64/3.2.x/GS64-GemBuilderforC-3.2.pdf
