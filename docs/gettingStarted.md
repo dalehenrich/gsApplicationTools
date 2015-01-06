@@ -847,6 +847,7 @@ The **GemServerRemoteClientSerialProcessingExample** class provides a number of 
 - scheduleTimeInLondonTask
 - scheduleWarning
 
+
 1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
 2. In the **client session** register the *gem server*, and reset the queue:
    ```Smalltalk
