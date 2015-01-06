@@ -9,6 +9,10 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
       #(\'interactive\' nil #\'none\').
       #(\'model\' nil #\'required\').
       #(\'register\' nil #\'required\').
+      #(\'remoteStart\' nil #\'required\').
+      #(\'remoteStatus\' nil #\'required\').
+      #(\'remoteStop\' nil #\'required\').
+      #(\'remoteRestart\' nil #\'required\').
       #(\'reset\' nil #\'none\').
       #(\'restart\' nil #\'required\').
       #(\'server\' nil #\'required\').
@@ -74,7 +78,6 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
             at: \'status\' put: #\'scheduleStatusTask\';
             at: \'overflow\' put: #\'scheduleStackOverflow\';
             at: \'time\' put: #\'scheduleTimeInLondonTask\';
-            
             yourself.
           opts
             at: \'server\'
@@ -99,6 +102,18 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
           client doCommitTransaction.
           result := client waitForTasks: taskList gemServer: gemServer ].
       opts
+        at: \'remoteStop\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stopGems ].
+      opts
+        at: \'remoteStart\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) startGems ].
+      opts
+        at: \'remoteStatus\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) statusGems ].
+      opts
+        at: \'remoteRestart\'
+        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) restartGems ].
+      opts
         at: \'stop\'
         ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stop ].
       opts
@@ -121,6 +136,10 @@ SYNOPSIS
   example --register=<server-name> --model=[parallel|serial] [--trace] [--interactive]
   example --unregister=<server-name>
   example --reset
+  example --remoteStart=<server-name>
+  example --remoteRestart=<server-name>
+  example --remoteStop=<server-name>
+  example --remoteStatus=<server-name>
   example --start=<server-name>
   example --restart=<server-name>
   example --stop=<server-name>
@@ -139,6 +158,11 @@ EXAMPLES
   ./example --register=example --model=serial --trace --interactive
   ./example --unregister=example
   ./example --reset
+
+  ./example --remoteStart=example
+  ./example --remoteStop=example
+  ./example --remoteRestart=example
+  ./example --remoteStatus=example
 
   ./example --start=example
   ./example --stop=example
@@ -163,4 +187,4 @@ EXAMPLES
 
   ./example --client=100 --server=example --trace
 \'
-        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2015-01-01T12:48:56.3453269004821-08:00']}
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2015-01-05T19:16:38.9522230625152-08:00']}
