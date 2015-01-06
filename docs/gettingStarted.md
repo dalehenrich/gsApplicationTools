@@ -858,8 +858,8 @@ When the method `submitAndWaitFor:gemServer:` is sent to a **GemServerRemoteServ
 7. `task` queue
 
 ######Interactive Debugging Step by Step
-**Note:** *I expect that a commit is performed after each **client session** *doit*.
-If you are not in auto commit mode, then an explicit commit is needed.*
+**Note:** *A commit should be performed after each **client session** doit.
+If you are not using auto commit mode, then an explicit commit is needed.*
  
 1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
 2. In the **client session**, `register` the *gem server*, and `reset` the queue:
