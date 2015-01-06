@@ -1,6 +1,6 @@
 service instance-private
-gemPidFileName: port
+gemPidFileName: portOrResourceName
   "must match bin/stopGemServerGem script"
 
   ^ (GsFile _expandEnvVariable: 'GEMSTONE_LOGDIR' isClient: false) , '/'
-    , self name , '_server-' , port asString , '.pid'
+    , self name , '_server-' , portOrResourceName asString , '.pid'

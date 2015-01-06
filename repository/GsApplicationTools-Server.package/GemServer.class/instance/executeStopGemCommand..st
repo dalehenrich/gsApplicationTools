@@ -1,6 +1,6 @@
 server specialization
-executeStopGemCommand: port
+executeStopGemCommand: portOrResourceName
   | commandLine |
-  commandLine := self stopScriptPath , ' ' , self name , ' ' , port asString
-    , ' "' , self exeConfPath , '"'.
+  commandLine := self stopScriptPath , ' ' , self name , ' '
+    , portOrResourceName asString , ' "' , self exeConfPath , '"'.
   self performOnServer: commandLine
