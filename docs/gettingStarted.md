@@ -47,9 +47,7 @@ A *gem server* is a [Topaz session](#gemstone-session) that executes an *applica
 
 The [Topaz][2] execution model is very different from the typical Smalltalk execution model:
 
->> Topaz is a GemStone programming environment that provides keyboard command access
->> to the GemStone system. Topaz does not require a windowing system and so is a useful,
->> interface for batch work and for many system administration functions.
+> Topaz is a GemStone programming environment that provides keyboard command access to the GemStone system. Topaz does not require a windowing system and so is a useful, interface for batch work and for many system administration functions.
 
 Smalltalk code is executed in [Topaz][2] using the `run` command:
 
@@ -421,7 +419,7 @@ For [interactive debugging](#interactive-debugging) using the `interactiveStartS
 
 Regardless of which *transaction mode* is used, it is important to manage transaction boundaries very carefully:
 
->> When an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
+> When an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
 
 The **GemServer** class provides three methods for performing transactions: 
   - [`doBasicTransaction:`](#dobasictransaction)
