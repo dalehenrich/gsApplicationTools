@@ -847,22 +847,77 @@ The **GemServerRemoteClientSerialProcessingExample** class provides a number of 
 - scheduleTimeInLondonTask
 - scheduleWarning
 
-######Debugging Session
+When the method `submitAndWaitFor:gemServer:` is sent to a **GemServerRemoteServerSerialProcessingExample** instance, a result array is returned with the following fields:
+- `true` when all tasks return expected result or `false` if one or more tasks returned unexpected results, or the wait timed out.
+- list of tasks
+- list of `completed` tasks
+- list of `valid` tasks
+- #success, #timedOut, or #crashed
+- `inProcess` queue
+- `task` queue
 
+######Debugging Session
+Note: I expect that a commit is performed after each **client session** *doit* (auto commit mode).
+ 
 1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
-2. In the **client session** `register` the *gem server*, and `reset` the queue:
+2. In the **client session**, `register` the *gem server*, and `reset` the queue:
    ```Smalltalk
    (GemServerRemoteServerSerialProcessingExample register: 'example')
      interactiveMode: true.
    ```
 
-3. In the **client session** `reset` the queue:
+3. In the **client session**, `reset` the task queue:
    ```Smalltalk
    GemServerRemoteTaskExample reset.
    ```
 
-4. In the **server session**...
-     
+4. In the **server session**, do an `abort` and `start` the *gem server* for interactive debugging:
+   ```Smalltalk
+   System abortTransaction.
+   (GemServerRegistry gemServerNamed: 'example') 
+     interactiveStartServiceOn: nil 
+     transactionMode: #'autoBegin'.
+   ```
+
+   The **server session** will be blocked.
+   If you need to regain control you can interrupt the server using `CMD-.` in GemTools or tODE.
+
+5. In the **client session**, schedule a `simple` task and `inspect` the result:
+   ```Smalltalk
+   | gemServer client task taskList result |
+   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   client := gemServer clientClass new.
+   result := client 
+     submitAndWaitFor: {  #scheduleSimpleTask }
+     gemServer: gemServer.
+   result inspect.
+   ```
+
+6.  In the **client session**, schedule an `error` task, the debugger should come up on the **server session**:
+   ```Smalltalk
+   | gemServer client task taskList result |
+   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   client := gemServer clientClass new.
+   result := client 
+     submitAndWaitFor: {  #scheduleError }
+     gemServer: gemServer.
+   ```
+
+7. In the **server session** fiddle around with the debugger.
+   When you are done, go ahead and close the debugger.
+   Closing the debugger should terminate the Smalltalk process that was performing the task, but the other Smalltalk *gem server* processes are still active.
+   Rather than try to make sure that all of the *gem server* Smalltalk processes are terminted, it is probably simpler to logout, login and start the *gem server* processes again by repeating Step 4.
+
+8. In the **client session**, schedule an `exampleHttpTask` task and `inspect` the result:
+   ```Smalltalk
+   | gemServer client task taskList result |
+   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   client := gemServer clientClass new.
+   result := client 
+     submitAndWaitFor: {  #scheduleExampleHttpTask }
+     gemServer: gemServer.
+   result inspect.
+   ```
 
 ---
 ---
