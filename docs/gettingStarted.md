@@ -783,7 +783,19 @@ Naturally there is a cost to saving continuations, but it continuation-based deb
 If you have a reproducable test case or you need to do some hands on development of your server code, you would like to be able run a *gem server* in your favorite interactive development environment.
 However, there are several obstacles that need to be overcome when trying to do interactive development with a *gem server* that has been designed to run in a headless manner:
   1. The GemStone [GCI](#gembuilder-for-c) (used by interactive development environments for GemStone) permits only one non-blocking function call per session.
-     This means that when a Smalltalk thread is active in a *gem server*, the interactive development environment may not make any other GemStone calls and in effect must block until the non-block call returns.
+     This means that when a Smalltalk thread is active in a *gem server*, the interactive development environment may not make any other [GCI](#gembuilder-for-c) function calls.
+     In effect the development environment must block until the in process non-blocking call returns.
+  2. The *gem server* code is structured to [handle most of the interesting exceptions](#gem-server-exception-set) by [logging the stack to the [object log](object-log) and either unwinding the stack or resuming the exception](#gem-server-exception-handlers).
+     This means that without *devine intervention*, an interactive debugger will not be opened when an interesting exception occurs.
+  3. The *gem server* is [designed to run in manual transaction mode](#gem-server-transaction-management).
+     This means that you need to explicitly manage transaction boundaries 
+
+#####Two debugging sessions: server and client
+
+#####Gem Server `interactive mode`
+
+#####Gem Server `transaction mode`
+
 ---
 ---
 
