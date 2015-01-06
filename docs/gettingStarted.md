@@ -25,15 +25,16 @@
     - [Practical Gem Server Transaction Support](#practical-gem-server-transaction-support)
       - [Request/Response Gem Server Tasks](#requestresponse-gem-server-tasks)
       - [I/O Gem Server Tasks](#io-gem-server-tasks)
-  - [Gem Server Control](#gem-server-control)
-    - [Gem Server Control from Smalltalk](#gem-server-control-from-smalltalk)
-    - [Gem Server Bash scripts](#gem-server-bash-scripts)
-      - [Gem Server start script](#gem-server-start-script)
-      - [Gem Server stop script](#gem-server-stop-script)
-  - [Gem Server Debugging](#gem-server-debugging)
-    - [Object Log Debugging](#object-log-debugging)
-    - [Interactive Debugging](#interactive-debugging)
-      - [Interactive Debugging Example](#interactive-debugging-example)
+- [Gem Server Control](#gem-server-control)
+  - [Gem Server Control from Smalltalk](#gem-server-control-from-smalltalk)
+  - [Gem Server Bash scripts](#gem-server-bash-scripts)
+    - [Gem Server start script](#gem-server-start-script)
+    - [Gem Server stop script](#gem-server-stop-script)
+- [Gem Server Debugging](#gem-server-debugging)
+  - [Object Log Debugging](#object-log-debugging)
+  - [Interactive Debugging](#interactive-debugging)
+    - [Interactive Debugging Example](#interactive-debugging-example)
+      - [Interactive Debugging Step by Step](#interactive-debugging-step-by-step)
 - [Glossary](#glossary)
 
 ---
@@ -46,9 +47,7 @@ A *gem server* is a [Topaz session](#gemstone-session) that executes an *applica
 
 The [Topaz][2] execution model is very different from the typical Smalltalk execution model:
 
->> Topaz is a GemStone programming environment that provides keyboard command access
->> to the GemStone system. Topaz does not require a windowing system and so is a useful,
->> interface for batch work and for many system administration functions.
+> Topaz is a GemStone programming environment that provides keyboard command access to the GemStone system. Topaz does not require a windowing system and so is a useful, interface for batch work and for many system administration functions.
 
 Smalltalk code is executed in [Topaz][2] using the `run` command:
 
@@ -420,7 +419,7 @@ For [interactive debugging](#interactive-debugging) using the `interactiveStartS
 
 Regardless of which *transaction mode* is used, it is important to manage transaction boundaries very carefully:
 
->> When an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
+> When an abort or begin transaction is executed all un-committed changes to persistent objects are lost irrespective of which thread may have made the changes.
 
 The **GemServer** class provides three methods for performing transactions: 
   - [`doBasicTransaction:`](#dobasictransaction)
@@ -582,7 +581,7 @@ It is permissable to read persistent objects but any modifications to persistent
 
 ---
 
-###Gem Server Control
+##Gem Server Control
 
 When you register a *gem server*, you specify a list of ports associated with the *gem server*:
 
@@ -628,7 +627,7 @@ executeStartGemCommand: port
   self performOnServer: commandLine
 ```
 
-####Gem Server Control from Smalltalk
+###Gem Server Control from Smalltalk
 *Gem servers* can be started, stopped and restarted from Smalltalk:
 
 ```Smalltalk
@@ -637,13 +636,13 @@ executeStartGemCommand: port
 (GemServerRegistry gemServerNamed: 'Seaside') restartGems.
 ```
 
-####Gem Server Bash scripts
+###Gem Server Bash scripts
 The *gem server* bash scripts are designed to control a single *gem server* operating system process, one process for each port in the port.
 The bash scripts are aimed at making it possible to start and stop individual gem servers from a process management tool like [DaemonTools][5] or [Monit][6].
 
 The scripts are also called from within Smalltalk using `System class>>performOnServer:`.
 
-#####Gem Server start script
+####Gem Server start script
 The [*gem server* start script][14] takes three arguments:
   1. gem server name
   2. port number
@@ -690,7 +689,7 @@ scriptServicePrologOn: portOrNil
 
 which among other things records the `gem process id` in a file, so that the [gem server stop script](#gem-server-stop-script) knows which operating system process to kill.
 
-#####Gem Server stop script
+####Gem Server stop script
 The [*gem server* stop script][15] takes two arguments:
   1. gem server name
   2. port number
@@ -703,8 +702,8 @@ The script gets the `gem process id` from the `pid` file and kills.
 
 ---
 
-###Gem Server Debugging
-####Object Log Debugging
+##Gem Server Debugging
+###Object Log Debugging
 In normal operation, a *gem server* is running as a headless [Topaz][2] process.
 When an error occurs, [a continuation is saved to the object log](#gem-server-exception-logging):
 
@@ -779,7 +778,7 @@ If you are experiencing problems in production and are having trouble characteri
 By default the [*gem server* exception handlers](#gem-server-exception-set) will handle a **Halt** by saving a debug continuation to the [object log](#object-log) and then `resuming` the **Halt** exception, so execution continues.
 Naturally there is a cost to saving continuations, but it continuation-based debugging is superior to print statment debugging.
 
-####Interactive Debugging
+###Interactive Debugging
 
 If you have a reproducable test case or you need to do some hands on development of your server code, you would like to be able run a *gem server* in your favorite interactive development environment.
 However, there are several obstacles that need to be overcome when trying to do interactive development with a *gem server* that has been designed to run in a headless [Topaz][2] session:
@@ -824,7 +823,7 @@ interactiveStartServiceOn: portOrNil transactionMode: mode
     startServerOn: portOrNil	"does not return"
 ```
 
-#####Interactive Debugging Example
+####Interactive Debugging Example
 For this example we will be using the **GemServerRemoteServerSerialProcessingExample** for the *gem server* and the **GemServerRemoteClientSerialProcessingExample** as the client.  
 
 The **GemServerRemoteServerSerialProcessingExample** instance takes tasks (**GemServerRemoteTaskSerialProcessingExample** class) off of a queue and executes the task in a separate Smalltalk process. 
@@ -847,29 +846,85 @@ The **GemServerRemoteClientSerialProcessingExample** class provides a number of 
 - scheduleTimeInLondonTask
 - scheduleWarning
 
-######Debugging Session
+When the method `submitAndWaitFor:gemServer:` is sent to a **GemServerRemoteServerSerialProcessingExample** instance, a result array is returned with the following fields:
+1. `true` when all tasks return expected result or `false` if one or more tasks returned unexpected results, or the wait timed out.
+2. list of tasks
+3. list of `completed` tasks
+4. list of `valid` tasks
+5. #success, #timedOut, or #crashed
+6. `inProcess` queue
+7. `task` queue
 
+#####Interactive Debugging Step by Step
+**Note:** *A commit should be performed after each **client session** doit.
+If you are not using auto commit mode, then an explicit commit is needed.*
+ 
 1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
-2. In the **client session** `register` the *gem server*, and `reset` the queue:
+2. In the **client session**, `register` the *gem server*, and `reset` the queue:
    ```Smalltalk
    (GemServerRemoteServerSerialProcessingExample register: 'example')
      interactiveMode: true.
    ```
 
-3. In the **client session** `reset` the queue:
+3. In the **client session**, `reset` the task queue:
    ```Smalltalk
    GemServerRemoteTaskExample reset.
    ```
 
-4. In the **server session**...
-     
+4. In the **server session**, do an `abort` and `start` the *gem server* for interactive debugging:
+   ```Smalltalk
+   System abortTransaction.
+   (GemServerRegistry gemServerNamed: 'example') 
+     interactiveStartServiceOn: nil 
+     transactionMode: #'autoBegin'.
+   ```
+
+   The **server session** will be blocked.
+   If you need to regain control you can interrupt the server using `CMD-.` in GemTools or tODE.
+
+5. In the **client session**, schedule a `simple` task and `inspect` the result:
+   ```Smalltalk
+   | gemServer client task taskList result |
+   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   client := gemServer clientClass new.
+   result := client 
+     submitAndWaitFor: {  #scheduleSimpleTask }
+     gemServer: gemServer.
+   result inspect.
+   ```
+
+6.  In the **client session**, schedule an `error` task, the debugger should come up on the **server session**:
+   ```Smalltalk
+   | gemServer client task taskList result |
+   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   client := gemServer clientClass new.
+   result := client 
+     submitAndWaitFor: {  #scheduleError }
+     gemServer: gemServer.
+   ```
+
+7. In the **server session** fiddle around with the debugger.
+   When you are done, go ahead and close the debugger.
+   Closing the debugger should terminate the Smalltalk process that was performing the task, but the other Smalltalk *gem server* processes are still active.
+   Rather than try to make sure that all of the *gem server* Smalltalk processes are terminted, it is probably simpler to logout, login and start the *gem server* processes again by repeating Step 4.
+
+8. In the **client session**, schedule an `exampleHttpTask` task and `inspect` the result:
+   ```Smalltalk
+   | gemServer client task taskList result |
+   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   client := gemServer clientClass new.
+   result := client 
+     submitAndWaitFor: {  #scheduleExampleHttpTask }
+     gemServer: gemServer.
+   result inspect.
+   ```
 
 ---
 ---
 
 ##Glossary
 
-###Abort Transcation
+###Abort Transaction
 **Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.2**
 
 ---
