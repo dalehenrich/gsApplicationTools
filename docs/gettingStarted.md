@@ -31,9 +31,10 @@
       - [Gem Server start script](#gem-server-start-script)
       - [Gem Server stop script](#gem-server-stop-script)
   - [Gem Server Debugging](#gem-server-debugging)
-    - [Object Log Debugging](#object-log-debugging)
     - [Interactive Debugging](#interactive-debugging)
       - [Interactive Debugging Example](#interactive-debugging-example)
+        - [Interactive Debugging Step by Step](#interactive-debugging-step-by-step)
+    - [Object Log Debugging](#object-log-debugging)
 - [Glossary](#glossary)
 
 ---
@@ -856,7 +857,7 @@ When the method `submitAndWaitFor:gemServer:` is sent to a **GemServerRemoteServ
 - `inProcess` queue
 - `task` queue
 
-######Debugging Session
+######Interactive Debugging Step by Step
 Note: I expect that a commit is performed after each **client session** *doit* (auto commit mode).
  
 1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
