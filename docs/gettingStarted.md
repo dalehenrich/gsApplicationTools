@@ -850,15 +850,18 @@ The **GemServerRemoteClientSerialProcessingExample** class provides a number of 
 ######Debugging Session
 
 1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
-2. In the **client session** register the *gem server*, and reset the queue:
+2. In the **client session** `register` the *gem server*, and `reset` the queue:
    ```Smalltalk
    (GemServerRemoteServerSerialProcessingExample register: 'example')
      interactiveMode: true.
-   GemServerRemoteTaskExample reset.
-   System commitTransaction.
    ```
 
-3. In the **server session**...
+3. In the **client session** `reset` the queue:
+   ```Smalltalk
+   GemServerRemoteTaskExample reset.
+   ```
+
+4. In the **server session**...
      
 
 ---
