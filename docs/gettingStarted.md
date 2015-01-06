@@ -25,16 +25,16 @@
     - [Practical Gem Server Transaction Support](#practical-gem-server-transaction-support)
       - [Request/Response Gem Server Tasks](#requestresponse-gem-server-tasks)
       - [I/O Gem Server Tasks](#io-gem-server-tasks)
-  - [Gem Server Control](#gem-server-control)
-    - [Gem Server Control from Smalltalk](#gem-server-control-from-smalltalk)
-    - [Gem Server Bash scripts](#gem-server-bash-scripts)
-      - [Gem Server start script](#gem-server-start-script)
-      - [Gem Server stop script](#gem-server-stop-script)
-  - [Gem Server Debugging](#gem-server-debugging)
-    - [Interactive Debugging](#interactive-debugging)
-      - [Interactive Debugging Example](#interactive-debugging-example)
-        - [Interactive Debugging Step by Step](#interactive-debugging-step-by-step)
-    - [Object Log Debugging](#object-log-debugging)
+- [Gem Server Control](#gem-server-control)
+  - [Gem Server Control from Smalltalk](#gem-server-control-from-smalltalk)
+  - [Gem Server Bash scripts](#gem-server-bash-scripts)
+    - [Gem Server start script](#gem-server-start-script)
+    - [Gem Server stop script](#gem-server-stop-script)
+- [Gem Server Debugging](#gem-server-debugging)
+  - [Object Log Debugging](#object-log-debugging)
+  - [Interactive Debugging](#interactive-debugging)
+    - [Interactive Debugging Example](#interactive-debugging-example)
+      - [Interactive Debugging Step by Step](#interactive-debugging-step-by-step)
 - [Glossary](#glossary)
 
 ---
@@ -583,7 +583,7 @@ It is permissable to read persistent objects but any modifications to persistent
 
 ---
 
-###Gem Server Control
+##Gem Server Control
 
 When you register a *gem server*, you specify a list of ports associated with the *gem server*:
 
@@ -629,7 +629,7 @@ executeStartGemCommand: port
   self performOnServer: commandLine
 ```
 
-####Gem Server Control from Smalltalk
+###Gem Server Control from Smalltalk
 *Gem servers* can be started, stopped and restarted from Smalltalk:
 
 ```Smalltalk
@@ -638,13 +638,13 @@ executeStartGemCommand: port
 (GemServerRegistry gemServerNamed: 'Seaside') restartGems.
 ```
 
-####Gem Server Bash scripts
+###Gem Server Bash scripts
 The *gem server* bash scripts are designed to control a single *gem server* operating system process, one process for each port in the port.
 The bash scripts are aimed at making it possible to start and stop individual gem servers from a process management tool like [DaemonTools][5] or [Monit][6].
 
 The scripts are also called from within Smalltalk using `System class>>performOnServer:`.
 
-#####Gem Server start script
+####Gem Server start script
 The [*gem server* start script][14] takes three arguments:
   1. gem server name
   2. port number
@@ -691,7 +691,7 @@ scriptServicePrologOn: portOrNil
 
 which among other things records the `gem process id` in a file, so that the [gem server stop script](#gem-server-stop-script) knows which operating system process to kill.
 
-#####Gem Server stop script
+####Gem Server stop script
 The [*gem server* stop script][15] takes two arguments:
   1. gem server name
   2. port number
@@ -704,8 +704,8 @@ The script gets the `gem process id` from the `pid` file and kills.
 
 ---
 
-###Gem Server Debugging
-####Object Log Debugging
+##Gem Server Debugging
+###Object Log Debugging
 In normal operation, a *gem server* is running as a headless [Topaz][2] process.
 When an error occurs, [a continuation is saved to the object log](#gem-server-exception-logging):
 
@@ -780,7 +780,7 @@ If you are experiencing problems in production and are having trouble characteri
 By default the [*gem server* exception handlers](#gem-server-exception-set) will handle a **Halt** by saving a debug continuation to the [object log](#object-log) and then `resuming` the **Halt** exception, so execution continues.
 Naturally there is a cost to saving continuations, but it continuation-based debugging is superior to print statment debugging.
 
-####Interactive Debugging
+###Interactive Debugging
 
 If you have a reproducable test case or you need to do some hands on development of your server code, you would like to be able run a *gem server* in your favorite interactive development environment.
 However, there are several obstacles that need to be overcome when trying to do interactive development with a *gem server* that has been designed to run in a headless [Topaz][2] session:
@@ -825,7 +825,7 @@ interactiveStartServiceOn: portOrNil transactionMode: mode
     startServerOn: portOrNil	"does not return"
 ```
 
-#####Interactive Debugging Example
+####Interactive Debugging Example
 For this example we will be using the **GemServerRemoteServerSerialProcessingExample** for the *gem server* and the **GemServerRemoteClientSerialProcessingExample** as the client.  
 
 The **GemServerRemoteServerSerialProcessingExample** instance takes tasks (**GemServerRemoteTaskSerialProcessingExample** class) off of a queue and executes the task in a separate Smalltalk process. 
@@ -857,7 +857,7 @@ When the method `submitAndWaitFor:gemServer:` is sent to a **GemServerRemoteServ
 6. `inProcess` queue
 7. `task` queue
 
-######Interactive Debugging Step by Step
+#####Interactive Debugging Step by Step
 **Note:** *A commit should be performed after each **client session** doit.
 If you are not using auto commit mode, then an explicit commit is needed.*
  
@@ -926,7 +926,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 
 ##Glossary
 
-###Abort Transcation
+###Abort Transaction
 **Excerpted from [Programming Guide for GemStone/S 64 Bit][3], Section 8.2**
 
 ---
