@@ -849,13 +849,13 @@ The **GemServerRemoteClientSerialProcessingExample** class provides a number of 
 - scheduleWarning
 
 When the method `submitAndWaitFor:gemServer:` is sent to a **GemServerRemoteServerSerialProcessingExample** instance, a result array is returned with the following fields:
-- `true` when all tasks return expected result or `false` if one or more tasks returned unexpected results, or the wait timed out.
-- list of tasks
-- list of `completed` tasks
-- list of `valid` tasks
-- #success, #timedOut, or #crashed
-- `inProcess` queue
-- `task` queue
+1. `true` when all tasks return expected result or `false` if one or more tasks returned unexpected results, or the wait timed out.
+2. list of tasks
+3. list of `completed` tasks
+4. list of `valid` tasks
+5. #success, #timedOut, or #crashed
+6. `inProcess` queue
+7. `task` queue
 
 ######Interactive Debugging Step by Step
 Note: I expect that a commit is performed after each **client session** *doit* (auto commit mode).
