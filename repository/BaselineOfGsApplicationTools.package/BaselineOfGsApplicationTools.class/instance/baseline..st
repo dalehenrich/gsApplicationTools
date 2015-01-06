@@ -12,7 +12,8 @@ baseline: spec
                 repository: 'github://glassdb/glass:master/repository' ];
         yourself.
       spec
-        package: 'GsApplicationTools-Server';
+        package: 'GsApplicationTools-Server'
+          with: [ spec requires: #('GLASS1') ];
         package: 'GsApplicationTools-Test'
           with: [ spec requires: #('GsApplicationTools-Server') ];
         yourself.
@@ -39,4 +40,14 @@ baseline: spec
           with: [ spec includes: 'GsApplicationTools-ServerV30' ];
         package: 'GsApplicationTools-ServerV30'
           with: [ spec requires: 'GsApplicationTools-Server' ];
+        yourself ].
+  spec
+    for: #(#'gs3.1.x' #'gs3.2.x' #'gs3.3.x')
+    do: [ 
+      spec
+        package: 'GsApplicationTools-ExampleV31'
+          with: [ spec requires: #('GsApplicationTools-Server' 'GsApplicationTools-Test') ];
+        yourself.
+      spec
+        group: 'CI' with: #('GsApplicationTools-ExampleV31');
         yourself ]

@@ -1,0 +1,17 @@
+{
+	"category" : "GsApplicationTools-ExampleV31",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"currentQueueCounter",
+		"tracing",
+		"activeProcesses",
+		"activeProcessesMutex" ],
+	"name" : "GemServerRemoteServerExample",
+	"pools" : [
+		 ],
+	"super" : "GemServerRemoteAbstractExample",
+	"type" : "normal" }

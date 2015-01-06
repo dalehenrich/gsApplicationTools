@@ -1,0 +1,3 @@
+*gsapplicationtools-server
+exceptionHandlingForGemServer: aGemServer
+  aGemServer gemServerHandleErrorException: self

@@ -1,0 +1,3 @@
+*gsapplicationtools-serverv24
+exceptionHandlingForGemServer: aGemServer
+  aGemServer gemServerHandleBreakpointException: self

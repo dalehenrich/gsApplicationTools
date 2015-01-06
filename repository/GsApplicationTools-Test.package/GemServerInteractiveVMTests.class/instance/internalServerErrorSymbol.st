@@ -1,0 +1,3 @@
+private
+internalServerErrorSymbol
+  ^ #'interactiveError'

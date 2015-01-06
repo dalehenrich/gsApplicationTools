@@ -1,4 +1,3 @@
 private
 logControlEvent: label
-  GRPlatform current
-    doTransaction: [ (ObjectLogEntry info: label object: self) addToLog ]
+  self doTransaction: [ (ObjectLogEntry info: label object: self) addToLog ]

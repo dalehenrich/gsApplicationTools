@@ -1,0 +1,3 @@
+private
+scheduledTaskList
+  self subclassResponsibility
