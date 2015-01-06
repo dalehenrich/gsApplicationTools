@@ -9,7 +9,6 @@
       - [Exceptions to Handle in Topaz](#exceptions-to-handle-in-topaz)
     - [Topaz Transaction Modes](#topaz-transaction-modes)
 - [GemServer class](#gemserver-class)
-  - [GemServerRegistry class](#gemserverregistry-class)
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
     - [Gem Server Exception Set](#gem-server-exception-set)
@@ -130,22 +129,6 @@ The **GemServer** class provides a concise framework for standardized:
 
 ---
 
-###GemServerRegistry class
-The **GemServerRegistry** class provides a registry of named *gem servers*.
-A *gem server* named instance is created by using the `register:` method:
-
-```Smalltalk
-GemServerTestServer register: 'testServer'.
-```
-
-Once an instance has been registered, it may be accessed from the **GemServerRegistry** using the `gemServerNamed:` method:
-
-```Smalltalk
-(GemServerRegistry gemServerNamed: gemName)
-```
-
----
-
 ###Gem Server Service Loop
 A *gem server* is associated with one or more ports (a port may be nil).
 
@@ -157,7 +140,7 @@ The *gem server* is launched by calling the [gem server start script](#gem-serve
 The [script](#gem-server-start-script) executes the following Smalltalk code to start the *gem server*:
 
 ```Smalltalk
-(GemServerRegistry gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
+(GemServer gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
 ```
 
 The `scriptStartServiceOn:` method:
@@ -592,7 +575,7 @@ FastCGISeasideGemServer register: 'Seaside' on: #( 9001 9002 9003 )
 When you subsequently ask the *gem server* to start:
 
 ```Smalltalk
-(GemServerRegistry gemServerNamed: 'Seaside') startGems.
+(GemServer gemServerNamed: 'Seaside') startGems.
 ```
 
 A [Topaz][2] process should be started for each port in the list.
@@ -631,9 +614,9 @@ executeStartGemCommand: port
 *Gem servers* can be started, stopped and restarted from Smalltalk:
 
 ```Smalltalk
-(GemServerRegistry gemServerNamed: 'Seaside') startGems.
-(GemServerRegistry gemServerNamed: 'Seaside') stopGems.
-(GemServerRegistry gemServerNamed: 'Seaside') restartGems.
+(GemServer gemServerNamed: 'Seaside') startGems.
+(GemServer gemServerNamed: 'Seaside') stopGems.
+(GemServer gemServerNamed: 'Seaside') restartGems.
 ```
 
 ###Gem Server Bash scripts
@@ -655,7 +638,7 @@ startGemServerGem Seaside 9001 $GEMSTONE_EXE_CONF
 The script itself invokes the following Smalltalk code:
 
 ```Smalltalk
-(GemServerRegistry gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
+(GemServer gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
 ```
 
 The `scriptStartServiceOn:` method:
@@ -874,7 +857,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 4. In the **server session**, do an `abort` and `start` the *gem server* for interactive debugging:
    ```Smalltalk
    System abortTransaction.
-   (GemServerRegistry gemServerNamed: 'example') 
+   (GemServer gemServerNamed: 'example') 
      interactiveStartServiceOn: nil 
      transactionMode: #'autoBegin'.
    ```
@@ -885,7 +868,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 5. In the **client session**, schedule a `simple` task and `inspect` the result:
    ```Smalltalk
    | gemServer client task taskList result |
-   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   gemServer := GemServer gemServerNamed: 'example'.
    client := gemServer clientClass new.
    result := client 
      submitAndWaitFor: {  #scheduleSimpleTask }
@@ -896,7 +879,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 6.  In the **client session**, schedule an `error` task, the debugger should come up on the **server session**:
    ```Smalltalk
    | gemServer client task taskList result |
-   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   gemServer := GemServer gemServerNamed: 'example'.
    client := gemServer clientClass new.
    result := client 
      submitAndWaitFor: {  #scheduleError }
@@ -911,7 +894,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 8. In the **client session**, schedule an `exampleHttpTask` task and `inspect` the result:
    ```Smalltalk
    | gemServer client task taskList result |
-   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   gemServer := GemServer gemServerNamed: 'example'.
    client := gemServer clientClass new.
    result := client 
      submitAndWaitFor: {  #scheduleExampleHttpTask }

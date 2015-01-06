@@ -6,8 +6,8 @@
 		"assertExpectedNames:equals:" : "dkh 11/26/2014 15:01",
 		"setUp" : "dkh 11/29/2014 09:15",
 		"testInvalidGemServerNames" : "dkh 11/29/2014 06:37",
-		"testQuerying" : "dkh 11/26/2014 18:02",
-		"testRegistration" : "dkh 11/29/2014 06:38",
+		"testQuerying" : "dkh 01/06/2015 13:40",
+		"testRegistration" : "dkh 01/06/2015 13:40",
 		"testStartStopRestart" : "dkh 11/29/2014 18:21",
 		"testStartStopRestartAll" : "dkh 11/29/2014 14:42",
 		"testValidGemServerNames" : "dkh 11/29/2014 06:39" } }

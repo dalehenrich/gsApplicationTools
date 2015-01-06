@@ -1,4 +1,4 @@
-registration
+gem server registration
 register: aName for: aServerClass on: anArrayOfPortNumbers
   ^ (self
     createServerOfClass: aServerClass

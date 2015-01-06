@@ -2,7 +2,7 @@ running
 setUp
   | gemServer |
   super setUp.
-  gemServer := GemServerRegistry gemServerNamed: self gemServerName.
+  gemServer := GemServer gemServerNamed: self gemServerName.
   gemServer
     interactiveMode: true;
     gemServerExceptionSet:

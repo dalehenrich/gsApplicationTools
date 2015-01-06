@@ -1,7 +1,7 @@
 tests
 testError
   | gemServer client |
-  gemServer := GemServerRegistry gemServerNamed: self gemServerName.
+  gemServer := GemServer gemServerNamed: self gemServerName.
   gemServer
     enableCreateContinuations: true;
     tracing: true.

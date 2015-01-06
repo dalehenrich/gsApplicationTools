@@ -1,11 +1,16 @@
 {
 	"class" : {
+		"addGemServer:" : "dkh 01/06/2015 13:31",
 		"createContinuation:" : "dkh 12/21/2014 13:38",
 		"createServerOfClass:withName:on:" : "SebastianHeidbrink 11/02/2014 15:00",
 		"defaultPortList" : "dkh 11/29/2014 06:33",
+		"gemServerNamed:" : "dkh 01/06/2015 13:29",
+		"gemServerNames" : "dkh 01/06/2015 13:30",
 		"register:" : "dkh 11/29/2014 06:33",
 		"register:for:on:" : "dkh 12/03/2014 10:21",
 		"register:on:" : "dkh 11/29/2014 06:31",
+		"removeGemServer:" : "dkh 01/06/2015 13:34",
+		"removeGemServerNamed:" : "dkh 01/06/2015 13:34",
 		"serverClass" : "dkh 11/29/2014 06:32" },
 	"instance" : {
 		"activeProcessIsNative" : "dkh 12/09/2014 14:22",
@@ -87,7 +92,7 @@
 		"ports" : "dkh 12/10/2014 17:02",
 		"ports:" : "SebastianHeidbrink 11/02/2014 15:00",
 		"recordGemPid:" : "dkh 12/04/2014 06:56",
-		"register" : "dkh 12/03/2014 10:21",
+		"register" : "dkh 01/06/2015 13:39",
 		"restartGems" : "dkh 12/06/2014 13:04",
 		"saveContinuationFor:titled:inTransactionDo:" : "dkh 12/30/2014 07:25",
 		"scriptBinDirPath" : "dkh 11/29/2014 09:44",
@@ -118,6 +123,6 @@
 		"transactionMode" : "dkh 12/22/2014 12:57",
 		"transactionMode:" : "dkh 12/30/2014 07:25",
 		"transactionMutex" : "dkh 12/22/2014 14:48",
-		"unregister" : "dkh 12/03/2014 10:22",
+		"unregister" : "dkh 01/06/2015 13:39",
 		"validateName:" : "dkh 11/26/2014 18:29",
 		"writeGemLogEntryFor:titled:" : "dkh 12/30/2014 06:52" } }

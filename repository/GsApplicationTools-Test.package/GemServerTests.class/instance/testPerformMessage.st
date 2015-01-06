@@ -1,7 +1,7 @@
 tests
 testPerformMessage
   | gemServer |
-  gemServer := GemServerRegistry gemServerNamed: self gemServerName.
+  gemServer := GemServer gemServerNamed: self gemServerName.
   gemServer scriptLogEvent: '---->testPerformMessage' object: gemServer.
   [ 
   self startGems: gemServer.
