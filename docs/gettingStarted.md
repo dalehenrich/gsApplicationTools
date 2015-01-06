@@ -33,6 +33,7 @@
   - [Gem Server Debugging](#gem-server-debugging)
     - [Object Log Debugging](#object-log-debugging)
     - [Interactive Debugging](#interactive-debugging)
+      - [Interactive Debugging Example](#interactive-debugging-example)
 - [Glossary](#glossary)
 
 ---
@@ -781,20 +782,66 @@ Naturally there is a cost to saving continuations, but it continuation-based deb
 ####Interactive Debugging
 
 If you have a reproducable test case or you need to do some hands on development of your server code, you would like to be able run a *gem server* in your favorite interactive development environment.
-However, there are several obstacles that need to be overcome when trying to do interactive development with a *gem server* that has been designed to run in a headless manner:
+However, there are several obstacles that need to be overcome when trying to do interactive development with a *gem server* that has been designed to run in a headless [Topaz][2] session:
   1. The GemStone [GCI](#gembuilder-for-c) (used by interactive development environments for GemStone) permits only one non-blocking function call per session.
      This means that when a Smalltalk thread is active in a *gem server*, the interactive development environment may not make any other [GCI](#gembuilder-for-c) function calls.
      In effect the development environment must block until the in process non-blocking call returns.
-  2. The *gem server* code is structured to [handle most of the interesting exceptions](#gem-server-exception-set) by [logging the stack to the [object log](object-log) and either unwinding the stack or resuming the exception](#gem-server-exception-handlers).
+  2. The *gem server* code is structured to [handle most of the interesting exceptions](#gem-server-exception-set) by [logging the stack to the object log and either unwinding the stack or resuming the exception](#gem-server-exception-handlers).
      This means that without *devine intervention*, an interactive debugger will not be opened when an interesting exception occurs.
   3. The *gem server* is [designed to run in manual transaction mode](#gem-server-transaction-management).
-     This means that you need to explicitly manage transaction boundaries 
+     This means that you need to explicitly manage transaction boundaries. 
 
-#####Two debugging sessions: server and client
+The solution to having the server debugging session blocked while serving requests is to use with two interactive debugging sessions.
+  1. Server debugging session which is blocked running the [*gem server* service loop](#gem-server-service-loop).
+  2. Client debugging session, which is where most of the interactive development takes place.
 
-#####Gem Server `interactive mode`
+In order to arrange to debug interesting exceptions, one may set `interactiveMode` for the *gem server*. 
+When `interactiveMode` is `true`, the *gem server* passes exceptions to the debugger, instead of doing the [standard exception logging](#gem-server-exception-logging):
 
-#####Gem Server `transaction mode`
+```Smalltalk
+doInteractiveModePass: exception
+  self interactiveMode
+    ifTrue: [ exception pass ]
+```
+
+Finally, one may use [automatic transaction mode](#automatic-transaction-mode) when using `GemServer>>interactiveStartServiceOn:transactionMode:` to start the server:
+
+```Smalltalk
+interactiveStartServiceOn: portOrNil transactionMode: mode
+  "called from development environment ... service run in current vm."
+
+  "transactionMode: #autoBegin or #manualBegin"
+
+  self
+    scriptLogEvent:
+      '-->>Interactive Start ' , self name , ' on ' , portOrNil printString
+    object: self.
+  self transactionMode: mode.
+  mode == #'manualBegin'
+    ifTrue: [ self startTransactionBacklogHandling ].
+  self
+    enableAlmostOutOfMemoryHandling;
+    startServerOn: portOrNil	"does not return"
+```
+
+#####Interactive Debugging Example
+For this example we will be using the **GemServerRemoteServerSerialProcessingExample** for the *gem server* and the **GemServerRemoteClientSerialProcessingExample** as the client.  
+
+The **GemServerRemoteServerSerialProcessingExample** instance takes tasks (**GemServerRemoteTaskSerialProcessingExample** class) off of a queue and executes the task in a separate Smalltalk process. 
+If the task completes successfully the result is stored as the `value` for the task which marks the task as complete. 
+If an error occurs while executing the task, the resulting exception is stored as the `exception` for the task which marks the task as complete.
+
+The **GemServerRemoteClientSerialProcessingExample** instance adds requested tasks to the queue and then waits for the list of tasks to finish processing by the server.
+
+1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
+2. In the **client session** register the *gem server*:
+   ```Smalltalk
+   (GemServerRemoteServerSerialProcessingExample register: 'example')
+     interactiveMode: true.
+   ```
+
+3. In the **server session**...
+     
 
 ---
 ---
