@@ -2,4 +2,4 @@
 gemServerExceptionSet
   "Answer exceptionSet for handling Halt and or Breakpoint"
 
-  ^ BreakpointNotification , Halt
+  ^ ExceptionSet new

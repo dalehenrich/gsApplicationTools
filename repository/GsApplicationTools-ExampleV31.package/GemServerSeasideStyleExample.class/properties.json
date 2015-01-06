@@ -1,0 +1,15 @@
+{
+	"category" : "GsApplicationTools-ExampleV31",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"requests",
+		"expectedLoopCount" ],
+	"name" : "GemServerSeasideStyleExample",
+	"pools" : [
+		 ],
+	"super" : "GemServerRemoteAbstractExample",
+	"type" : "normal" }

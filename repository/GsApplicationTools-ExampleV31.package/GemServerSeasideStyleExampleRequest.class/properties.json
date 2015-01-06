@@ -1,0 +1,20 @@
+{
+	"category" : "GsApplicationTools-ExampleV31",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"request",
+		"response",
+		"exception",
+		"status",
+		"expectedException",
+		"expectedResponse",
+		"expectedStatus" ],
+	"name" : "GemServerSeasideStyleExampleRequest",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

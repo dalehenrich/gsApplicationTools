@@ -5,7 +5,6 @@ notifications:
     urls:
       - https://webhooks.gitter.im/e/dd28fc6ec3cc9c66b330 # GsDevKit/gsApplicationTools room
       - https://webhooks.gitter.im/e/c59e6bffa0b41a693676 # GsDevKit/chat (public)
-      - https://webhooks.gitter.im/e/869dcaa7f45f315db301 # GsDevKit room (private)
     on_success: always # options: [always|never|change] default: always
     on_failure: always  # options: [always|never|change] default: always
     on_start: false     # default: false
@@ -19,8 +18,8 @@ env:
    - ST=GemStone-3.0.1 
    - ST=GemStone-3.1.0.6
    - ST=GemStone-3.2.0
-#   - ST=GemStone-3.2.1
-#   - ST=GemStone-3.2.2
+   - ST=GemStone-3.2.1
+   - ST=GemStone-3.2.2
    - ST=GemStone-3.2.3
 
 install:

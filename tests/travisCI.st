@@ -1,20 +1,14 @@
 "Load and run tests to be performed by TravisCI"
-| gitPath fullSystemTest |
+| gitPath |
 Transcript cr; show: 'travis---->travisCI.st'.
 gitPath := (FileDirectory default directoryNamed: 'git_cache') fullName.
-
-fullSystemTest := false.
 
 Gofer new
   package: 'GsUpgrader-Core';
   url: 'http://ss3.gemtalksystems.com/ss/gsUpgrader';
   load.
 
-fullSystemTest ifTrue: [ 
-  (Smalltalk at: #GsUpgrader) upgradeGLASS1. "test against latest version of GLASS1 - clean tests"
-] ifFalse: [
-  (Smalltalk at: #GsUpgrader) upgradeGrease. "test against virgin version of GLASS"
-].
+(Smalltalk at: #GsUpgrader) upgradeGrease. "test against virgin version of GLASS"
 
 GsDeployer deploy: [
   "Load GsApplicationTools... "
@@ -24,7 +18,7 @@ GsDeployer deploy: [
     load: #('CI')
 ].
 
-fullSystemTest ifTrue: [
+true ifTrue: [
   "Run all tests in image"
   TravisCISuiteHarness
     value: TestCase suite

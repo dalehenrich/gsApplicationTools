@@ -1,5 +1,6 @@
 *gsapplicationtools-serverv30
 gemServerExceptionSet
-  "Answer exceptionSet for handling Halt and or Breakpoint"
+  "implement exceptionHandlingForGemServer: for exceptions in exceptionSet, so gem server
+   instances can install custom exception handling. "
 
-  ^ Break , Breakpoint , Halt
+  ^ AlmostOutOfMemory , AlmostOutOfStack

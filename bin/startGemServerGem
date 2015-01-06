@@ -3,6 +3,33 @@
 GemServer="$1"
 Port="$2"
 
+set -e # exit on error
+
+# Debugging controls - uncomemnt and edit debugging env vars as desired:
+
+# The default behaviour is to delete this process's log file if it exits
+# normally. If you want to keep this process's log file even on normal exit
+# then uncomment the following
+#
+# export GEMSTONE_KEEP_LOG=1
+
+#  Print Smalltalk stack and instance counts when OutOfMemory error occurs
+#
+# export GS_DEBUG_VMGC_VERBOSE_OUTOFMEM=1
+
+# --------------------------------
+# GS_DEBUG_VMGC_PRINT_MKSW_MEMORY_USED specifies a percent of memory
+# used threshold.
+# If the GS_DEBUG_VMGC_PRINT_MKSW_MEMORY_USED environment variable
+# is not defined, the default is 75 percent.
+# At the end of each mark sweep, if the percent used is greater than
+# this threshold, the markSweep is printed, the Smalltalk stack
+# is printed to stdout, and the threshold is raised by 5 percent.  Thus in
+# situation producing error 4067, OutOfMemory, you should get several
+# Smalltalk stacks printed in the gem log file before the session dies.
+#
+# export GS_DEBUG_VMGC_PRINT_MKSW_MEMORY_USED=75
+
 if [ -s $GEMSTONE/seaside/etc/gemstone.secret ]; then
     . $GEMSTONE/seaside/etc/gemstone.secret
 else
@@ -11,14 +38,16 @@ else
 fi
 
 if [ "${3}x" = "x" ] ; then
-  ExeArg=
+  ExeArg="-e $(dirname $0)/gem.conf"
 else
   ExeArg="-e $3"
 fi
 
-echo "Starting $GemServer on $Port using $ExeConf ..."
+logFile="${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.log"
 
-cat << EOF | nohup $GEMSTONE/bin/topaz -l ${ExeArg} 2>&1 >> ${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.log &
+echo "Starting $GemServer on $Port exeConf: -$ExeConf- logFile: -$logFile-"
+
+cat << EOF | nohup $GEMSTONE/bin/topaz -l ${ExeArg} >> $logFile 2>&1 &
 
 set user DataCurator pass $GEMSTONE_CURATOR_PASS gems $GEMSTONE_NAME
 
@@ -32,11 +61,14 @@ run
 %
 
 run
+| logEntry |
 System beginTransaction.
-(ObjectLogEntry
+(logEntry := ObjectLogEntry
   fatal: '${GemServer}_server_${Port}: topaz exit'
   object:
     'pid: ', (System gemVersionReport at: 'processId') printString) addToLog.
+(GemServerRegistry gemServerNamed: '$GemServer')
+  ifNotNil: [:gemServer | gemServer crashLog add: (${Port}) asString -> logEntry ].
 System commitTransaction.
 %
 

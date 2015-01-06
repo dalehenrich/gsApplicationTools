@@ -1,0 +1,3 @@
+private
+gemServerClass
+  ^ self subclassResponsibility

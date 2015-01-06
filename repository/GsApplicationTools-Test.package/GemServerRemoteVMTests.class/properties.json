@@ -10,5 +10,5 @@
 	"name" : "GemServerRemoteVMTests",
 	"pools" : [
 		 ],
-	"super" : "GemServerAbstractTests",
+	"super" : "GemServerTests",
 	"type" : "normal" }

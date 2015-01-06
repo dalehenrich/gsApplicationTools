@@ -2,6 +2,7 @@
 	"class" : {
 		 },
 	"instance" : {
+		"assertEventLog:total:start:stop:restart:" : "dkh 12/21/2014 14:26",
 		"assertExpectedNames:equals:" : "dkh 11/26/2014 15:01",
 		"setUp" : "dkh 11/29/2014 09:15",
 		"testInvalidGemServerNames" : "dkh 11/29/2014 06:37",

@@ -1,0 +1,23 @@
+{
+	"category" : "GsApplicationTools-ExampleV31",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"InProcess",
+		"Queue" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"taskBlock",
+		"taskValue",
+		"hasValue",
+		"exception",
+		"creation",
+		"valuation",
+		"label",
+		"expectedException",
+		"expectedDelay" ],
+	"name" : "GemServerRemoteTaskExample",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }
