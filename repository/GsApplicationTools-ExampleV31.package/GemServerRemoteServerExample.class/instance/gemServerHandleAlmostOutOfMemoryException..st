@@ -23,4 +23,4 @@ gemServerHandleAlmostOutOfMemoryException: exception
   self
     logStack: exception
     titled:
-      self name , ' ' , exception class name asString , ' exception encountered: '	"out of transaction or commit did not free up enough memory, unwind stack"
+      self name , ' ' , exception class name asString , ' exception encountered:'	"out of transaction or commit did not free up enough memory, unwind stack"

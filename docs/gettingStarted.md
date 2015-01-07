@@ -205,7 +205,6 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
     do: [ :ex | 
       | exception |
       [ 
-      "only returns if an error was logged"
       exception := ex.
       self handleGemServerException: ex.
       beforeUnwindBlock value: exception ]
@@ -243,13 +242,33 @@ There are several variants of the `GemServer>>gemServer:exceptionSet:beforeUnwin
   - gemServer:exceptionSet:ensure:
 
 ####Gem Server Exception Set
-Default exception handling has been defined for the following exceptions (the list of default exceptions is slightly different for [GemStone 2.4.x][8]):
+Default exception handling has been defined for the following exceptions:
   - **Error**
   - **Break**
   - **Breakpoint**
   - **Halt**
   - **AlmostOutOfMemory**
   - **AlmostOutOfStack** 
+
+One may define an `exceptionSet`:
+  - on a *gem server* by *gem server* basis using the `GemServer>>gemServerExceptionSet:` method.
+  - by overriding `GemServer>>gemServerExceptionSet` and providing an alternate implementation:
+    ```Smalltalk
+    gemServerExceptionSet
+      gemServerExceptionSet
+        ifNil: [ 
+          self interactiveMode
+            ifTrue: [ ^ Error , self class gemServerExceptionSet ].
+          ^ Error , self class gemServerExceptionSet
+            , self class gemServerDebuggingExceptionSet ].
+      ^ gemServerExceptionSet
+    ```
+
+  - by defining alternate implementations of the **GemServer** class methods: `gemServerExceptionSet` and `gemServerDebuggingExceptionSet`.
+    The `exceptionSet` returned by `gemServerDebuggingExceptionSet` is not applied when `interactiveMode` is on. 
+
+
+**Note**: *The list of default exceptions discussed in this section are slightly different for [GemStone 2.4.x][8].*
 
 ####Gem Server Exception Handlers
 The *gem server* uses [double dispatching][9] to invoke exception-specific handling behavior.
@@ -279,12 +298,13 @@ For an **Error** exception, the `GemServer>>gemServerHandleErrorException:` meth
 
 ```Smalltalk
 gemServerHandleErrorException: exception
-  "log the stack trace and unwind stack, unless in interactive mode"
+  "log the stack trace and unwind stack.
+   interactiveMode is handled by caller of handleGemServerException: before stack is unwound."
 
   self
     logStack: exception
     titled:
-      self name , ' ' , exception class name asString , ' exception encountered: '.
+      self name , ' ' , exception class name asString , ' exception encountered:'.
 ```
 
 the [exception is logged](#gem-server-exception-logging) and the method returns.
@@ -300,11 +320,13 @@ gemServerHandleResumableException: exception
   self
     logStack: exception
     titled:
-      self name , ' ' , exception class name asString , ' exception encountered: '.
+      self name , ' ' , exception class name asString , ' exception encountered:'.
   exception resume
 ```
 
 As in the case of handling an **Error** the [exception is logged](#gem-server-exception-logging), but instead of returning, the exception is resumed and processing continues uninterrupted.
+
+If your *gem server* needs custom handling for an exception, you can add new `gemServerHandle*` methods or override existing `gemServerHandle*` methods.
 
 ####Gem Server `beforeUnwindBlock`
 The `beforeUnwindBlock` gives you a chance to perform application specific operations before the stack is unwound.
@@ -316,8 +338,6 @@ handleRequest: request for: socket
     gemServer: [ ^self processRequest: request for: socket ]
     beforeUnwind: [ :ex | ^ self writeServerError: ex to: socket ]
 ```
-
-If your *gem server* needs custom handling for an exception, you can add new `gemServerHandle*` methods or override existing `gemServerHandle*` methods.
 
 ####Gem Server Exception Logging
 When an exception is handled, the stack is written to the gem log and a continuation for the stack is saved to the [object log](#object-log) by the `logStack:titled:inTransactionDo:` method:
@@ -332,14 +352,14 @@ logStack: exception titled: title inTransactionDo: inTransactionBlock
 ```
 
 The `writeGemLogEnryFor:titled:` dumps a stack to the gem log.
-This method is called first to ensure that a record of the error has been written to disk in the event the continuation fails to be committed:
+This method is called first to ensure that a record of the error has been written to disk in the event the continuation cannot be committed:
 
 ```Smalltalk
 writeGemLogEntryFor: exception titled: title
   | stream stack |
   stack := GsProcess stackReportToLevel: self stackReportLimit.
   stream := WriteStream on: String new.
-  stream nextPutAll: '----------- ' , title , DateAndTime now printString.
+  stream nextPutAll: '----------- ' , title , ' ', DateAndTime now printString.
   stream lf.
   stream nextPutAll: exception description.
   stream lf.
@@ -349,7 +369,7 @@ writeGemLogEntryFor: exception titled: title
   GsFile gciLogServer: stream contents
 ```
 
-The `saveContinuationFor:titled:inTransactionDo:` method arranges to create the continuation within it's own transaction or within an existing transaction:
+The `saveContinuationFor:titled:inTransactionDo:` method arranges to create the continuation within its own transaction or within an existing transaction:
 
 ```Smalltalk
 saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
@@ -366,15 +386,22 @@ saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
           inTransactionBlock value ] ]
 ```
 
+The `logStack:titled:` method calls  `logStack:titled:inTransactionDo:`:
+
+```Smalltalk
+logStack: exception titled: title
+  self logStack: exception titled: title inTransactionDo: [  ]
+```
+
 The `serverError:titled:` method calls `logStack:titled:inTransactionDo:` and allows for [interactive debugging](#interactive-debugging) of the exception:
 
 ```Smalltalk
 serverError: exception titled: title inTransactionDo: inTransactionBlock
+  self doInteractiveModePass: exception.
   self
     logStack: exception
-    titled: title , ' Server error encountered: '
+    titled: title , ' Server error encountered:'
     inTransactionDo: inTransactionBlock.
-  self doInteractiveModePass: exception
 ```
 
 ####Gem Server `ensureBlock`
@@ -409,8 +436,10 @@ The **GemServer** class provides three methods for performing transactions:
   - [`doTransaction:onConflict:`](#dotransactiononconflict)
   - [`doTransaction:`](#dotransaction)
 
+All three methods perform transactions under the protection of the `transactionMutex`.
+
 #####doBasicTransaction:
-The `doBasicTransaction:` method performs transactions under the protection of the `transactionMutex`:
+The `doBasicTransaction:` ensures that the session is in transaction before the `aBlock is invoked and then performs a commit:
 
 ```Smalltalk
 doBasicTransaction: aBlock
