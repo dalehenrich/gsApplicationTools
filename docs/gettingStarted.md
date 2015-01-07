@@ -130,9 +130,9 @@ The **GemServer** class provides a concise framework for standardized:
 ---
 
 ###Gem Server Service Loop
-A *gem server* is associated with one or more ports (a port may be nil).
+A *gem server* is associated with one or more *port or resource names*.
 
-One [Topaz session](#gemstone-session) is launched for each of the *ports* associated with a *gem server*.
+One [Topaz session](#gemstone-session) is launched for each of the *port or resource names* associated with a *gem server*.
 
 The *gem server* instance is shared by each of the *[Topaz][2] gems*.
 
@@ -140,36 +140,36 @@ The *gem server* is launched by calling the [gem server start script](#gem-serve
 The [script](#gem-server-start-script) executes the following Smalltalk code to start the *gem server*:
 
 ```Smalltalk
-(GemServer gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
+(GemServer gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portOrResourceName>.
 ```
 
 The `scriptStartServiceOn:` method:
 
 ```Smalltalk
-scriptStartServiceOn: portOrNil
+scriptStartServiceOn: portOrResourceName
   "called from shell script"
 
   self
-    scriptServicePrologOn: portOrNil;
-    startServerOn: portOrNil	"does not return"
+    scriptServicePrologOn: portOrResourceName;
+    startServerOn: portOrResourceName  "does not return"
 ```
 
 The `startServerOn:` method is expected to block the main Smalltalk process in the *gem*:
 
 ```Smalltalk
-startServerOn: portOrNil
+startServerOn: portOrResourceName
   "start server in current vm. Not expected to return."
 
-  self startBasicServerOn: portOrNil.
+  self startBasicServerOn: portOrResourceName.
   [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
 ```
 
 The `startBasicServerOn:` method forks a process to run the `basicServerOn:` method:
 ```Smalltalk
-startBasicServerOn: portOrNil
+startBasicServerOn: portOrResourceName
   "start basic server process in current vm. fork and record forked process instance. expected to return."
 
-  self basicServerProcess: [ self basicServerOn: portOrNil ] fork.
+  self basicServerProcess: [ self basicServerOn: portOrResourceName ] fork.
   self serverInstance: self	"the serverProcess is session-specific"
 ```
 
@@ -177,7 +177,7 @@ The `basicServerOn:` method is expected to be implemented by a concrete subclass
 For example, here's the `basicServerOn:` method for the [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
-basicServerOn: port
+basicServerOn: portOrResourceName
   "forked by caller"
 
   | count |
@@ -588,25 +588,26 @@ startGems
   System commitTransaction
     ifFalse: [ self error: 'Commit transaction failed before startGems' ].
   self logControlEvent: 'Start Gems: ' , self name.
-  self ports
-    do: [ :port | 
+  self portOrResourceNameList
+    do: [ :portOrResourceName | 
       | pidFilePath |
-      pidFilePath := self gemPidFileName: port.
+      pidFilePath := self gemPidFileName: portOrResourceName.
       (GsFile existsOnServer: pidFilePath)
         ifTrue: [ 
           self
             error:
-              'Pid file exists for port: ' , port printString , '. Try restart command.' ].
-      self executeStartGemCommand: port ]
+              'Pid file exists for port or resource: ' , portOrResourceName printString
+                , '. Try restart command.' ].
+      self executeStartGemCommand: portOrResourceName ]
 ```
 
 calls the `executeStartGemCommand:` method, which in turn constructs shell command line that calls the [*gem server* start script](#gem-server-start-script):
 
 ```Smalltalk
-executeStartGemCommand: port
+executeStartGemCommand: portOrResourceName
   | commandLine |
-  commandLine := self startScriptPath , ' ' , self name , ' ' , port asString
-    , ' "' , self exeConfPath , '"'.
+  commandLine := self startScriptPath , ' ' , self name , ' '
+    , portOrResourceName asString , ' "' , self exeConfPath , '"'.
   self performOnServer: commandLine
 ```
 
@@ -628,7 +629,7 @@ The scripts are also called from within Smalltalk using `System class>>performOn
 ####Gem Server start script
 The [*gem server* start script][14] takes three arguments:
   1. gem server name
-  2. port number
+  2. port number or resource name
   3. exe conf file path
 
 ```
@@ -638,30 +639,30 @@ startGemServerGem Seaside 9001 $GEMSTONE_EXE_CONF
 The script itself invokes the following Smalltalk code:
 
 ```Smalltalk
-(GemServer gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
+(GemServer gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrResourceName>.
 ```
 
 The `scriptStartServiceOn:` method:
 
 ```Smalltalk
-scriptStartServiceOn: portOrNil
+scriptStartServiceOn: portOrResourceName
   "called from shell script"
 
   self
-    scriptServicePrologOn: portOrNil;
-    startServerOn: portOrNil	"does not return"
+    scriptServicePrologOn: portOrResourceName;
+    startServerOn: portOrResourceName  "does not return"
 ```
 
 initiates the [service loop](#gem-server-service-loop) and calls the `scriptServicePrologOn:` method: 
 
 ```Smalltalk 
-scriptServicePrologOn: portOrNil
+scriptServicePrologOn: portOrResourceName
   self
     scriptLogEvent:
-      '-->>Script Start ' , self name , ' on ' , portOrNil printString
+      '-->>Script Start ' , self name , ' on ' , portOrResourceName printString
     object: self.
   self
-    recordGemPid: portOrNil;
+    recordGemPid: portOrResourceName;
     setStatmonCacheName;
     enableRemoteBreakpointHandling.
   self transactionMode: #'manualBegin'.
@@ -675,7 +676,7 @@ which among other things records the `gem process id` in a file, so that the [ge
 ####Gem Server stop script
 The [*gem server* stop script][15] takes two arguments:
   1. gem server name
-  2. port number
+  2. port number or resource name
 
 ```
 stopGemServerGem Seaside 9001
@@ -789,21 +790,21 @@ doInteractiveModePass: exception
 Finally, one may use [automatic transaction mode](#automatic-transaction-mode) when using `GemServer>>interactiveStartServiceOn:transactionMode:` to start the server:
 
 ```Smalltalk
-interactiveStartServiceOn: portOrNil transactionMode: mode
+interactiveStartServiceOn: portOrResourceName transactionMode: mode
   "called from development environment ... service run in current vm."
 
   "transactionMode: #autoBegin or #manualBegin"
 
   self
     scriptLogEvent:
-      '-->>Interactive Start ' , self name , ' on ' , portOrNil printString
+      '-->>Interactive Start ' , self name , ' on ' , portOrResourceName printString
     object: self.
   self transactionMode: mode.
   mode == #'manualBegin'
     ifTrue: [ self startTransactionBacklogHandling ].
   self
     enableAlmostOutOfMemoryHandling;
-    startServerOn: portOrNil	"does not return"
+    startServerOn: portOrResourceName  "does not return"
 ```
 
 ####Interactive Debugging Example

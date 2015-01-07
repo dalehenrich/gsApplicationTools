@@ -1,3 +1,3 @@
 server compat
 start
-  self interactiveStartServiceOn: nil transactionMode: #'manualBegin'
+  self interactiveStartServiceOn: 'instance' transactionMode: #'manualBegin'

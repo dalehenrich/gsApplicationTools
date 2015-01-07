@@ -1,3 +1,3 @@
 private
 startGemServer: gemServer
-  gemServer unitTestStartServiceOn: nil
+  gemServer unitTestStartServiceOn: 'instance'

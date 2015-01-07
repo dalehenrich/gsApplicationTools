@@ -1,6 +1,6 @@
 service instance-server
-startServerOn: portOrNil
+startServerOn: portOrResourceName
   "start server in current vm. Not expected to return."
 
-  self startBasicServerOn: portOrNil.
+  self startBasicServerOn: portOrResourceName.
   [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]

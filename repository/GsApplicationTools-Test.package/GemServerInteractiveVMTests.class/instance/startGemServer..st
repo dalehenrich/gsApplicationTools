@@ -1,3 +1,3 @@
 private
 startGemServer: gemServer
-  gemServer interactiveStartServiceOn: nil
+  gemServer interactiveStartServiceOn: 'instance'
