@@ -24,6 +24,7 @@
     - [Practical Gem Server Transaction Support](#practical-gem-server-transaction-support)
       - [Request/Response Gem Server Tasks](#requestresponse-gem-server-tasks)
       - [I/O Gem Server Tasks](#io-gem-server-tasks)
+    - [Important Transaction Considerations](#important-transaction-considerations)
 - [Gem Server Control](#gem-server-control)
   - [Gem Server Control from Smalltalk](#gem-server-control-from-smalltalk)
   - [Gem Server Bash scripts](#gem-server-bash-scripts)
@@ -195,7 +196,9 @@ basicServerOn: portOrResourceName
 ---
 
 ###Gem Server Exception Handling
-The `gemServer:exceptionSet:beforeUnwind:ensure:` method implements the basic exception handling logic for the **GemServer** class:
+There are a number of `gemServer:*` methods. 
+The `gemServer:exceptionSet:beforeUnwind:ensure`: method is the foundation of them all. 
+It implements the basic exception handling logic for the GemServer class:
 
 ```Smalltalk
 gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock
@@ -510,7 +513,9 @@ doTransaction: aBlock
 This method dumps the  [conflict dictionary](#transaction-conflict-dictionary) to the [object log](#object-log) and signals an error.
 
 ####Practical Gem Server Transaction Support
-The `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` wraps a transaction around the [`gemServer:exceptionSet:beforeUnwind:ensure:`](#gem-server-exception-handling) method and exports the [`conflictBlock`](#dotransactiononconflict):
+There are a number of `gemServerTransaction:*` methods.
+The `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` is the foundation of them all.
+It wraps a transaction around the [`gemServer:exceptionSet:beforeUnwind:ensure:`](#gem-server-exception-handling) call:
 
 ```Smalltalk
 gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock onConflict: conflictBlock
@@ -528,6 +533,9 @@ gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwi
         ensure: ensureBlock ]
     onConflict: conflictBlock
 ```
+
+To keep the transaction model simple, the `gemServerTransaction:*` methods are not re-entrant.
+If you need a more complicated transaction models, then you are free to build your own supporting methods.
 
 There are several variants of the  `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` available:
   - gemServerTransaction:
@@ -587,6 +595,8 @@ performTask:
 
 In this example we do the http get *outside of transaction*, which means that a large number of tasks can be waiting for an http response, concurrently.
 Only when a response becomes available, does the *transaction mutex* and then the processing required while *in transaction* should be very short.
+
+####Important Transaction Considerations
 
 It is important that one avoids modifying persistent objects while *outside of transaction*.
 It is permissable to read persistent objects but any modifications to persistent objects made while outside of transaction will be lost when the [abort](#abort-transaction) or [begin](#begin-transaction) transaction is called by the `gemServerTransaction:` method.
@@ -650,7 +660,8 @@ executeStartGemCommand: portOrResourceName
 ```
 
 ###Gem Server Bash scripts
-The *gem server* bash scripts are designed to control a single *gem server* operating system process, one process for each port in the port.
+The *gem server* bash scripts are designed to control a single *gem server* operating system process, one process for each port in the port list.
+For *gem servers* that are not port-based, resource names are used to differentiate between *gem server* instances.
 The bash scripts are aimed at making it possible to start and stop individual gem servers from a process management tool like [DaemonTools][5] or [Monit][6].
 
 The scripts are also called from within Smalltalk using `System class>>performOnServer:`.
@@ -789,7 +800,7 @@ While you cannot resume execution of a stack from a *debugger continuation*, you
 
 If you are experiencing problems in production and are having trouble characterizing the problem, you can insert `halt` statements into your code.
 By default the [*gem server* exception handlers](#gem-server-exception-set) will handle a **Halt** by saving a debug continuation to the [object log](#object-log) and then `resuming` the **Halt** exception, so execution continues.
-Naturally there is a cost to saving continuations, but it continuation-based debugging is superior to print statment debugging.
+Naturally there is a cost to saving continuations, but continuation-based debugging is superior to print statment debugging.
 
 ###Interactive Debugging
 
@@ -799,15 +810,16 @@ However, there are several obstacles that need to be overcome when trying to do 
      This means that when a Smalltalk thread is active in a *gem server*, the interactive development environment may not make any other [GCI](#gembuilder-for-c) function calls.
      In effect the development environment must block until the in process non-blocking call returns.
   2. The *gem server* code is structured to [handle most of the interesting exceptions](#gem-server-exception-set) by [logging the stack to the object log and either unwinding the stack or resuming the exception](#gem-server-exception-handlers).
-     This means that without *devine intervention*, an interactive debugger will not be opened when an interesting exception occurs.
+     This means that without *divine intervention*, an interactive debugger will not be opened when an interesting exception occurs.
   3. The *gem server* is [designed to run in manual transaction mode](#gem-server-transaction-management).
      This means that you need to explicitly manage transaction boundaries. 
 
 The solution to having the server debugging session blocked while serving requests is to use with two interactive debugging sessions.
-  1. Server debugging session which is blocked running the [*gem server* service loop](#gem-server-service-loop).
-  2. Client debugging session, which is where most of the interactive development takes place.
+Two interactive sessions gets around the "blocked server environment" problem:
+  1. A **server session** which is blocked running the [*gem server* service loop](#gem-server-service-loop).
+  2. A **client session**, which is where most of the interactive development takes place.
 
-In order to arrange to debug interesting exceptions, one may set `interactiveMode` for the *gem server*. 
+In order to arrange to debug interesting exceptions, set `interactiveMode` for the *gem server*. 
 When `interactiveMode` is `true`, the *gem server* passes exceptions to the debugger, instead of doing the [standard exception logging](#gem-server-exception-logging):
 
 ```Smalltalk
@@ -873,7 +885,7 @@ When the method `submitAndWaitFor:gemServer:` is sent to a **GemServerRemoteServ
 If you are not using auto commit mode, then an explicit commit is needed.*
  
 1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
-2. In the **client session**, `register` the *gem server*, and `reset` the queue:
+2. In the **client session**, `register` the *gem server*:
    ```Smalltalk
    (GemServerRemoteServerSerialProcessingExample register: 'example')
      interactiveMode: true.
@@ -893,7 +905,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
    ```
 
    The **server session** will be blocked.
-   If you need to regain control you can interrupt the server using `CMD-.` in GemTools or tODE.
+   If you need to regain control you can interrupt the server using `ALT-.` in GemTools or tODE.
 
 5. In the **client session**, schedule a `simple` task and `inspect` the result:
    ```Smalltalk
@@ -919,7 +931,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 7. In the **server session** fiddle around with the debugger.
    When you are done, go ahead and close the debugger.
    Closing the debugger should terminate the Smalltalk process that was performing the task, but the other Smalltalk *gem server* processes are still active.
-   Rather than try to make sure that all of the *gem server* Smalltalk processes are terminted, it is probably simpler to logout, login and start the *gem server* processes again by repeating Step 4.
+   Rather than try to make sure that all of the *gem server* Smalltalk processes are terminated, it is probably simpler to logout, login and start the *gem server* processes again by repeating Step 4.
 
 8. In the **client session**, schedule an `exampleHttpTask` task and `inspect` the result:
    ```Smalltalk
