@@ -1,7 +1,7 @@
 tests
 testError
   | gemServer |
-  gemServer := GemServerRegistry gemServerNamed: self gemServerName.
+  gemServer := GemServer gemServerNamed: self gemServerName.
   gemServer scriptLogEvent: '---->testERROR' object: gemServer.
   [ 
   self startGems: gemServer.

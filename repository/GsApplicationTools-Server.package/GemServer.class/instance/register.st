@@ -1,3 +1,3 @@
 registration
 register
-  GemServerRegistry addGemServer: self
+  self class addGemServer: self

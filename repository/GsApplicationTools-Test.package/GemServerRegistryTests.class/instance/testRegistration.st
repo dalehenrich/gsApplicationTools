@@ -2,8 +2,8 @@ tests
 testRegistration
   | gemName gemServer |
   gemName := 'Another_Mock_Server'.
-  self assert: (GemServerRegistry gemServerNamed: gemName) isNil.
+  self assert: (GemServer gemServerNamed: gemName) isNil.
   gemServer := MockGemServer register: gemName on: #(9001 9002 9003).
-  self assert: (GemServerRegistry gemServerNamed: gemName) notNil.
-  GemServerRegistry removeGemServer: gemServer.
-  self assert: (GemServerRegistry gemServerNamed: gemName) isNil
+  self assert: (GemServer gemServerNamed: gemName) notNil.
+  GemServer removeGemServer: gemServer.
+  self assert: (GemServer gemServerNamed: gemName) isNil

@@ -1,5 +1,7 @@
 service instance-script
-interactiveStartServiceOn: portOrNil
+interactiveStartServiceOn: portOrResourceName
   "called from development environment ... service run in current vm."
 
-  self interactiveStartServiceOn: portOrNil transactionMode: #'autoBegin'
+  self
+    interactiveStartServiceOn: portOrResourceName
+    transactionMode: #'autoBegin'

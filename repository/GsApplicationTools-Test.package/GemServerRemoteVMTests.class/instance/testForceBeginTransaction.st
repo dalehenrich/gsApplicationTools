@@ -1,7 +1,7 @@
 tests
 testForceBeginTransaction
   | gemServer |
-  gemServer := GemServerRegistry gemServerNamed: self gemServerName.
+  gemServer := GemServer gemServerNamed: self gemServerName.
   gemServer scriptLogEvent: '---->testForceBeginTransaction' object: gemServer.
   [ 
   self startGems: gemServer.

@@ -1,4 +1,5 @@
 accessing
-ports: aCollection 
+ports: aCollection
+  "convenient alias for portOrResourceNameList for gem servers that are port based"
 
-	ports := aCollection
+  portOrResourceNameList := aCollection

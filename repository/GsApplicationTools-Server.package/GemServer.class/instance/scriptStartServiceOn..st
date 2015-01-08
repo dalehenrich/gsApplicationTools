@@ -1,7 +1,7 @@
 service instance-script
-scriptStartServiceOn: portOrNil
+scriptStartServiceOn: portOrResourceName
   "called from shell script"
 
   self
-    scriptServicePrologOn: portOrNil;
-    startServerOn: portOrNil	"does not return"
+    scriptServicePrologOn: portOrResourceName;
+    startServerOn: portOrResourceName	"does not return"

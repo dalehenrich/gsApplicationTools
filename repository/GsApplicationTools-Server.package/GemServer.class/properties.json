@@ -10,6 +10,7 @@
 		"serverClassAssoc",
 		"serverInstance",
 		"ports",
+		"portOrResourceNameList",
 		"enableRemoteBreakpoints",
 		"transactionMode",
 		"interactiveMode",

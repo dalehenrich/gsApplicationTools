@@ -1,7 +1,7 @@
 instance creation
-createServerOfClass: aServerClass withName: aName on: anArrayOfPortNumbers
-	^self new
-		serverClass: aServerClass;
-		name: aName;
-		ports: anArrayOfPortNumbers;
-		yourself.
+createServerOfClass: aServerClass withName: aName on: anArrayOfPortNumbersOrResourceNames
+  ^ self new
+    serverClass: aServerClass;
+    name: aName;
+    portOrResourceNameList: anArrayOfPortNumbersOrResourceNames;
+    yourself

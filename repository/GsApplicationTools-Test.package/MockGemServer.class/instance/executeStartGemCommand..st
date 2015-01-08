@@ -1,5 +1,5 @@
 server specialization
-executeStartGemCommand: port
+executeStartGemCommand: portOrResourceName
   self useEventLog
-    ifFalse: [ ^ super executeStartGemCommand: port ].
-  self eventLog add: 'start' -> port
+    ifFalse: [ ^ super executeStartGemCommand: portOrResourceName ].
+  self eventLog add: 'start' -> portOrResourceName

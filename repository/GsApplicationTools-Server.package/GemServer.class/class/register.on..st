@@ -1,3 +1,6 @@
-registration
-register: aName on: anArrayOfPortNumbers
-  ^ self register: aName for: self serverClass on: anArrayOfPortNumbers
+gem server registration
+register: aName on: anArrayOfPortNumbersOrResourceIds
+  ^ self
+    register: aName
+    for: self serverClass
+    on: anArrayOfPortNumbersOrResourceIds
