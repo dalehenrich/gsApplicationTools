@@ -1,5 +1,5 @@
 server specialization
-executeStopGemCommand: port
+executeStopGemCommand: portOrResourceName
   self useEventLog
-    ifFalse: [ ^ super executeStopGemCommand: port ].
-  self eventLog add: 'stop' -> port
+    ifFalse: [ ^ super executeStopGemCommand: portOrResourceName ].
+  self eventLog add: 'stop' -> portOrResourceName

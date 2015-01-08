@@ -1,3 +1,3 @@
 registration
 unregister
-  GemServerRegistry removeGemServer: self
+  self class removeGemServer: self

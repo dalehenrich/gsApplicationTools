@@ -1,7 +1,7 @@
 running
 tearDown
   | gemServer |
-  gemServer := GemServerRegistry gemServerNamed: self gemServerName.
+  gemServer := GemServer gemServerNamed: self gemServerName.
   super tearDown.
   (ObjectLogEntry trace: 'tearDown: stopGems') addToLog.
   gemServer

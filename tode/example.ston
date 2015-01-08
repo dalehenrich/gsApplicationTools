@@ -40,7 +40,7 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
       opts at: \'model\' ifPresent: [ :model | transModel := model ].
       opts
         at: \'unregister\'
-        ifPresent: [ :serverName | result := GemServerRegistry removeGemServerNamed: serverName ]
+        ifPresent: [ :serverName | result := GemServer removeGemServerNamed: serverName ]
         ifAbsent: [ 
           | serverName serverCls |
           opts
@@ -54,7 +54,7 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
                     ifTrue: [ serverCls := GemServerRemoteServerSerialProcessingExample ] ].
               serverName
                 ifNotNil: [ 
-                  gemServer := (GemServerRegistry gemServerNamed: serverName)
+                  gemServer := (GemServer gemServerNamed: serverName)
                     ifNil: [ gemServer := serverCls register: serverName ] ].
               gemServer
                 tracing: trace;
@@ -82,7 +82,7 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
           opts
             at: \'server\'
             ifPresent: [ :serverName | 
-              client := (gemServer := GemServerRegistry gemServerNamed: serverName)
+              client := (gemServer := GemServer gemServerNamed: serverName)
                 clientClass new ].
           taskList := {}.
           selectors
@@ -103,28 +103,28 @@ TDScriptLeafNode{#name:'example',#contents:'[ :topez :objIn :tokens :command :co
           result := client waitForTasks: taskList gemServer: gemServer ].
       opts
         at: \'remoteStop\'
-        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stopGems ].
+        ifPresent: [ :serverName | result := (GemServer gemServerNamed: serverName) stopGems ].
       opts
         at: \'remoteStart\'
-        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) startGems ].
+        ifPresent: [ :serverName | result := (GemServer gemServerNamed: serverName) startGems ].
       opts
         at: \'remoteStatus\'
-        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) statusGems ].
+        ifPresent: [ :serverName | result := (GemServer gemServerNamed: serverName) statusGems ].
       opts
         at: \'remoteRestart\'
-        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) restartGems ].
+        ifPresent: [ :serverName | result := (GemServer gemServerNamed: serverName) restartGems ].
       opts
         at: \'stop\'
-        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) stop ].
+        ifPresent: [ :serverName | result := (GemServer gemServerNamed: serverName) stop ].
       opts
         at: \'start\'
-        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) start ].
+        ifPresent: [ :serverName | result := (GemServer gemServerNamed: serverName) start ].
       opts
         at: \'status\'
-        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) status ].
+        ifPresent: [ :serverName | result := (GemServer gemServerNamed: serverName) status ].
       opts
         at: \'restart\'
-        ifPresent: [ :serverName | result := (GemServerRegistry gemServerNamed: serverName) restart ].
+        ifPresent: [ :serverName | result := (GemServer gemServerNamed: serverName) restart ].
       result ]
     ifPresent: [ :ignored | 
       TDManPage
@@ -187,4 +187,4 @@ EXAMPLES
 
   ./example --client=100 --server=example --trace
 \'
-        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2015-01-05T19:16:38.9522230625152-08:00']}
+        topez: topez ] ]',#creationTime:DateAndTime['2014-12-24T14:36:04.4822709560394-08:00'],#modificationTime:DateAndTime['2015-01-06T13:39:25.4889669418335-08:00']}

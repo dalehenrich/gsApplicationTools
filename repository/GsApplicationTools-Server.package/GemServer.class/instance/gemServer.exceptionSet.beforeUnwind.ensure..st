@@ -6,7 +6,6 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
     do: [ :ex | 
       | exception |
       [ 
-      "only returns if an error was logged"
       exception := ex.
       self handleGemServerException: ex.
       beforeUnwindBlock value: exception ]

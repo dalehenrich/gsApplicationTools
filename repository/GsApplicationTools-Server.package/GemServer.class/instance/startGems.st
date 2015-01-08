@@ -4,13 +4,14 @@ startGems
   System commitTransaction
     ifFalse: [ self error: 'Commit transaction failed before startGems' ].
   self logControlEvent: 'Start Gems: ' , self name.
-  self ports
-    do: [ :port | 
+  self portOrResourceNameList
+    do: [ :portOrResourceName | 
       | pidFilePath |
-      pidFilePath := self gemPidFileName: port.
+      pidFilePath := self gemPidFileName: portOrResourceName.
       (GsFile existsOnServer: pidFilePath)
         ifTrue: [ 
           self
             error:
-              'Pid file exists for port: ' , port printString , '. Try restart command.' ].
-      self executeStartGemCommand: port ]
+              'Pid file exists for port or resource: ' , portOrResourceName printString
+                , '. Try restart command.' ].
+      self executeStartGemCommand: portOrResourceName ]

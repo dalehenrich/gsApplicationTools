@@ -6,4 +6,4 @@ gemServerHandleAlmostOutOfMemoryException: exception
   self
     logStack: exception
     titled:
-      self name , ' ' , exception class name asString , ' exception encountered: '
+      self name , ' ' , exception class name asString , ' exception encountered:'

@@ -9,7 +9,6 @@
       - [Exceptions to Handle in Topaz](#exceptions-to-handle-in-topaz)
     - [Topaz Transaction Modes](#topaz-transaction-modes)
 - [GemServer class](#gemserver-class)
-  - [GemServerRegistry class](#gemserverregistry-class)
   - [Gem Server Service Loop](#gem-server-service-loop)
   - [Gem Server Exception Handling](#gem-server-exception-handling)
     - [Gem Server Exception Set](#gem-server-exception-set)
@@ -25,6 +24,7 @@
     - [Practical Gem Server Transaction Support](#practical-gem-server-transaction-support)
       - [Request/Response Gem Server Tasks](#requestresponse-gem-server-tasks)
       - [I/O Gem Server Tasks](#io-gem-server-tasks)
+    - [Important Transaction Considerations](#important-transaction-considerations)
 - [Gem Server Control](#gem-server-control)
   - [Gem Server Control from Smalltalk](#gem-server-control-from-smalltalk)
   - [Gem Server Bash scripts](#gem-server-bash-scripts)
@@ -130,26 +130,10 @@ The **GemServer** class provides a concise framework for standardized:
 
 ---
 
-###GemServerRegistry class
-The **GemServerRegistry** class provides a registry of named *gem servers*.
-A *gem server* named instance is created by using the `register:` method:
-
-```Smalltalk
-GemServerTestServer register: 'testServer'.
-```
-
-Once an instance has been registered, it may be accessed from the **GemServerRegistry** using the `gemServerNamed:` method:
-
-```Smalltalk
-(GemServerRegistry gemServerNamed: gemName)
-```
-
----
-
 ###Gem Server Service Loop
-A *gem server* is associated with one or more ports (a port may be nil).
+A *gem server* is associated with one or more *port or resource names*.
 
-One [Topaz session](#gemstone-session) is launched for each of the *ports* associated with a *gem server*.
+One [Topaz session](#gemstone-session) is launched for each of the *port or resource names* associated with a *gem server*.
 
 The *gem server* instance is shared by each of the *[Topaz][2] gems*.
 
@@ -157,36 +141,36 @@ The *gem server* is launched by calling the [gem server start script](#gem-serve
 The [script](#gem-server-start-script) executes the following Smalltalk code to start the *gem server*:
 
 ```Smalltalk
-(GemServerRegistry gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
+(GemServer gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portOrResourceName>.
 ```
 
 The `scriptStartServiceOn:` method:
 
 ```Smalltalk
-scriptStartServiceOn: portOrNil
+scriptStartServiceOn: portOrResourceName
   "called from shell script"
 
   self
-    scriptServicePrologOn: portOrNil;
-    startServerOn: portOrNil	"does not return"
+    scriptServicePrologOn: portOrResourceName;
+    startServerOn: portOrResourceName  "does not return"
 ```
 
 The `startServerOn:` method is expected to block the main Smalltalk process in the *gem*:
 
 ```Smalltalk
-startServerOn: portOrNil
+startServerOn: portOrResourceName
   "start server in current vm. Not expected to return."
 
-  self startBasicServerOn: portOrNil.
+  self startBasicServerOn: portOrResourceName.
   [ true ] whileTrue: [ (Delay forSeconds: 10) wait ]
 ```
 
 The `startBasicServerOn:` method forks a process to run the `basicServerOn:` method:
 ```Smalltalk
-startBasicServerOn: portOrNil
+startBasicServerOn: portOrResourceName
   "start basic server process in current vm. fork and record forked process instance. expected to return."
 
-  self basicServerProcess: [ self basicServerOn: portOrNil ] fork.
+  self basicServerProcess: [ self basicServerOn: portOrResourceName ] fork.
   self serverInstance: self	"the serverProcess is session-specific"
 ```
 
@@ -194,7 +178,7 @@ The `basicServerOn:` method is expected to be implemented by a concrete subclass
 For example, here's the `basicServerOn:` method for the [maintenance vm](#maintenance-vm):
 
 ```Smalltalk
-basicServerOn: port
+basicServerOn: portOrResourceName
   "forked by caller"
 
   | count |
@@ -212,7 +196,9 @@ basicServerOn: port
 ---
 
 ###Gem Server Exception Handling
-The `gemServer:exceptionSet:beforeUnwind:ensure:` method implements the basic exception handling logic for the **GemServer** class:
+There are a number of `gemServer:*` methods. 
+The `gemServer:exceptionSet:beforeUnwind:ensure`: method is the foundation of them all. 
+It implements the basic exception handling logic for the GemServer class:
 
 ```Smalltalk
 gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock
@@ -222,7 +208,6 @@ gemServer: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ens
     do: [ :ex | 
       | exception |
       [ 
-      "only returns if an error was logged"
       exception := ex.
       self handleGemServerException: ex.
       beforeUnwindBlock value: exception ]
@@ -260,13 +245,33 @@ There are several variants of the `GemServer>>gemServer:exceptionSet:beforeUnwin
   - gemServer:exceptionSet:ensure:
 
 ####Gem Server Exception Set
-Default exception handling has been defined for the following exceptions (the list of default exceptions is slightly different for [GemStone 2.4.x][8]):
+Default exception handling has been defined for the following exceptions:
   - **Error**
   - **Break**
   - **Breakpoint**
   - **Halt**
   - **AlmostOutOfMemory**
   - **AlmostOutOfStack** 
+
+One may define an `exceptionSet`:
+  - on a *gem server* by *gem server* basis using the `GemServer>>gemServerExceptionSet:` method.
+  - by overriding `GemServer>>gemServerExceptionSet` and providing an alternate implementation:
+    ```Smalltalk
+    gemServerExceptionSet
+      gemServerExceptionSet
+        ifNil: [ 
+          self interactiveMode
+            ifTrue: [ ^ Error , self class gemServerExceptionSet ].
+          ^ Error , self class gemServerExceptionSet
+            , self class gemServerDebuggingExceptionSet ].
+      ^ gemServerExceptionSet
+    ```
+
+  - by defining alternate implementations of the **GemServer** class methods: `gemServerExceptionSet` and `gemServerDebuggingExceptionSet`.
+    The `exceptionSet` returned by `gemServerDebuggingExceptionSet` is not applied when `interactiveMode` is on. 
+
+
+**Note**: *The list of default exceptions discussed in this section are slightly different for [GemStone 2.4.x][8].*
 
 ####Gem Server Exception Handlers
 The *gem server* uses [double dispatching][9] to invoke exception-specific handling behavior.
@@ -296,12 +301,13 @@ For an **Error** exception, the `GemServer>>gemServerHandleErrorException:` meth
 
 ```Smalltalk
 gemServerHandleErrorException: exception
-  "log the stack trace and unwind stack, unless in interactive mode"
+  "log the stack trace and unwind stack.
+   interactiveMode is handled by caller of handleGemServerException: before stack is unwound."
 
   self
     logStack: exception
     titled:
-      self name , ' ' , exception class name asString , ' exception encountered: '.
+      self name , ' ' , exception class name asString , ' exception encountered:'.
 ```
 
 the [exception is logged](#gem-server-exception-logging) and the method returns.
@@ -317,11 +323,13 @@ gemServerHandleResumableException: exception
   self
     logStack: exception
     titled:
-      self name , ' ' , exception class name asString , ' exception encountered: '.
+      self name , ' ' , exception class name asString , ' exception encountered:'.
   exception resume
 ```
 
 As in the case of handling an **Error** the [exception is logged](#gem-server-exception-logging), but instead of returning, the exception is resumed and processing continues uninterrupted.
+
+If your *gem server* needs custom handling for an exception, you can add new `gemServerHandle*` methods or override existing `gemServerHandle*` methods.
 
 ####Gem Server `beforeUnwindBlock`
 The `beforeUnwindBlock` gives you a chance to perform application specific operations before the stack is unwound.
@@ -333,8 +341,6 @@ handleRequest: request for: socket
     gemServer: [ ^self processRequest: request for: socket ]
     beforeUnwind: [ :ex | ^ self writeServerError: ex to: socket ]
 ```
-
-If your *gem server* needs custom handling for an exception, you can add new `gemServerHandle*` methods or override existing `gemServerHandle*` methods.
 
 ####Gem Server Exception Logging
 When an exception is handled, the stack is written to the gem log and a continuation for the stack is saved to the [object log](#object-log) by the `logStack:titled:inTransactionDo:` method:
@@ -349,14 +355,14 @@ logStack: exception titled: title inTransactionDo: inTransactionBlock
 ```
 
 The `writeGemLogEnryFor:titled:` dumps a stack to the gem log.
-This method is called first to ensure that a record of the error has been written to disk in the event the continuation fails to be committed:
+This method is called first to ensure that a record of the error has been written to disk in the event the continuation cannot be committed:
 
 ```Smalltalk
 writeGemLogEntryFor: exception titled: title
   | stream stack |
   stack := GsProcess stackReportToLevel: self stackReportLimit.
   stream := WriteStream on: String new.
-  stream nextPutAll: '----------- ' , title , DateAndTime now printString.
+  stream nextPutAll: '----------- ' , title , ' ', DateAndTime now printString.
   stream lf.
   stream nextPutAll: exception description.
   stream lf.
@@ -366,7 +372,7 @@ writeGemLogEntryFor: exception titled: title
   GsFile gciLogServer: stream contents
 ```
 
-The `saveContinuationFor:titled:inTransactionDo:` method arranges to create the continuation within it's own transaction or within an existing transaction:
+The `saveContinuationFor:titled:inTransactionDo:` method arranges to create the continuation within its own transaction or within an existing transaction:
 
 ```Smalltalk
 saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
@@ -383,15 +389,22 @@ saveContinuationFor: exception titled: title inTransactionDo: inTransactionBlock
           inTransactionBlock value ] ]
 ```
 
+The `logStack:titled:` method calls  `logStack:titled:inTransactionDo:`:
+
+```Smalltalk
+logStack: exception titled: title
+  self logStack: exception titled: title inTransactionDo: [  ]
+```
+
 The `serverError:titled:` method calls `logStack:titled:inTransactionDo:` and allows for [interactive debugging](#interactive-debugging) of the exception:
 
 ```Smalltalk
 serverError: exception titled: title inTransactionDo: inTransactionBlock
+  self doInteractiveModePass: exception.
   self
     logStack: exception
-    titled: title , ' Server error encountered: '
+    titled: title , ' Server error encountered:'
     inTransactionDo: inTransactionBlock.
-  self doInteractiveModePass: exception
 ```
 
 ####Gem Server `ensureBlock`
@@ -426,8 +439,10 @@ The **GemServer** class provides three methods for performing transactions:
   - [`doTransaction:onConflict:`](#dotransactiononconflict)
   - [`doTransaction:`](#dotransaction)
 
+All three methods perform transactions under the protection of the `transactionMutex`.
+
 #####doBasicTransaction:
-The `doBasicTransaction:` method performs transactions under the protection of the `transactionMutex`:
+The `doBasicTransaction:` ensures that the session is in transaction before the `aBlock is invoked and then performs a commit:
 
 ```Smalltalk
 doBasicTransaction: aBlock
@@ -498,7 +513,9 @@ doTransaction: aBlock
 This method dumps the  [conflict dictionary](#transaction-conflict-dictionary) to the [object log](#object-log) and signals an error.
 
 ####Practical Gem Server Transaction Support
-The `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` wraps a transaction around the [`gemServer:exceptionSet:beforeUnwind:ensure:`](#gem-server-exception-handling) method and exports the [`conflictBlock`](#dotransactiononconflict):
+There are a number of `gemServerTransaction:*` methods.
+The `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` is the foundation of them all.
+It wraps a transaction around the [`gemServer:exceptionSet:beforeUnwind:ensure:`](#gem-server-exception-handling) call:
 
 ```Smalltalk
 gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwindBlock ensure: ensureBlock onConflict: conflictBlock
@@ -516,6 +533,9 @@ gemServerTransaction: aBlock exceptionSet: exceptionSet beforeUnwind: beforeUnwi
         ensure: ensureBlock ]
     onConflict: conflictBlock
 ```
+
+To keep the transaction model simple, the `gemServerTransaction:*` methods are not re-entrant.
+If you need a more complicated transaction models, then you are free to build your own supporting methods.
 
 There are several variants of the  `gemServerTransaction:exceptionSet:beforeUnwind:ensure:onConflict:` available:
   - gemServerTransaction:
@@ -576,6 +596,8 @@ performTask:
 In this example we do the http get *outside of transaction*, which means that a large number of tasks can be waiting for an http response, concurrently.
 Only when a response becomes available, does the *transaction mutex* and then the processing required while *in transaction* should be very short.
 
+####Important Transaction Considerations
+
 It is important that one avoids modifying persistent objects while *outside of transaction*.
 It is permissable to read persistent objects but any modifications to persistent objects made while outside of transaction will be lost when the [abort](#abort-transaction) or [begin](#begin-transaction) transaction is called by the `gemServerTransaction:` method.
 
@@ -592,7 +614,7 @@ FastCGISeasideGemServer register: 'Seaside' on: #( 9001 9002 9003 )
 When you subsequently ask the *gem server* to start:
 
 ```Smalltalk
-(GemServerRegistry gemServerNamed: 'Seaside') startGems.
+(GemServer gemServerNamed: 'Seaside') startGems.
 ```
 
 A [Topaz][2] process should be started for each port in the list.
@@ -605,25 +627,26 @@ startGems
   System commitTransaction
     ifFalse: [ self error: 'Commit transaction failed before startGems' ].
   self logControlEvent: 'Start Gems: ' , self name.
-  self ports
-    do: [ :port | 
+  self portOrResourceNameList
+    do: [ :portOrResourceName | 
       | pidFilePath |
-      pidFilePath := self gemPidFileName: port.
+      pidFilePath := self gemPidFileName: portOrResourceName.
       (GsFile existsOnServer: pidFilePath)
         ifTrue: [ 
           self
             error:
-              'Pid file exists for port: ' , port printString , '. Try restart command.' ].
-      self executeStartGemCommand: port ]
+              'Pid file exists for port or resource: ' , portOrResourceName printString
+                , '. Try restart command.' ].
+      self executeStartGemCommand: portOrResourceName ]
 ```
 
 calls the `executeStartGemCommand:` method, which in turn constructs shell command line that calls the [*gem server* start script](#gem-server-start-script):
 
 ```Smalltalk
-executeStartGemCommand: port
+executeStartGemCommand: portOrResourceName
   | commandLine |
-  commandLine := self startScriptPath , ' ' , self name , ' ' , port asString
-    , ' "' , self exeConfPath , '"'.
+  commandLine := self startScriptPath , ' ' , self name , ' '
+    , portOrResourceName asString , ' "' , self exeConfPath , '"'.
   self performOnServer: commandLine
 ```
 
@@ -631,13 +654,14 @@ executeStartGemCommand: port
 *Gem servers* can be started, stopped and restarted from Smalltalk:
 
 ```Smalltalk
-(GemServerRegistry gemServerNamed: 'Seaside') startGems.
-(GemServerRegistry gemServerNamed: 'Seaside') stopGems.
-(GemServerRegistry gemServerNamed: 'Seaside') restartGems.
+(GemServer gemServerNamed: 'Seaside') startGems.
+(GemServer gemServerNamed: 'Seaside') stopGems.
+(GemServer gemServerNamed: 'Seaside') restartGems.
 ```
 
 ###Gem Server Bash scripts
-The *gem server* bash scripts are designed to control a single *gem server* operating system process, one process for each port in the port.
+The *gem server* bash scripts are designed to control a single *gem server* operating system process, one process for each port in the port list.
+For *gem servers* that are not port-based, resource names are used to differentiate between *gem server* instances.
 The bash scripts are aimed at making it possible to start and stop individual gem servers from a process management tool like [DaemonTools][5] or [Monit][6].
 
 The scripts are also called from within Smalltalk using `System class>>performOnServer:`.
@@ -645,7 +669,7 @@ The scripts are also called from within Smalltalk using `System class>>performOn
 ####Gem Server start script
 The [*gem server* start script][14] takes three arguments:
   1. gem server name
-  2. port number
+  2. port number or resource name
   3. exe conf file path
 
 ```
@@ -655,30 +679,30 @@ startGemServerGem Seaside 9001 $GEMSTONE_EXE_CONF
 The script itself invokes the following Smalltalk code:
 
 ```Smalltalk
-(GemServerRegistry gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrNil>.
+(GemServer gemServerNamed: '<gemServerName>') scriptStartServiceOn: <portNumberOrResourceName>.
 ```
 
 The `scriptStartServiceOn:` method:
 
 ```Smalltalk
-scriptStartServiceOn: portOrNil
+scriptStartServiceOn: portOrResourceName
   "called from shell script"
 
   self
-    scriptServicePrologOn: portOrNil;
-    startServerOn: portOrNil	"does not return"
+    scriptServicePrologOn: portOrResourceName;
+    startServerOn: portOrResourceName  "does not return"
 ```
 
 initiates the [service loop](#gem-server-service-loop) and calls the `scriptServicePrologOn:` method: 
 
 ```Smalltalk 
-scriptServicePrologOn: portOrNil
+scriptServicePrologOn: portOrResourceName
   self
     scriptLogEvent:
-      '-->>Script Start ' , self name , ' on ' , portOrNil printString
+      '-->>Script Start ' , self name , ' on ' , portOrResourceName printString
     object: self.
   self
-    recordGemPid: portOrNil;
+    recordGemPid: portOrResourceName;
     setStatmonCacheName;
     enableRemoteBreakpointHandling.
   self transactionMode: #'manualBegin'.
@@ -692,7 +716,7 @@ which among other things records the `gem process id` in a file, so that the [ge
 ####Gem Server stop script
 The [*gem server* stop script][15] takes two arguments:
   1. gem server name
-  2. port number
+  2. port number or resource name
 
 ```
 stopGemServerGem Seaside 9001
@@ -776,7 +800,7 @@ While you cannot resume execution of a stack from a *debugger continuation*, you
 
 If you are experiencing problems in production and are having trouble characterizing the problem, you can insert `halt` statements into your code.
 By default the [*gem server* exception handlers](#gem-server-exception-set) will handle a **Halt** by saving a debug continuation to the [object log](#object-log) and then `resuming` the **Halt** exception, so execution continues.
-Naturally there is a cost to saving continuations, but it continuation-based debugging is superior to print statment debugging.
+Naturally there is a cost to saving continuations, but continuation-based debugging is superior to print statment debugging.
 
 ###Interactive Debugging
 
@@ -786,15 +810,16 @@ However, there are several obstacles that need to be overcome when trying to do 
      This means that when a Smalltalk thread is active in a *gem server*, the interactive development environment may not make any other [GCI](#gembuilder-for-c) function calls.
      In effect the development environment must block until the in process non-blocking call returns.
   2. The *gem server* code is structured to [handle most of the interesting exceptions](#gem-server-exception-set) by [logging the stack to the object log and either unwinding the stack or resuming the exception](#gem-server-exception-handlers).
-     This means that without *devine intervention*, an interactive debugger will not be opened when an interesting exception occurs.
+     This means that without *divine intervention*, an interactive debugger will not be opened when an interesting exception occurs.
   3. The *gem server* is [designed to run in manual transaction mode](#gem-server-transaction-management).
      This means that you need to explicitly manage transaction boundaries. 
 
 The solution to having the server debugging session blocked while serving requests is to use with two interactive debugging sessions.
-  1. Server debugging session which is blocked running the [*gem server* service loop](#gem-server-service-loop).
-  2. Client debugging session, which is where most of the interactive development takes place.
+Two interactive sessions gets around the "blocked server environment" problem:
+  1. A **server session** which is blocked running the [*gem server* service loop](#gem-server-service-loop).
+  2. A **client session**, which is where most of the interactive development takes place.
 
-In order to arrange to debug interesting exceptions, one may set `interactiveMode` for the *gem server*. 
+In order to arrange to debug interesting exceptions, set `interactiveMode` for the *gem server*. 
 When `interactiveMode` is `true`, the *gem server* passes exceptions to the debugger, instead of doing the [standard exception logging](#gem-server-exception-logging):
 
 ```Smalltalk
@@ -806,21 +831,21 @@ doInteractiveModePass: exception
 Finally, one may use [automatic transaction mode](#automatic-transaction-mode) when using `GemServer>>interactiveStartServiceOn:transactionMode:` to start the server:
 
 ```Smalltalk
-interactiveStartServiceOn: portOrNil transactionMode: mode
+interactiveStartServiceOn: portOrResourceName transactionMode: mode
   "called from development environment ... service run in current vm."
 
   "transactionMode: #autoBegin or #manualBegin"
 
   self
     scriptLogEvent:
-      '-->>Interactive Start ' , self name , ' on ' , portOrNil printString
+      '-->>Interactive Start ' , self name , ' on ' , portOrResourceName printString
     object: self.
   self transactionMode: mode.
   mode == #'manualBegin'
     ifTrue: [ self startTransactionBacklogHandling ].
   self
     enableAlmostOutOfMemoryHandling;
-    startServerOn: portOrNil	"does not return"
+    startServerOn: portOrResourceName  "does not return"
 ```
 
 ####Interactive Debugging Example
@@ -860,7 +885,7 @@ When the method `submitAndWaitFor:gemServer:` is sent to a **GemServerRemoteServ
 If you are not using auto commit mode, then an explicit commit is needed.*
  
 1. Open two interactive development clients, one will be designated as the **client session** and the other will be designated as the **server session**
-2. In the **client session**, `register` the *gem server*, and `reset` the queue:
+2. In the **client session**, `register` the *gem server*:
    ```Smalltalk
    (GemServerRemoteServerSerialProcessingExample register: 'example')
      interactiveMode: true.
@@ -874,18 +899,18 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 4. In the **server session**, do an `abort` and `start` the *gem server* for interactive debugging:
    ```Smalltalk
    System abortTransaction.
-   (GemServerRegistry gemServerNamed: 'example') 
+   (GemServer gemServerNamed: 'example') 
      interactiveStartServiceOn: nil 
      transactionMode: #'autoBegin'.
    ```
 
    The **server session** will be blocked.
-   If you need to regain control you can interrupt the server using `CMD-.` in GemTools or tODE.
+   If you need to regain control you can interrupt the server using `ALT-.` in GemTools or tODE.
 
 5. In the **client session**, schedule a `simple` task and `inspect` the result:
    ```Smalltalk
    | gemServer client task taskList result |
-   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   gemServer := GemServer gemServerNamed: 'example'.
    client := gemServer clientClass new.
    result := client 
      submitAndWaitFor: {  #scheduleSimpleTask }
@@ -896,7 +921,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 6.  In the **client session**, schedule an `error` task, the debugger should come up on the **server session**:
    ```Smalltalk
    | gemServer client task taskList result |
-   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   gemServer := GemServer gemServerNamed: 'example'.
    client := gemServer clientClass new.
    result := client 
      submitAndWaitFor: {  #scheduleError }
@@ -906,12 +931,12 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 7. In the **server session** fiddle around with the debugger.
    When you are done, go ahead and close the debugger.
    Closing the debugger should terminate the Smalltalk process that was performing the task, but the other Smalltalk *gem server* processes are still active.
-   Rather than try to make sure that all of the *gem server* Smalltalk processes are terminted, it is probably simpler to logout, login and start the *gem server* processes again by repeating Step 4.
+   Rather than try to make sure that all of the *gem server* Smalltalk processes are terminated, it is probably simpler to logout, login and start the *gem server* processes again by repeating Step 4.
 
 8. In the **client session**, schedule an `exampleHttpTask` task and `inspect` the result:
    ```Smalltalk
    | gemServer client task taskList result |
-   gemServer := GemServerRegistry gemServerNamed: 'example'.
+   gemServer := GemServer gemServerNamed: 'example'.
    client := gemServer clientClass new.
    result := client 
      submitAndWaitFor: {  #scheduleExampleHttpTask }

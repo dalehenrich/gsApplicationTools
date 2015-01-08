@@ -23,9 +23,9 @@ GsDeployer deploy: [
 ].
 ```
 
-## Examples
+## Docs
 
-- [REST example](https://github.com/GsDevKit/gsApplicationTools/blob/master/docs/rest.md#gemserver-support-for-zinc-rest)
+- [Getting started with Gem Servers](https://github.com/GsDevKit/gsApplicationTools/blob/master/docs/gettingStarted.md#table-of-contents)
 
 ## Questions [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GsDevKit/gsApplicationTools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 

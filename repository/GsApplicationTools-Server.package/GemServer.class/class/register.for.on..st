@@ -1,8 +1,8 @@
-registration
-register: aName for: aServerClass on: anArrayOfPortNumbers
+gem server registration
+register: aName for: aServerClass on: anArrayOfPortNumbersOrResourceNames
   ^ (self
     createServerOfClass: aServerClass
     withName: aName
-    on: anArrayOfPortNumbers)
+    on: anArrayOfPortNumbersOrResourceNames)
     register;
     yourself

@@ -1,6 +1,6 @@
 server specialization
-executeStartGemCommand: port
+executeStartGemCommand: portOrResourceName
   | commandLine |
-  commandLine := self startScriptPath , ' ' , self name , ' ' , port asString
-    , ' "' , self exeConfPath , '"'.
+  commandLine := self startScriptPath , ' ' , self name , ' '
+    , portOrResourceName asString , ' "' , self exeConfPath , '"'.
   self performOnServer: commandLine

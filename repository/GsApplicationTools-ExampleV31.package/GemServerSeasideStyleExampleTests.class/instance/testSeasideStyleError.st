@@ -1,7 +1,7 @@
 tests
 testSeasideStyleError
   | gemServer client |
-  gemServer := GemServerRegistry gemServerNamed: self gemServerName.
+  gemServer := GemServer gemServerNamed: self gemServerName.
   gemServer enableCreateContinuations: true.
   gemServer scriptLogEvent: '---->testSeasideStyleError' object: gemServer.
   gemServer

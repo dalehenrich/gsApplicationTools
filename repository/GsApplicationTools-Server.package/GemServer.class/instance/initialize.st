@@ -2,7 +2,7 @@ initialization
 initialize
   super initialize.
   enableRemoteBreakpoints := true.
-  ports := self defaultPortList.
+  portOrResourceNameList := self defaultPortOrResourceNameList.
   serverInstance := TransientValue value: nil.
   interactiveMode := false.
   transactionMode := #'manualBegin'.
