@@ -1,0 +1,3 @@
+private
+reentryAllowed
+  ^ [ :methodName |  ]

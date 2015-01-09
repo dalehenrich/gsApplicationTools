@@ -16,7 +16,8 @@
 		"crashLog",
 		"enableCreateContinuations",
 		"gemServerExceptionSet",
-		"basicServerProcess" ],
+		"basicServerProcess",
+		"basicTransactionReentry" ],
 	"name" : "GemServer",
 	"pools" : [
 		 ],
