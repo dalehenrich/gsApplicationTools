@@ -1,7 +1,13 @@
 {
 	"class" : {
-		 },
+		"interactiveRemoteServer" : "dkh 01/09/2015 14:02",
+		"interactiveRemoteServer:" : "dkh 01/09/2015 14:02",
+		"staticRemoteServer" : "dkh 01/09/2015 14:02",
+		"staticRemoteServer:" : "dkh 01/09/2015 14:02" },
 	"instance" : {
-		"startGems:" : "dkh 12/22/2014 11:18",
-		"stopGems:" : "dkh 12/22/2014 11:18",
-		"testForceBeginTransaction" : "dkh 01/06/2015 13:43" } }
+		"createGemServer" : "dkh 01/09/2015 14:05",
+		"interactiveRemoteServer" : "dkh 01/09/2015 14:02",
+		"startGems:" : "dkh 01/09/2015 14:08",
+		"staticRemoteServer" : "dkh 01/09/2015 14:03",
+		"stopGems:" : "dkh 01/09/2015 14:08",
+		"testForceBeginTransaction" : "dkh 01/09/2015 14:08" } }

@@ -1,7 +1,7 @@
 tests
 testForceInternalServerError
   | gemServer |
-  gemServer := GemServer gemServerNamed: self gemServerName.
+  gemServer := self createGemServer.
   gemServer
     scriptLogEvent: '---->testForceInternalServerError'
     object: gemServer.
