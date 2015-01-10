@@ -12,6 +12,8 @@ handleAction
     ifTrue: [ ^ self performAdd ].
   actionSymbol == #'error'
     ifTrue: [ ^ self performError ].
+  actionSymbol == #'reentrantTransactionError'
+    ifTrue: [ ^ self performReentrantTransactionError ].
   actionSymbol == #'halt'
     ifTrue: [ ^ self performHalt ].
   actionSymbol == #'serverStarted'

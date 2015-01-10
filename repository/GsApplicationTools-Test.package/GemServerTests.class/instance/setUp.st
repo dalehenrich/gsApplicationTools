@@ -1,5 +1,7 @@
 running
 setUp
+  "(GemServer gemServerNamed: 'Test_Server') stopGems"
+
   super setUp.
-  self stopGems: (GemServerTestServer register: self gemServerName).
+  GemServerTestServer register: self gemServerName.
   System commitTransaction
