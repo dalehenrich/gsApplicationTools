@@ -1,3 +1,7 @@
 private
 logControlEvent: label
-  self doTransaction: [ (ObjectLogEntry info: label object: self) addToLog ]
+  | eventBlock |
+  eventBlock := [ (ObjectLogEntry info: label object: self) addToLog ].
+  System inTransaction
+    ifTrue: [ eventBlock value ]
+    ifFalse: [ self doTransaction: eventBlock ]
