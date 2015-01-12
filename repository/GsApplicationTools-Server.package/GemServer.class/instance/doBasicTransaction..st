@@ -1,6 +1,6 @@
 transactions-support
 doBasicTransaction: aBlock
-  "I do an unconditional commit. 
+  "I do an unconditional commit and I am not reentrant
    If running in manual transaction mode, the system will be outside of transaction upon 
     returning.
    Return true, if the transaction completed without conflicts.
@@ -9,14 +9,15 @@ doBasicTransaction: aBlock
 
   self transactionMutex
     critical: [ 
-      | commitResult |
+      | commitResult oldValue |
+      self basicTransactionReentry value: 'doBasicTransaction:'.	"throw error upon reentry"
+      oldValue := self basicTransactionReentry.
       [ 
-      System inTransaction
-        ifTrue: [ aBlock value ]
-        ifFalse: [ 
-          self doBeginTransaction.
-          aBlock value ] ]
+      self basicTransactionReentry: self reentryDisallowed.
+      self doBeginTransaction.
+      aBlock value ]
         ensure: [ 
           "workaround for Bug 42963: ensure: block executed twice (don't return from ensure: block)"
-          commitResult := self doCommitTransaction ].
+          commitResult := self doCommitTransaction.
+          self basicTransactionReentry: oldValue ].
       ^ commitResult ]

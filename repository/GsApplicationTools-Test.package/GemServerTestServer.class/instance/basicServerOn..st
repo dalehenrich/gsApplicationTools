@@ -51,7 +51,7 @@ basicServerOn: port
         do: [ :ex | 
           "Handler for interactive Errors ... record for testing purposes"
           self
-            doTransaction: [ 
+            interactiveErrorCommit: [ 
               (forceBeginTransaction or: [ forceInternalServerError ])
                 ifTrue: [ 
                   "acknowledge event handled"

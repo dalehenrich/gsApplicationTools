@@ -8,4 +8,5 @@ initialize
   transactionMode := #'manualBegin'.
   enableCreateContinuations := true.
   basicServerProcess := TransientValue value: nil.
+  basicTransactionReentry := TransientStackValue value: nil.
   self initCrashLog

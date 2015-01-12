@@ -1,7 +1,7 @@
 tests
 testHalt
   | gemServer |
-  gemServer := GemServer gemServerNamed: self gemServerName.
+  gemServer := self createGemServer.
   gemServer scriptLogEvent: '---->testHalt' object: gemServer.
   [ 
   self startGems: gemServer.
