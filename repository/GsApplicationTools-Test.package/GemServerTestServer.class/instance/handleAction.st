@@ -17,5 +17,7 @@ handleAction
   actionSymbol == #'halt'
     ifTrue: [ ^ self performHalt ].
   actionSymbol == #'serverStarted'
-    ifTrue: [ ^ self performServerStarted ] ]
+    ifTrue: [ ^ self performServerStarted ].
+  actionSymbol == #'transaction'
+    ifTrue: [ ^ self performTransaction ] ]
     ensure: [ actionSymbol := nil ]

@@ -1,0 +1,3 @@
+accessing
+resetPersistentRoot
+  PersistentRoot := nil
