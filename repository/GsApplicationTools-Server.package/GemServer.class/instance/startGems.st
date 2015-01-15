@@ -1,8 +1,11 @@
 service instance-control
 startGems
-  self initCrashLog.
-  System commitTransaction
-    ifFalse: [ self error: 'Commit transaction failed before startGems' ].
+  self doCommitTransaction
+    ifFalse: [ 
+      | conflicts |
+      conflicts := System transactionConflicts.
+      self doAbortTransaction.
+      self error: 'Commit transaction failed before startGems' ].
   self logControlEvent: 'Start Gems: ' , self name.
   self portOrResourceNameList
     do: [ :portOrResourceName | 
