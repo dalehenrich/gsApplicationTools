@@ -9,7 +9,6 @@
 		"name",
 		"serverClassAssoc",
 		"serverInstance",
-		"ports",
 		"portOrResourceNameList",
 		"enableRemoteBreakpoints",
 		"transactionMode",
@@ -17,7 +16,8 @@
 		"crashLog",
 		"enableCreateContinuations",
 		"gemServerExceptionSet",
-		"basicServerProcess" ],
+		"basicServerProcess",
+		"basicTransactionReentry" ],
 	"name" : "GemServer",
 	"pools" : [
 		 ],
