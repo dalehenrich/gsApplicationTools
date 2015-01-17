@@ -1,4 +1,4 @@
-tests
+private
 runTest: gemServer client: client task: task
   [ 
   self startGems: gemServer.
