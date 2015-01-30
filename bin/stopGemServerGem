@@ -4,7 +4,12 @@ GemServer="$1"
 Port="$2"
 
 # must match GemServer>>gemPidFileName:
-pidfile="${GEMSTONE_LOGDIR}/${GemServer}_server-${Port}.pid"
+
+logDir=${GEMSTONE_LOGDIR}
+if [ "${logDir}x" = "x" ] ; then
+  logDir=/opt/gemstone/log
+fi
+pidfile="${logDir}/${GemServer}_server-${Port}.pid"
 
 if [ -e $pidfile ]; then
   pid=`cat $pidfile`
