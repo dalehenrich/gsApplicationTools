@@ -30,9 +30,9 @@ set -e # exit on error
 #
 # export GS_DEBUG_VMGC_PRINT_MKSW_MEMORY_USED=75
 
-secret=$GEMSTONE/seaside/etc/gemstone.secret
-if [ "${GEMSTONE_ETC_DIR}x" = "x" ] ; then
-  secret=$GEMSTONE_ETC_DIR
+secret=${GEMSTONE_ETC_SECRET}
+if [ "${GEMSTONE_ETC_SECRET}x" = "x" ] ; then
+  secret=$GEMSTONE/seaside/etc/gemstone.secret
 fi
 
 if [ -s $secret ]; then
