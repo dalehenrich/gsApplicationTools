@@ -54,11 +54,16 @@ if [ "${logDir}x" = "x" ] ; then
 fi
 logFile="${logDir}/${GemServer}_server-${Port}.log"
 
+username=$GEMSTONE_USER_NAME
+if [ "${GEMSTONE_USER_NAME}x" = "x" ] ; then
+  username=DataCurator
+fi
+
 echo "Starting $GemServer on $Port exeConf: -$ExeConf- logFile: -$logFile-"
 
 cat << EOF | nohup $GEMSTONE/bin/topaz -l ${ExeArg} >> $logFile 2>&1 &
 
-set user DataCurator pass $GEMSTONE_CURATOR_PASS gems $GEMSTONE_NAME
+set user $username pass $GEMSTONE_CURATOR_PASS gems $GEMSTONE_NAME
 
 display oops
 iferror stack
