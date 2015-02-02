@@ -30,10 +30,15 @@ set -e # exit on error
 #
 # export GS_DEBUG_VMGC_PRINT_MKSW_MEMORY_USED=75
 
-if [ -s $GEMSTONE/seaside/etc/gemstone.secret ]; then
-    . $GEMSTONE/seaside/etc/gemstone.secret
+secret=$GEMSTONE/seaside/etc/gemstone.secret
+if [ "${GEMSTONE_ETC_DIR}x" = "x" ] ; then
+  secret=$GEMSTONE_ETC_DIR
+fi
+
+if [ -s $secret ]; then
+    . $secret
 else
-    echo 'Missing password file $GEMSTONE/seaside/etc/gemstone.secret'
+    echo 'Missing password file $secret'
     exit 1
 fi
 
