@@ -924,7 +924,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
    gemServer := GemServer gemServerNamed: 'example'.
    client := gemServer clientClass new.
    result := client 
-     submitAndWaitFor: {  #scheduleError }
+     submitAndWaitFor: {  #scheduleErrorTask }
      gemServer: gemServer.
    ```
 
