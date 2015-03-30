@@ -71,7 +71,7 @@ iferror stack
 login
 
 run
-(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
+(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: '$Port'.
 %
 
 run
@@ -82,7 +82,7 @@ System beginTransaction.
   object:
     'pid: ', (System gemVersionReport at: 'processId') printString) addToLog.
 (GemServerRegistry gemServerNamed: '$GemServer')
-  ifNotNil: [:gemServer | gemServer crashLog add: (${Port}) asString -> logEntry ].
+  ifNotNil: [:gemServer | gemServer crashLog add: ('$Port') asString -> logEntry ].
 System commitTransaction.
 %
 
