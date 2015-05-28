@@ -6,4 +6,6 @@ startGems: gemServer
       self
         notify:
           'evaluate on server: abort; /home/gemserver/example --start=Test_Server' ]
-    ifFalse: [ gemServer startGems ]
+    ifFalse: [ 
+      gemServer startGems.
+      self waitForStartGems: 'Gems did not start ' , self gemServerName ]
