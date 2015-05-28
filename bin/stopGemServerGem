@@ -2,6 +2,7 @@
 
 GemServer="$1"
 Port="$2"
+PortName=`echo ${Port} | sed "s/'//g"`  #strip ' off in case of a non-integer argument
 
 # must match GemServer>>gemPidFileName:
 
@@ -9,13 +10,16 @@ logDir=${GEMSTONE_LOGDIR}
 if [ "${logDir}x" = "x" ] ; then
   logDir=/opt/gemstone/log
 fi
-pidfile="${logDir}/${GemServer}_server-${Port}.pid"
+pidfile="${logDir}/${GemServer}_server-${PortName}.pid"
 
 if [ -e $pidfile ]; then
   pid=`cat $pidfile`
   rm $pidfile
   echo "   Stopping topaz PID $pid running on port $port"
   kill $pid
+  while [[ ( -d /proc/$pid ) && ( -z `grep zombie /proc/$pid/status` ) ]]; do
+      sleep 1
+  done
 else
   echo "   No PID file found for gem on port $port, not running?"
 fi
