@@ -8,4 +8,6 @@ startGems: gemServer
           'evaluate on server: abort; /home/gemserver/example --start=Test_Server' ]
     ifFalse: [ 
       gemServer startGems.
-      self waitForStartGems: 'Gems did not start ' , self gemServerName ]
+      self
+        waitForGemServer: gemServer
+        message: 'Gems did not start ' , self gemServerName ]
