@@ -924,7 +924,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
    gemServer := GemServer gemServerNamed: 'example'.
    client := gemServer clientClass new.
    result := client 
-     submitAndWaitFor: {  #scheduleError }
+     submitAndWaitFor: {  #scheduleErrorTask }
      gemServer: gemServer.
    ```
 
@@ -958,7 +958,7 @@ If you are not using auto commit mode, then an explicit commit is needed.*
 transaction. However, work you have done within your own object space is not affected
 by an abortTransaction. GemStone gives you a new view of the repository that does
 not include any changes you made to permanent objects during the aborted
-transaction—because the transaction was aborted, your changes did not affect objects in
+transactionâbecause the transaction was aborted, your changes did not affect objects in
 the repository. The new view, however, does include changes committed by other users
 since your last transaction started. Objects that you have created in the GemBuilder for
 Smalltalk object space, outside the repository, remain until you remove them or end your
@@ -1006,13 +1006,13 @@ either explicitly begin a new one or change transaction modes.*
 
 ---
 
-*Sessions only update their view of the repository when they commit or abort. The repository must keep a copy of each session’s view so long as the session is using it, even if other sessions frequently commit changes and create new views (commit records). Storing the original view and all the intermediate views uses up space in the repository, and can result in the repository running out of space. To avoid this problem, all sessions in a busy system should commit or abort regularly.*
+*Sessions only update their view of the repository when they commit or abort. The repository must keep a copy of each sessionâs view so long as the session is using it, even if other sessions frequently commit changes and create new views (commit records). Storing the original view and all the intermediate views uses up space in the repository, and can result in the repository running out of space. To avoid this problem, all sessions in a busy system should commit or abort regularly.*
 
 *For a session that is not in a transaction, if the number of commit records exceeds the
-value of STN_CR_BACKLOG_THRESHOLD, the Stone repository monitor signals the session to abort by signaling TransactionBacklog (also called “sigAbort”). If the session does not abort, the Stone repository monitor reinitializes the session or terminates it, depending on the value of STN_GEM_LOSTOT_TIMEOUT.*
+value of STN_CR_BACKLOG_THRESHOLD, the Stone repository monitor signals the session to abort by signaling TransactionBacklog (also called âsigAbortâ). If the session does not abort, the Stone repository monitor reinitializes the session or terminates it, depending on the value of STN_GEM_LOSTOT_TIMEOUT.*
 
 *Sessions that are in transaction are not subject to losing their view forcibly. Sessions in
-transaction enable receipt of the signal TransactionBacklog, and handle it appropriately, but it is optional. It is important that sessions do not stay in transaction for long periods in busy systems; this can result in the Stone running out of space and shutting down. However, sessions that run in automatic transaction mode are always in transaction; as soon as they commit or abort, they begin a new transaction. (For a discussion of automatic and manual transaction modes, see the “Transactions and Concurrency Control” chapter of the GemStone/S 64 Bit Programming Guide.) *
+transaction enable receipt of the signal TransactionBacklog, and handle it appropriately, but it is optional. It is important that sessions do not stay in transaction for long periods in busy systems; this can result in the Stone running out of space and shutting down. However, sessions that run in automatic transaction mode are always in transaction; as soon as they commit or abort, they begin a new transaction. (For a discussion of automatic and manual transaction modes, see the âTransactions and Concurrency Controlâ chapter of the GemStone/S 64 Bit Programming Guide.) *
 
 ---
 
@@ -1074,7 +1074,7 @@ Smalltalk model).*
 
 ---
 
-*GemStone prevents conflict between users by encapsulating each session’s operations
+*GemStone prevents conflict between users by encapsulating each sessionâs operations
 (computations, stores, and fetches) in units called transactions. The operations that make
 up a transaction act on what appears to you to be a private view of GemStone objects.
 When you tell GemStone to commit the current transaction, GemStone tries to merge the
@@ -1084,7 +1084,7 @@ modified objects in your view with the shared object store.*
 
 *Every user session maintains its own consistent view of the
 repository state. Objects that the repository contained at the beginning of your session are
-preserved in your view, even if you are not using them—and even if other users’ actions
+preserved in your view, even if you are not using themâand even if other usersâ actions
 have rendered them obsolete. The storage that those objects are using cannot be reclaimed
 until you commit or abort your transaction. Depending upon the characteristics of your
 particular installation (such as the number of users and the commit frequency), this
@@ -1175,7 +1175,7 @@ your application, they are copied to temporary object memory.*
 *Some of these objects may ultimately become permanent and reside on the disk, but
 probably not all of them. Temporary objects that your application creates merely in order
 to do its work reside in temporary object space until they are no longer needed, when the
-Gem’s garbage collector reclaims the storage they use.*
+Gemâs garbage collector reclaims the storage they use.*
 
 *It is important to provide sufficient temporary object space. At the same time, you must
 design your application so that it does not create an infinite amount of reachable
@@ -1194,10 +1194,10 @@ and terminate.*
 *GemStone detects conflict by comparing your read and write sets with those of all other
 transactions committed since your transaction began. The following conditions signal a
 possible concurrency conflict:*
-- *An object in your write set is also in the write set of another transaction—a write-write
+- *An object in your write set is also in the write set of another transactionâa write-write
 conflict. Write-write conflicts can involve only a single object.*
-- *An object in your write set is also in another session’s dependency list—a writedependency
-conflict. An object belongs to a session’s dependency list if the session has
+- *An object in your write set is also in another sessionâs dependency listâa writedependency
+conflict. An object belongs to a sessionâs dependency list if the session has
 added, removed, or changed a dependency (index) for that object. For details about
 how GemStone creates and manages indexes on collections, see Chapter 7, Indexes
 and Querying.*

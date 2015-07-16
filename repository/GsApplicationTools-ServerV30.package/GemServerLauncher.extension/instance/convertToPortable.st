@@ -7,7 +7,7 @@ convertToPortable
   activeProcess := ProcessorScheduler scheduler activeProcess.
   [ 
   activeProcess localStackDepth.
-  activeProcess _convertToPortableStack.
+  activeProcess convertToPortableStack.
   sema signal ]
     fork.
   sema wait
