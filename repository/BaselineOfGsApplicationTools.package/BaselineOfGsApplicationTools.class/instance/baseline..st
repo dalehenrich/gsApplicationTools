@@ -50,4 +50,13 @@ baseline: spec
         yourself.
       spec
         group: 'CI' with: #('GsApplicationTools-ExampleV31');
+        yourself ].
+  spec
+    for: #(#'gs3.0.x' #'gs3.1.x' #'gs3.2.x')
+    do: [ 
+      spec
+        package: 'GsApplicationTools-Server'
+          with: [ spec includes: 'GsApplicationTools-ServerExtensionsV30' ];
+        package: 'GsApplicationTools-ServerExtensionsV30'
+          with: [ spec requires: 'GsApplicationTools-Server' ];
         yourself ]
