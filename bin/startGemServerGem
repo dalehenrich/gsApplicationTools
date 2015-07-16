@@ -2,6 +2,7 @@
 
 GemServer="$1"
 Port="$2"
+PortName=`echo ${Port} | sed "s/'//g"`  #strip ' off in case of a non-integer argument
 
 set -e # exit on error
 
@@ -52,7 +53,7 @@ logDir=${GEMSTONE_LOGDIR}
 if [ "${logDir}x" = "x" ] ; then
   logDir=/opt/gemstone/log
 fi
-logFile="${logDir}/${GemServer}_server-${Port}.log"
+logFile="${logDir}/${GemServer}_server-${PortName}.log"
 
 username=$GEMSTONE_USER_NAME
 if [ "${GEMSTONE_USER_NAME}x" = "x" ] ; then
@@ -71,18 +72,18 @@ iferror stack
 login
 
 run
-(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: '$Port'.
+(GemServerRegistry gemServerNamed: '$GemServer') scriptStartServiceOn: $Port.
 %
 
 run
 | logEntry |
 System beginTransaction.
 (logEntry := ObjectLogEntry
-  fatal: '${GemServer}_server_${Port}: topaz exit'
+  fatal: '${GemServer}_server_${PortName}: topaz exit'
   object:
     'pid: ', (System gemVersionReport at: 'processId') printString) addToLog.
 (GemServerRegistry gemServerNamed: '$GemServer')
-  ifNotNil: [:gemServer | gemServer crashLog add: ('$Port') asString -> logEntry ].
+  ifNotNil: [:gemServer | gemServer crashLog add: (${PortName}) asString -> logEntry ].
 System commitTransaction.
 %
 
